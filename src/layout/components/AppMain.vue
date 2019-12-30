@@ -37,4 +37,7 @@ export default {
     padding-right: 15px;
   }
 }
+.container{
+  padding: 20px;
+}
 </style>

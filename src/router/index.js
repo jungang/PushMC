@@ -51,28 +51,153 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }]
+  },
+  {
+    path: '/source',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Source',
+        component: () => import('@/views/source/index'),
+        meta: { title: '数据源', icon: 'form' }
+      }
+    ]
   },
 
   {
-    path: '/example',
+    path: '/data-tag',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
+        path: '',
+        name: 'DataTag',
+        component: () => import('@/views/form/index'),
+        meta: { title: '数据标注', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/label-sort',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'LabelSort',
+        component: () => import('@/views/form/index'),
+        meta: { title: '标签分类', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/business-channel',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'BusinessChannel',
+        component: () => import('@/views/form/index'),
+        meta: { title: '业务频道', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/push-content',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Push content',
+        component: () => import('@/views/form/index'),
+        meta: { title: '推送内容', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/push-channel',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'PushChannel',
+        component: () => import('@/views/form/index'),
+        meta: { title: '推送通道', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/push-target',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'PushTarget',
+        component: () => import('@/views/form/index'),
+        meta: { title: '推送对象', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/message-template',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'MessageTemplate',
+        component: () => import('@/views/form/index'),
+        meta: { title: '消息模版', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/message-push',
+    component: Layout,
+    redirect: '/message-push/table',
+    name: 'MessagePush',
+    meta: { title: '消息推送', icon: 'example' },
+    children: [
+      {
+        path: 'channel-push',
+        name: 'ChannelPush',
         component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        meta: { title: '渠道推送', icon: 'table' }
       },
       {
-        path: 'tree',
-        name: 'Tree',
+        path: 'content-push',
+        name: 'ContentPush',
         component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        meta: { title: '内容推送', icon: 'tree' }
+      }
+    ]
+  },
+
+  {
+    path: '/permission',
+    component: Layout,
+    redirect: '/example/table',
+    name: 'Permission',
+    meta: { title: '用户权限', icon: 'example' },
+    children: [
+      {
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/table/index'),
+        meta: { title: '用户权限', icon: 'table' }
+      },
+      {
+        path: 'role',
+        name: 'Role',
+        component: () => import('@/views/tree/index'),
+        meta: { title: '用户角色', icon: 'tree' }
       }
     ]
   },
@@ -85,7 +210,7 @@ export const constantRoutes = [
         path: 'index',
         name: 'Form',
         component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        meta: { title: '推送统计', icon: 'form' }
       }
     ]
   }
@@ -103,7 +228,8 @@ export const asyncRoutes = [
     name: 'Nested',
     meta: {
       title: 'Nested',
-      icon: 'nested'
+      icon: 'nested',
+      roles: ['admin', 'editor']
     },
     children: [
       {
