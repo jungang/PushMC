@@ -160,9 +160,45 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item label="添加路径" prop="paths">
+
+          <el-form-item
+            v-for="(path, index) in temp.paths"
+            :key="path.key"
+            :prop="'paths.' + index + '.value'"
+            :rules="{
+              required: true, message: '路径不能为空', trigger: 'blur'
+            }"
+          >
+            <el-input v-model="path.value" placeholder="输入路径地址" class="dy_path">
+              <template slot="prepend">路径 {{ index }}</template>
+              <el-button slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
+            </el-input>
+
+            <el-row>
+
+              <el-input
+                v-for="(arg, index) in path.args"
+                v-model="arg.value"
+                :prop="'args.' + index + '.value'"
+                placeholder="参数"
+                size="mini"
+                class="dy_arg"
+              >
+                <el-button slot="append" icon="el-icon-delete" @click.prevent="removeArg( path.args, index)"/>
+              </el-input>
+            </el-row>
+            <el-button size="mini" @click="addArg(path)">+添加参数</el-button>
+
+          </el-form-item>
+
+          <el-button @click="addPath">+添加路径</el-button>
+        </el-form-item>
+
         <el-form-item label="说明">
           <el-input
             v-model="temp.introduce"
+            :autosize="{ minRows: 4, maxRows: 10}"
             type="textarea"
             maxlength="30"
             show-word-limit
@@ -170,7 +206,7 @@
           />
         </el-form-item>
 
-      </el-form>
+        </el-form-item></el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           Cancel
@@ -291,14 +327,13 @@ export default {
         dataSource: '',
         updatePlanHours: '',
         updatePlanTimes: '',
-        importance: 1,
         introduce: '',
-        timestamp: new Date(),
         title: '',
         serverAddress: '',
-        secretKey: '',
-        type: '',
-        status: 'published'
+        secretKey: '1111',
+        paths: [{
+          value: ''
+        }]
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -329,6 +364,37 @@ export default {
   methods: {
     handleTabClick(tab, event) {
       this.currentTab = tab.name
+    },
+    removePath(item) {
+      var index = this.temp.paths.indexOf(item)
+      if (index !== -1) {
+        this.temp.paths.splice(index, 1)
+      }
+    },
+    removeArg(args, index) {
+      console.log(index)
+      // var index = this.temp.paths.indexOf(item)
+      if (index !== -1) {
+        args.splice(index, 1)
+      }
+    },
+    addPath() {
+      this.temp.paths.push({
+        value: '',
+        key: Date.now(),
+        args: [
+          { value: '',
+            key: Date.now()
+          }
+        ]
+      })
+      console.log(this.temp)
+    },
+    addArg(path) {
+      console.log(path)
+      path.args.push({ value: '',
+        key: Date.now()
+      })
     },
     getList(sheetStr) {
       this.listLoading = true
@@ -370,6 +436,7 @@ export default {
       this.handleFilter(sheetStr)
     },
     resetTemp() {
+      console.log('resetTemp...')
       this.temp = {
         id: undefined,
         importance: 1,
@@ -377,7 +444,16 @@ export default {
         timestamp: new Date(),
         title: '',
         status: 'published',
-        type: ''
+        type: '',
+        paths: [{
+          value: '',
+          key: Date.now(),
+          args: [
+            { value: '',
+              key: Date.now()
+            }
+          ]
+        }]
       }
     },
     handleCreate() {
@@ -486,5 +562,12 @@ export default {
   /*margin: 30px;*/
 
 }
+  .dy_path{
+    margin-bottom: 10px;
+  }
+  .dy_arg{
+    width: 190px;
+    margin-right: 10px;
+  }
 
 </style>
