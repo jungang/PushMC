@@ -1,155 +1,195 @@
 <template>
   <div class="container">
-    <div>name: {{ name }}</div>
-    <div>roles: <span v-for="role in roles" :key="role">{{ role }}</span></div>
+    <el-row>
+      数据源列表
+    </el-row>
+    <el-row type="flex" justify="end">
+      <el-button type="primary" @click="handleCreate">新建数据源</el-button>
+    </el-row>
+    <el-tabs type="border-card" value="business" @tab-click="handleTabClick">
+      <el-tab-pane label="业务数据源" name="business">
+        <el-table
+          :key="businessTableKey"
+          v-loading="listLoading"
+          :data="listArr['business'].data"
+          border
+          fit
+          highlight-current-row
+          style="width: 100%;"
+          @sort-change="sortChange"
+        >
+          <el-table-column label="ID" prop="id" sortable="custom" align="center" :class-name="getSortClass('id', 'business')" min-width="50">
+            <template slot-scope="{row}">
+              <span>{{ row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="类型" prop="type" align="center" min-width="50">
+            <template slot-scope="{row}">
+              <span>{{ row.type }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" class-name="status-col" min-width="50">
+            <template slot-scope="{row}">
+              <el-tag :type="row.status | statusFilter">
+                {{ row.status === 'enabled' ? '启用': '未启用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="数据源名称" min-width="100">
+            <template slot-scope="{row}">
+              <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="数据源描述" align="center" min-width="100">
+            <template slot-scope="{row}">
+              <span>{{ row.describe }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+            <template slot-scope="{row}">
+              <el-button type="primary" size="mini" @click="handleUpdate(row)">
+                编辑
+              </el-button>
+              <el-button v-if="row.status!='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+                启用
+              </el-button>
+              <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+                停用
+              </el-button>
+              <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          v-show="listArr['business'].total>0"
+          :total="listArr['business'].total"
+          :page.sync="listArr['business'].listQuery.page"
+          :limit.sync="listArr['business'].listQuery.limit"
+          @pagination="getList('business')"
+        />
 
-    <el-tabs type="border-card">
-      <el-tab-pane label="业务数据源">业务数据源</el-tab-pane>
-      <el-tab-pane label="渠道数据源">渠道数据源</el-tab-pane>
+      </el-tab-pane>
+      <el-tab-pane label="渠道数据源" name="channel">
+
+        <el-table
+          :key="channelTableKey"
+          v-loading="listLoading"
+          :data="listArr['channel'].data"
+          border
+          fit
+          highlight-current-row
+          style="width: 100%;"
+          @sort-change="sortChange"
+        >
+          <el-table-column label="ID" prop="id" sortable="custom" align="center" :class-name="getSortClass('id', 'channel')" min-width="50">
+            <template slot-scope="{row}">
+              <span>{{ row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="类型" prop="type" align="center" min-width="50">
+            <template slot-scope="{row}">
+              <span>{{ row.type }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" class-name="status-col" min-width="50">
+            <template slot-scope="{row}">
+              <el-tag :type="row.status | statusFilter">
+                {{ row.status === 'enabled' ? '启用': '未启用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="数据源名称" min-width="200">
+            <template slot-scope="{row}">
+              <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+            <template slot-scope="{row}">
+              <el-button type="primary" size="mini" @click="handleUpdate(row)">
+                编辑
+              </el-button>
+              <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
+                停用
+              </el-button>
+              <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          v-show="listArr['channel'].total>0"
+          :total="listArr['channel'].total"
+          :page.sync="listArr['channel'].listQuery.page"
+          :limit.sync="listArr['channel'].listQuery.limit"
+          @pagination="getList('channel')"
+        />
+
+      </el-tab-pane>
     </el-tabs>
 
-    <div class="app-container">
-      <div class="filter-container">
-        <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-        <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
-          <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
-        </el-select>
-        <el-select v-model="listQuery.type" placeholder="Type" clearable class="filter-item" style="width: 130px">
-          <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
-        </el-select>
-        <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-        </el-select>
-        <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-          Search
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 500px; margin-left:50px;">
+
+        <el-form-item label="数据源" prop="dataSource">
+          <el-select v-model="temp.dataSource" class="filter-item" placeholder="请选择">
+            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="数据源名称" prop="title">
+          <el-input v-model="temp.title" />
+        </el-form-item>
+
+        <el-form-item label="Secret Key" prop="secretKey">
+          <el-input v-model="temp.secretKey" />
+        </el-form-item>
+
+        <el-form-item label="服务器地址" prop="serverAddress">
+          <el-input v-model="temp.serverAddress" placeholder="多个IP间以逗号分隔" />
+        </el-form-item>
+
+        <el-form-item label="定时更新" prop="updatePlan">
+          <el-select v-model="temp.updatePlanHours" class="filter-item" placeholder="请选择" style="width:150px;">
+            <el-option v-for="item in MODEL.updatePlanOptions.hour" :key="item.key" :label="item.display_name" :value="item.key" />
+          </el-select>
+          <el-select v-model="temp.updatePlanTimes" class="filter-item" placeholder="请选择" style="width:100px;">
+            <el-option v-for="item in MODEL.updatePlanOptions.times" :key="item.key" :label="item.display_name" :value="item.key" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="说明">
+          <el-input
+            v-model="temp.introduce"
+            type="textarea"
+            maxlength="30"
+            show-word-limit
+            placeholder="200字"
+          />
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          Cancel
         </el-button>
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-          Add
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+          Confirm
         </el-button>
-        <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-          reviewer
-        </el-checkbox>
       </div>
+    </el-dialog>
 
-      <el-table
-        :key="tableKey"
-        v-loading="listLoading"
-        :data="list"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%;"
-        @sort-change="sortChange"
-      >
-        <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
-          <template slot-scope="{row}">
-            <span>{{ row.id }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Date" width="150px" align="center">
-          <template slot-scope="{row}">
-            <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Title" min-width="150px">
-          <template slot-scope="{row}">
-            <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-            <el-tag>{{ row.type | typeFilter }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="Author" width="110px" align="center">
-          <template slot-scope="{row}">
-            <span>{{ row.author }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
-          <template slot-scope="{row}">
-            <span style="color:red;">{{ row.reviewer }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Imp" width="80px">
-          <template slot-scope="{row}">
-            <svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="meta-item__icon" />
-          </template>
-        </el-table-column>
-        <el-table-column label="Readings" align="center" width="95">
-          <template slot-scope="{row}">
-            <span v-if="row.pageviews" class="link-type" @click="handleFetchPv(row.pageviews)">{{ row.pageviews }}</span>
-            <span v-else>0</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Status" class-name="status-col" width="100">
-          <template slot-scope="{row}">
-            <el-tag :type="row.status | statusFilter">
-              {{ row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
-          <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
-              Edit
-            </el-button>
-            <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
-              Publish
-            </el-button>
-            <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
-              Draft
-            </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
-              Delete
-            </el-button>
-          </template>
-        </el-table-column>
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
+        <el-table-column prop="key" label="Channel" />
+        <el-table-column prop="pv" label="Pv" />
       </el-table>
-
-      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-
-      <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-        <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-          <el-form-item label="Type" prop="type">
-            <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-              <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Date" prop="timestamp">
-            <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
-          </el-form-item>
-          <el-form-item label="Title" prop="title">
-            <el-input v-model="temp.title" />
-          </el-form-item>
-          <el-form-item label="Status">
-            <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-              <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="Imp">
-            <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
-          </el-form-item>
-          <el-form-item label="Remark">
-            <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">
-            Cancel
-          </el-button>
-          <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-            Confirm
-          </el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-        <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-          <el-table-column prop="key" label="Channel" />
-          <el-table-column prop="pv" label="Pv" />
-        </el-table>
-        <span slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
       </span>
-      </el-dialog>
-    </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -160,19 +200,35 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+const DataSourceModel = {
+  dataSourceTypeOptions: [
+    { key: 'api', display_name: 'API' },
+    { key: 'api2', display_name: 'API_2' },
+    { key: 'api3', display_name: 'API_3' },
+    { key: 'api4', display_name: 'API_4' }
+  ],
+  updatePlanOptions:
+    {
+      hour: [
+        { key: '1', display_name: '1小时' },
+        { key: '2', display_name: '2小时' },
+        { key: '3', display_name: '3小时' },
+        { key: '8', display_name: '8小时' }
+      ],
+      times: [
+        { key: '1', display_name: '1' },
+        { key: '2', display_name: '2' },
+        { key: '3', display_name: '3' },
+        { key: '8', display_name: '8' }
+      ]
+    }
+}
 
 // arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
+const dataSourceTypeKeyValue = DataSourceModel.dataSourceTypeOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name
   return acc
 }, {})
-
 
 export default {
   name: 'ComplexTable',
@@ -181,49 +237,74 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        enabled: 'success',
+        disabled: 'danger'
       }
       return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
+      return dataSourceTypeKeyValue[type]
     }
   },
   data() {
     return {
-      tableKey: 0,
-      list: null,
+      businessTableKey: 0,
+      channelTableKey: 0,
+      currentTab: 'business',
+      listArr: {
+        business: {
+          data: [],
+          total: 0,
+          listQuery: {
+            sheet: 'business',
+            page: 1,
+            limit: 20,
+            importance: undefined,
+            title: undefined,
+            type: undefined,
+            sort: '+id'
+          }
+        },
+        channel: {
+          data: [],
+          total: 0,
+          listQuery: {
+            sheet: 'channel',
+            page: 1,
+            limit: 20,
+            importance: undefined,
+            title: undefined,
+            type: undefined,
+            sort: '+id'
+          }
+        }
+      },
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
-      },
       importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
+      MODEL: DataSourceModel,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
+        dataSource: '',
+        updatePlanHours: '',
+        updatePlanTimes: '',
         importance: 1,
-        remark: '',
+        introduce: '',
         timestamp: new Date(),
         title: '',
+        serverAddress: '',
+        secretKey: '',
         type: '',
         status: 'published'
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: '编辑',
+        create: '新建'
       },
       dialogPvVisible: false,
       pvData: [],
@@ -235,27 +316,37 @@ export default {
       downloadLoading: false
     }
   },
+  computed: {
+    ...mapGetters([
+      'name',
+      'roles'
+    ])
+  },
   created() {
-    this.getList()
+    this.getList('business')
+    this.getList('channel')
   },
   methods: {
-    getList() {
+    handleTabClick(tab, event) {
+      this.currentTab = tab.name
+    },
+    getList(sheetStr) {
       this.listLoading = true
-
-      fetchList(this.listQuery).then(response => {
-
-        console.log(response)
-        this.list = response.data.items
-        this.total = response.data.total
+      fetchList(this.listArr[sheetStr].listQuery).then(response => {
+        // this.list = response.data.items
+        this.listArr[sheetStr].data = response.data.items
+        // this.total = response.data.total
+        this.listArr[sheetStr].total = response.data.total
+        // console.log(this.listArr)
         // Just to simulate the time of the request
         // setTimeout(() => {
-          this.listLoading = false
+        this.listLoading = false
         // }, 1.5 * 1000)
       })
     },
-    handleFilter() {
+    handleFilter(sheetStr) {
       this.listQuery.page = 1
-      this.getList()
+      this.getList(sheetStr)
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -267,16 +358,16 @@ export default {
     sortChange(data) {
       const { prop, order } = data
       if (prop === 'id') {
-        this.sortByID(order)
+        this.sortByID(this.currentTab, order)
       }
     },
-    sortByID(order) {
+    sortByID(sheetStr, order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listArr[sheetStr].listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = '-id'
+        this.listArr[sheetStr].listQuery.sort = '-id'
       }
-      this.handleFilter()
+      this.handleFilter(sheetStr)
     },
     resetTemp() {
       this.temp = {
@@ -373,27 +464,27 @@ export default {
         }
       }))
     },
-    getSortClass: function(key) {
-      const sort = this.listQuery.sort
+    getSortClass: function(key, sheetStr) {
+      const sort = this.listArr[sheetStr].listQuery.sort
       return sort === `+${key}`
         ? 'ascending'
         : sort === `-${key}`
           ? 'descending'
           : ''
     }
-  },
-  computed: {
-    ...mapGetters([
-      'name',
-      'roles'
-    ])
   }
+
 }
 </script>
 
 <style lang="scss" scoped>
 
+  .el-row{
+    margin-bottom: 10px;
+  }
 .el-tabs{
   /*margin: 30px;*/
+
 }
+
 </style>
