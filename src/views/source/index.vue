@@ -30,9 +30,18 @@
           </el-table-column>
           <el-table-column label="状态" class-name="status-col" min-width="50">
             <template slot-scope="{row}">
-              <el-tag :type="row.status | statusFilter">
+
+              <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
                 {{ row.status === 'enabled' ? '启用': '未启用' }}
               </el-tag>
+
+              <el-tag
+                v-if="row.status==='deleted'"
+                type="danger"
+              >
+                已删除
+              </el-tag>
+
             </template>
           </el-table-column>
           <el-table-column label="数据源名称" min-width="100">
@@ -55,6 +64,9 @@
               </el-button>
               <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
                 停用
+              </el-button>
+              <el-button v-if="row.status==='deleted'" size="mini" @click="handleModifyStatus(row,'draft')">
+                恢复
               </el-button>
               <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
                 删除
@@ -130,11 +142,11 @@
       </el-tab-pane>
     </el-tabs>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 500px; margin-left:50px;">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item label="数据源" prop="dataSource">
-          <el-select v-model="temp.dataSource" class="filter-item" placeholder="请选择">
+        <el-form-item label="数据源" prop="type">
+          <el-select v-model="temp.type" class="filter-item" placeholder="请选择">
             <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -151,7 +163,7 @@
           <el-input v-model="temp.serverAddress" placeholder="多个IP间以逗号分隔" />
         </el-form-item>
 
-        <el-form-item label="定时更新" prop="updatePlan">
+        <el-form-item label="定时更新" prop="updatePlanHours">
           <el-select v-model="temp.updatePlanHours" class="filter-item" placeholder="请选择" style="width:150px;">
             <el-option v-for="item in MODEL.updatePlanOptions.hour" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
@@ -164,9 +176,9 @@
           <DynamicInput :data.sync="temp.paths" />
         </el-form-item>
 
-        <el-form-item label="说明">
+        <el-form-item label="说明" prop="describe">
           <el-input
-            v-model="temp.introduce"
+            v-model="temp.describe"
             :autosize="{ minRows: 4, maxRows: 10}"
             type="textarea"
             maxlength="30"
@@ -178,29 +190,19 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          Cancel
+          取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          Confirm
+          确定
         </el-button>
       </div>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">Confirm</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, fetchPv, createSource, updateSource, changeStatus } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -222,6 +224,7 @@ const DataSourceModel = {
         { key: '8', display_name: '8小时' }
       ],
       times: [
+        { key: '0', display_name: '0' },
         { key: '1', display_name: '1' },
         { key: '2', display_name: '2' },
         { key: '3', display_name: '3' },
@@ -294,10 +297,10 @@ export default {
       showReviewer: false,
       temp: {
         id: undefined,
-        dataSource: '',
+        type: '',
         updatePlanHours: '',
         updatePlanTimes: '',
-        introduce: '',
+        describe: '',
         title: '',
         serverAddress: '',
         secretKey: '1111',
@@ -311,12 +314,33 @@ export default {
         update: '编辑',
         create: '新建'
       },
-      dialogPvVisible: false,
-      pvData: [],
       rules: {
+        type: [
+          { required: true, message: '请选择数据源', trigger: 'change' }
+        ],
+        title: [
+          { required: true, message: '数据源名称不能为空', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        describe: [
+          { required: true, message: '说明不能为空', trigger: 'blur' },
+          { min: 4, max: 200, message: '长度在 3 到 200 个字符', trigger: 'blur' }
+        ],
+        secretKey: [
+          { required: true, message: 'Secret Key不能为空', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        serverAddress: [
+          { required: true, message: '服务器地址不能为空', trigger: 'blur' },
+          { type: 'url', required: true, message: '服务器地址格式不正确', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        updatePlanHours: [
+          { required: true, message: '请选择时间', trigger: 'change' }
+        ],
+        // eslint-disable-next-line no-dupe-keys
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }]
       },
       downloadLoading: false
     }
@@ -336,6 +360,7 @@ export default {
       this.currentTab = tab.name
     },
     getList(sheetStr) {
+      sheetStr = sheetStr || 'business'
       this.listLoading = true
       fetchList(this.listArr[sheetStr].listQuery).then(response => {
         // this.list = response.data.items
@@ -350,17 +375,35 @@ export default {
       })
     },
     handleFilter(sheetStr) {
-      this.listQuery.page = 1
+      console.log('handleFilter...')
+      this.listArr[sheetStr].listQuery.page = 1
+
       this.getList(sheetStr)
     },
     handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
+      changeStatus(row.id, status).then(response => {
+        this.$message({
+          message: '操作完成',
+          type: 'success'
+        })
+        row.status = status
+
+        // 删除行
+        /*        if (status === 'deleted') {
+          for (const v of this.listArr[this.currentTab].data) {
+            if (v.id === row.id) {
+              const index = this.listArr[this.currentTab].data.indexOf(v)
+              this.listArr[this.currentTab].data.splice(index, 1)
+              break
+            }
+          }
+        }*/
+
+        this.listLoading = false
       })
-      row.status = status
     },
     sortChange(data) {
+      console.log(data)
       const { prop, order } = data
       if (prop === 'id') {
         this.sortByID(this.currentTab, order)
@@ -375,24 +418,26 @@ export default {
       this.handleFilter(sheetStr)
     },
     resetTemp() {
-      console.log('resetTemp...')
       this.temp = {
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: '',
+        type: 'API',
+        dataSource: this.currentTab,
+        title: '****',
+        status: 'disabled',
+        secretKey: '*****',
+        serverAddress: 'http://00000.com',
+        updatePlanHours: '4',
+        updatePlanTimes: '8',
         paths: [{
-          value: '',
+          value: '****',
           key: Date.now(),
           args: [
-            { value: '',
+            { value: '****',
               key: Date.now()
             }
           ]
-        }]
+        }],
+        describe: '*****'
       }
     },
     handleCreate() {
@@ -407,13 +452,15 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
+          this.temp.author = 'jun'
+          createSource(this.temp).then(() => {
+            console.log('createSource...')
+            this.getList()
+            // this.listArr[this.currentTab].data.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
+              title: '完成',
+              message: '新建数据源',
               type: 'success',
               duration: 2000
             })
@@ -435,11 +482,11 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            for (const v of this.list) {
+          updateSource(tempData).then(() => {
+            for (const v of this.listArr[this.currentTab].data) {
               if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
+                const index = this.listArr[this.currentTab].data.indexOf(v)
+                this.listArr[this.currentTab].data.splice(index, 1, this.temp)
                 break
               }
             }
@@ -494,12 +541,14 @@ export default {
 
 <style lang="scss" scoped>
 
-  .el-row{
-    margin-bottom: 10px;
+  .main-dialog{
+    color: red;
+    .el-dialog{
+      min-width: 650px;
+    }
   }
-.el-tabs{
-  /*margin: 30px;*/
-
-}
-
+  .main-form{
+    max-height: 600px;
+    overflow-y: scroll;
+  }
 </style>

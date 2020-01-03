@@ -74,7 +74,7 @@ export const constantRoutes = [
       {
         path: '',
         name: 'DataTag',
-        component: () => import('@/views/form/index'),
+        component: () => import('@/views/datatag/index'),
         meta: { title: '数据标注', icon: 'form' }
       }
     ]
