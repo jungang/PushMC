@@ -81,13 +81,13 @@ export const constantRoutes = [
   },
 
   {
-    path: '/label-sort',
+    path: '/category',
     component: Layout,
     children: [
       {
         path: '',
-        name: 'LabelSort',
-        component: () => import('@/views/form/index'),
+        name: 'category',
+        component: () => import('@/views/category/index'),
         meta: { title: '标签分类', icon: 'form' }
       }
     ]
@@ -100,7 +100,7 @@ export const constantRoutes = [
       {
         path: '',
         name: 'BusinessChannel',
-        component: () => import('@/views/form/index'),
+        component: () => import('@/views/businessChannel/index'),
         meta: { title: '业务频道', icon: 'form' }
       }
     ]

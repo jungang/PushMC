@@ -1,6 +1,6 @@
 <template>
   <div class="el-transfer-panel">
-    <p class="el-transfer-panel__header">
+    <p v-if="type!='businessChannel'" class="el-transfer-panel__header">
       <el-checkbox
         v-model="allChecked"
         :indeterminate="isIndeterminate"
@@ -9,6 +9,11 @@
         {{ title }}
         <span>{{ checkedSummary }}</span>
       </el-checkbox>
+    </p>
+
+    <p v-if="type==='businessChannel'" class="el-transfer-panel__header">
+      {{ title }}
+      <span style="float: right; margin-right: 10px">{{ checkedSummary }}</span>
     </p>
 
     <div :class="['el-transfer-panel__body', hasFooter ? 'is-with-footer' : '']">
@@ -42,7 +47,7 @@
         >
           <option-content :option="item" />
           <div v-if="isShowInput" class="right-input">
-            {{ customPrefix }}@<el-input v-if="isShowInput" v-model="item[labelProp]" placeholder="请输入内容" size="mini" />
+            {{ customPrefix ? customPrefix + '@' : '' }} <el-input v-if="isShowInput" v-model="item[labelProp]" placeholder="请输入内容" size="mini" />
           </div>
           <div v-else>
             {{ item[labelProp] }}
@@ -108,6 +113,10 @@ export default {
   componentName: 'ElTransferPanel',
 
   props: {
+    type: {
+      type: String,
+      default: () => ''
+    },
     data: {
       type: Array,
       default() {
@@ -270,6 +279,7 @@ export default {
     }
   },
   created() {
+    console.log(this.type)
   },
 
   methods: {

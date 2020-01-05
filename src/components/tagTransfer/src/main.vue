@@ -1,16 +1,18 @@
 <template>
-  <div class="el-transfer">
-    <el-row style="margin-bottom: 10px">
-      <el-col :span="12">&nbsp;</el-col>
-      <el-col :span="4"> <el-button size="small" @click="dialogVisible = true"> 自定义前缀  </el-button></el-col>
+  <div class="el-transfer" :id="type">
+    <el-row v-if="type==='dataTag'" style="margin-bottom: 10px">
+      <el-col :span="11">&nbsp;  </el-col>
+      <el-col :span="4"> <el-button size="small" @click="dialogVisible = true"> 自定义前缀 <span style="color:#67C23A"> {{ inputPrefix }}</span></el-button></el-col>
     </el-row>
     <transfer-panel
       ref="leftPanel"
+      :type="type"
       v-bind="$props"
       :data="sourceData"
       :title="titles[0] || t('el.transfer.titles.0')"
       :default-checked="leftDefaultChecked"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
+      class="left-panel"
       @checked-change="onSourceCheckedChange"
     >
       <slot name="left-footer" />
@@ -19,30 +21,28 @@
       <el-button
         type="primary"
         :class="['el-transfer__button', hasButtonTexts ? 'is-with-texts' : '']"
-        :disabled="leftChecked.length === 0"
-        size="small"
-        @click.native="addToRight"
-      >
-        <span v-if="buttonTexts[1] !== undefined">{{ buttonTexts[1] }}</span>
+        @click.native="addToLeft"
+        :disabled="rightChecked.length === 0">
+        <i class="el-icon-arrow-left"></i>
+        <span v-if="buttonTexts[0] !== undefined">{{ buttonTexts[0] }}</span>
       </el-button>
       <el-button
         type="primary"
         :class="['el-transfer__button', hasButtonTexts ? 'is-with-texts' : '']"
-        :disabled="rightChecked.length === 0"
-        size="small"
-        @click.native="addToLeft"
-      >
-        <span v-if="buttonTexts[0] !== undefined">{{ buttonTexts[0] }}</span>
+        @click.native="addToRight"
+        :disabled="leftChecked.length === 0">
+        <span v-if="buttonTexts[1] !== undefined">{{ buttonTexts[1] }}</span>
+        <i class="el-icon-arrow-right"></i>
       </el-button>
     </div>
     <transfer-panel
       ref="rightPanel"
+      :type="type"
       v-bind="$props"
       :data="targetData"
       :title="titles[1] || t('el.transfer.titles.1')"
       :default-checked="rightDefaultChecked"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
-      is-show-input
       :custom-prefix="prefix"
       class="right-panel"
       @checked-change="onTargetCheckedChange"
@@ -84,6 +84,12 @@ export default {
   mixins: [Emitter, Locale, Migrating],
 
   props: {
+    type: {
+      type: String,
+      default() {
+        return ''
+      }
+    },
     data: {
       type: Array,
       default() {
@@ -199,7 +205,9 @@ export default {
       this.dispatch('ElFormItem', 'el.form.change', val)
     }
   },
-
+  created() {
+    console.log(this.type)
+  },
   methods: {
     handlePrefix() {
       this.prefix = this.inputPrefix
@@ -277,19 +285,20 @@ export default {
 
 <style lang="scss" scoped>
 
-.el-transfer__buttons{
-  width: 200px;
-  text-align: center;
-  button{
-    width: 80px;
-    margin-left:0;
-  }
-}
-  .right-panel{
+ #dataTag .right-panel{
     width:400px;
     input{
       width: 100px;
     }
   }
+
+ #businessChannel{
+   .left-panel{
+     width:300px;
+   }
+   .right-panel{
+     width:300px;
+   }
+ }
 
 </style>

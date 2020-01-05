@@ -26,19 +26,19 @@
             />
           </el-col>
           <el-col :span="18">
-            <div v-if="currentRow.properties.length > 0" style="text-align: center">
+            <div v-if="listArr.business.transfer.length > 0" style="text-align: center">
               <XcomTagTransfer
                 ref="transfer"
                 v-model="value"
+                type="dataTag"
                 class="main-transfer"
                 style="text-align: left; display: inline-block"
                 :titles="['属性字段', '标注结果']"
-                :button-texts="['◀', '▶']"
                 :format="{
                   noChecked: '${total}',
                   hasChecked: '${checked}/${total}'
                 }"
-                :data="currentRow.properties"
+                :data="listArr.business.transfer"
                 @change="handleChange"
               >
                 <span slot-scope="{ h, option }" style="display: block">
@@ -85,28 +85,23 @@
           </el-col>
           <el-col :span="18">
 
-
-            <div v-if="currentRow.properties.length > 0" style="text-align: center">
+            <div v-if="listArr.channel.transfer.length > 0" style="text-align: center">
               <XcomTagTransfer
                 ref="transfer"
                 v-model="value"
                 class="main-transfer"
                 style="text-align: left; display: inline-block"
                 :titles="['属性字段', '标注结果']"
-                :button-texts="['◀', '▶']"
                 :format="{
                   noChecked: '${total}',
                   hasChecked: '${checked}/${total}'
                 }"
-                :data="currentRow.properties"
+                :data="listArr.channel.transfer"
                 @change="handleChange"
               >
                 <span slot-scope="{ h, option }" style="display: block">
                   {{ option.label }}
-
                 </span>
-                <!--            <el-button slot="left-footer" class="transfer-footer" size="small">操作</el-button>-->
-                <!--            <el-button slot="right-footer" class="transfer-footer" size="small">操作</el-button>-->
               </XcomTagTransfer>
 
               <el-row style="margin-top: 20px">
@@ -122,11 +117,11 @@
     </el-tabs>
 
     <el-dialog
-      title="自定义前缀"
+      title="保存并应用"
       :visible.sync="dialogVisible"
       width="40%"
     >
-      <p>数据源  <el-tag>{{ currentRow.title }} </el-tag>中</p>
+      <p>数据源  <el-tag>{{ saveQuery.title }} </el-tag>中</p>
       <p> 共有业务数据信息项 <el-tag>{{ saveQuery.sourceData.length + saveQuery.targetData.length }}  </el-tag> 项，
         共打标签<el-tag> {{ saveQuery.targetData.length }} </el-tag>个，
         剩余<el-tag> {{ saveQuery.sourceData.length }} </el-tag>个未打</p>
@@ -145,8 +140,9 @@ import { mapGetters } from 'vuex'
 // import { fetchList, fetchPv, createSource, updateSource, changeStatus } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { deepClone } from '@//utils/index.js'
 import XcomTagTransfer from '@/components/tagTransfer/index'
-import { fetchList } from '@/api/datatag' // waves directive
+import { fetchList, saveTag } from '@/api/datatag' // waves directive
 
 export default {
   name: 'DataTag',
@@ -189,13 +185,14 @@ export default {
           title: '王小虎'
         }],
       currentRow: {
-        properties: []
+        multProperties: []
       },
       currentTab: 'business',
       listArr: {
         business: {
           data: [],
           total: 0,
+          transfer: [],
           listQuery: {
             sheet: 'business',
             page: 1,
@@ -209,6 +206,7 @@ export default {
         channel: {
           data: [],
           total: 0,
+          transfer: [],
           listQuery: {
             sheet: 'channel',
             page: 1,
@@ -218,7 +216,9 @@ export default {
             type: undefined,
             sort: '+id'
           }
-        }
+        },
+        businessTransfer: [],
+        channelTransfer: []
       },
       value: [],
       listLoading: true,
@@ -226,7 +226,8 @@ export default {
       saveQuery: {
         sourceData: [],
         targetData: [],
-        prefix: ''
+        prefix: '',
+        title: ''
       }
     }
   },
@@ -243,10 +244,31 @@ export default {
   methods: {
     openDailog() {
       this.saveQuery = this.$refs.transfer.getQuery()
-      console.log(this.saveQuery)
+      this.saveQuery.title = this.currentRow.title
       this.dialogVisible = true
     },
     handleSave() {
+      this.listLoading = true
+      this.currentRow.prefix = this.saveQuery.prefix
+      this.currentRow.dataSource = this.currentTab
+
+      this.saveQuery.targetData.forEach(item => {
+        console.log(item.key)
+        const index = this.currentRow.multProperties.findIndex((t, i, arr) => t.key === item.key)
+        this.currentRow.multProperties[index].newLabel = item.label
+      })
+
+      console.log(this.currentRow.multProperties)
+      saveTag(this.currentRow).then(res => {
+        this.listLoading = false
+        this.$notify({
+          title: '完成',
+          message: '保存完成',
+          type: 'success',
+          duration: 2000
+        })
+      })
+
       this.dialogVisible = false
     },
     getList(sheetStr) {
@@ -268,14 +290,17 @@ export default {
       this.$refs.singleTable.setCurrentRow(row)
     },
     handleCurrentChange(val) {
-      this.currentRow = val
+      if (val) {
+        this.listArr[this.currentTab].transfer = deepClone(val.multProperties)
+        this.currentRow = val
+      } else {
+        console.log('handleCurrentChange...')
+        this.listArr[this.currentTab].transfer = []
+      }
+      this.value = []
     },
     handleTabClick(tab, event) {
       this.currentTab = tab.name
-      this.currentRow = {
-        properties: []
-      }
-      console.log(this.currentRow)
     },
     handleChange(value, direction, movedKeys) {
     }

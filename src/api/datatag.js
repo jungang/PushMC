@@ -8,42 +8,10 @@ export function fetchList(query) {
   })
 }
 
-export function changeStatus(id, status) {
+export function saveTag(data) {
   return request({
-    url: '/data-tag/status',
+    url: '/data-tag/save-tag',
     method: 'post',
-    params: { id, status }
-  })
-}
-
-export function fetchSource(id) {
-  return request({
-    url: '/data-tag/detail',
-    method: 'get',
-    params: { id }
-  })
-}
-
-export function fetchPv(pv) {
-  return request({
-    url: '/data-tag/pv',
-    method: 'get',
-    params: { pv }
-  })
-}
-
-export function createSource(data) {
-  return request({
-    url: '/data-tag/create',
-    method: 'post',
-    data: { data: data }
-  })
-}
-
-export function updateSource(data) {
-  return request({
-    url: '/data-tag/update',
-    method: 'post',
-    data: { data: data }
+    params: { data: data }
   })
 }
