@@ -1,5 +1,5 @@
 <template>
-  <div class="el-transfer" :id="type">
+  <div :id="type" class="el-transfer">
     <el-row v-if="type==='dataTag'" style="margin-bottom: 10px">
       <el-col :span="11">&nbsp;  </el-col>
       <el-col :span="4"> <el-button size="small" @click="dialogVisible = true"> 自定义前缀 <span style="color:#67C23A"> {{ inputPrefix }}</span></el-button></el-col>
@@ -21,18 +21,20 @@
       <el-button
         type="primary"
         :class="['el-transfer__button', hasButtonTexts ? 'is-with-texts' : '']"
+        :disabled="rightChecked.length === 0"
         @click.native="addToLeft"
-        :disabled="rightChecked.length === 0">
-        <i class="el-icon-arrow-left"></i>
+      >
+        <i class="el-icon-arrow-left" />
         <span v-if="buttonTexts[0] !== undefined">{{ buttonTexts[0] }}</span>
       </el-button>
       <el-button
         type="primary"
         :class="['el-transfer__button', hasButtonTexts ? 'is-with-texts' : '']"
+        :disabled="leftChecked.length === 0"
         @click.native="addToRight"
-        :disabled="leftChecked.length === 0">
+      >
         <span v-if="buttonTexts[1] !== undefined">{{ buttonTexts[1] }}</span>
-        <i class="el-icon-arrow-right"></i>
+        <i class="el-icon-arrow-right" />
       </el-button>
     </div>
     <transfer-panel

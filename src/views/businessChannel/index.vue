@@ -71,43 +71,49 @@
       :visible.sync="dialogFormVisible"
       center
       width="900px"
+      closed="handleDialogClose"
     >
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item v-if="dialogStatus==='create'" label="输入名称" prop="title">
-          <el-input v-model="temp.title" style="width:400px" />
-        </el-form-item>
+        <div v-if="step==='step1'" class="zone-step-1">
+          <el-form-item v-if="dialogStatus==='create'" label="输入名称" prop="title">
+            <el-input v-model="temp.title" style="width:400px" />
+          </el-form-item>
+          <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
+            <XcomTagTransfer
+              ref="transfer"
+              v-model="tempValue"
+              :data="temp.tables"
+              type="businessChannel"
+              :titles="['最多选择三张表', '已选数据表']"
+              filterable
+              :format="{
+                noChecked: '0/'+ tempValueMax,
+                hasChecked: '${checked}/'+ tempValueMax
+              }"
+              @left-check-change="handleCheckLeft"
+              @right-check-change="handleCheckRight"
+              @change="handleChange"
+            />
+          </el-row>
+          <el-form-item label="选择标签" prop="tag">
+            <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
+              <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+            </el-select>
+          </el-form-item>
+        </div>
 
-        <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
-          <XcomTagTransfer
-            ref="transfer"
-            v-model="tempValue"
-            :data="temp.tables"
-            type="businessChannel"
-            :titles="['最多选择三张表', '已选数据表']"
-            filterable
-            :format="{
-              noChecked: '0/'+ tempValueMax,
-              hasChecked: '${checked}/'+ tempValueMax
-            }"
-            @left-check-change="handleCheckLeft"
-            @right-check-change="handleCheckRight"
-            @change="handleChange"
-          />
-        </el-row>
-
-        <el-form-item label="选择标签" prop="tag">
-          <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-          </el-select>
-        </el-form-item>
+        <div class="zone-step-1" />
 
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button v-if="step==='step1'" type="primary" @click="step='step2'">
+          下一步
+        </el-button>
+        <el-button v-if="step==='step2'" type="primary" @click="dialogStatus==='create'?createData():updateData()">
           下一步
         </el-button>
       </div>
@@ -162,6 +168,7 @@ export default {
         tables: []
       },
       dialogFormVisible: false,
+      step: 'step1',
       dialogStatus: '',
       textMap: {
         update: '编辑',
@@ -189,6 +196,9 @@ export default {
     this.getTables()
   },
   methods: {
+    handleDialogClose() {
+      this.step = 'step1'
+    },
     handleCheckLeft(value, direction) {
       console.log(this.$refs.transfer)
       const n = this.tempValue.length + value.length // 当前数量
