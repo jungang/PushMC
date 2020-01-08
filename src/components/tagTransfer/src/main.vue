@@ -208,7 +208,7 @@ export default {
     }
   },
   created() {
-    console.log(this.type)
+    // console.log(this.type)
   },
   methods: {
     handlePrefix() {

@@ -12,7 +12,7 @@
       >
         <el-input v-model="path.value" placeholder="输入路径地址" class="dy_path">
           <template slot="prepend">路径 {{ index }}</template>
-          <el-button slot="append" v-if="data.length > 1" icon="el-icon-delete" @click.prevent="removePath(path)" />
+          <el-button v-if="data.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
         </el-input>
       </el-form-item>
 
@@ -30,7 +30,7 @@
           size="mini"
           class="dy_arg"
         >
-          <el-button slot="append" v-if="path.args.length > 1" icon="el-icon-delete" @click.prevent="removeArg( path.args, index2)" />
+          <el-button v-if="path.args.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removeArg( path.args, index2)" />
         </el-input>
       </el-form-item>
 

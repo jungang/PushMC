@@ -113,7 +113,7 @@ export const constantRoutes = [
       {
         path: '',
         name: 'Push content',
-        component: () => import('@/views/form/index'),
+        component: () => import('@/views/pushContent/index'),
         meta: { title: '推送内容', icon: 'form' }
       }
     ]
@@ -126,7 +126,7 @@ export const constantRoutes = [
       {
         path: '',
         name: 'PushChannel',
-        component: () => import('@/views/form/index'),
+        component: () => import('@/views/pushChannel/index'),
         meta: { title: '推送通道', icon: 'form' }
       }
     ]
@@ -139,7 +139,7 @@ export const constantRoutes = [
       {
         path: '',
         name: 'PushTarget',
-        component: () => import('@/views/form/index'),
+        component: () => import('@/views/pushTarget/index'),
         meta: { title: '推送对象', icon: 'form' }
       }
     ]

@@ -70,8 +70,9 @@
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       center
-      width="900px"
-      closed="handleDialogClose"
+      destroy-on-close
+      :width="step==='step1'?'900px':'1300px'"
+      @closed="handleDialogClose"
     >
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
@@ -84,6 +85,8 @@
               ref="transfer"
               v-model="tempValue"
               :data="temp.tables"
+              :left-default-checked="temp.transferStatus"
+              :right-default-checked="temp.transferStatus"
               type="businessChannel"
               :titles="['最多选择三张表', '已选数据表']"
               filterable
@@ -98,12 +101,125 @@
           </el-row>
           <el-form-item label="选择标签" prop="tag">
             <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
-              <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+              <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
             </el-select>
           </el-form-item>
         </div>
 
-        <div class="zone-step-1" />
+        <div v-if="step==='step2'" class="zone-step-2">
+
+          <p>名称： <span>{{ temp.title }}</span></p>
+          <p>数据表： <span>{{ tempValue.length }}</span></p>
+          <p>标签： <span>{{ temp.tag }}</span></p>
+          <p>频道规则：   <el-button type="primary" @click="handleAddRule">+添加规则条目</el-button></p>
+
+          <el-table
+            :data="temp.rules"
+          >
+            <el-table-column
+              type="index"
+              label="序号"
+              align="center"
+            />
+            <el-table-column
+              prop="item1.tableKey"
+              label="选择数据项"
+              width="300"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+                <el-input v-model="row.item1.value" placeholder="请输入内容" style="width:45%" />
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="条件"
+              width="100"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.operation1" placeholder="请选择" style="width: 60px">
+                  <el-option
+                    v-for="item in ruleOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="选择数据项"
+              width="300"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.item2.tableName" placeholder="请选择" style="width:50%">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+                <el-input v-model="row.item2.value" placeholder="请输入内容" style="width:45%" />
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="条件"
+              width="100"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.operation2" placeholder="=" style="width: 60px">
+                  <el-option
+                    v-for="item in ruleOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="选择数据项"
+              width="300"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.item3.tableName" placeholder="请选择" style="width:50%">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+                <el-input v-model="row.item3.value" placeholder="请输入内容" style="width:45%" />
+              </template>
+            </el-table-column>
+
+            <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
+              <template slot-scope="{row}">
+                <el-button size="mini" type="danger" @click="handleRuleDelete(row,'deleted')">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+        </div>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -113,8 +229,11 @@
         <el-button v-if="step==='step1'" type="primary" @click="step='step2'">
           下一步
         </el-button>
+        <el-button v-if="step==='step2'" type="primary" @click="step='step1'">
+          上一步
+        </el-button>
         <el-button v-if="step==='step2'" type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          下一步
+          完成
         </el-button>
       </div>
     </el-dialog>
@@ -130,9 +249,9 @@ import XcomTagTransfer from '@/components/tagTransfer/index'
 
 const DataSourceModel = {
   dataSourceTypeOptions: [
-    { key: 'api', display_name: 'API' },
-    { key: 'api2', display_name: 'API_2' },
-    { key: 'api3', display_name: 'API_3' },
+    { key: 'api', display_name: '财务报销' },
+    { key: 'api2', display_name: 'HR' },
+    { key: 'api3', display_name: 'JIRA' },
     { key: 'api4', display_name: 'API_4' }
   ]
 }
@@ -142,6 +261,57 @@ export default {
   components: { Pagination, XcomTagTransfer },
   data() {
     return {
+      ruleOptions: [
+        {
+          value: '==',
+          label: '=='
+        }, {
+          value: '!=',
+          label: '!='
+        }, {
+          value: '>',
+          label: '>'
+        }, {
+          value: '<',
+          label: '<'
+        }],
+      options: [
+        {
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }],
+      value: '',
+      tableData: [
+        {
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-04',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1517 弄'
+        }, {
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1519 弄'
+        }, {
+          date: '2016-05-03',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1516 弄'
+        }],
+
       keyword: '',
       tables: [],
       tableKey: 0,
@@ -196,8 +366,15 @@ export default {
     this.getTables()
   },
   methods: {
+    handleRuleDelete(row) {
+      const index = this.temp.rules.indexOf(row)
+      this.temp.rules.splice(index, 1)
+    },
     handleDialogClose() {
+      // console.log('handleDialogClose...')
       this.step = 'step1'
+      this.tempValue = []
+      console.log(this.tempValue)
     },
     handleCheckLeft(value, direction) {
       console.log(this.$refs.transfer)
@@ -285,7 +462,9 @@ export default {
         id: undefined,
         category: 'API',
         title: '****',
-        tables: deepClone(this.tables)
+        tables: deepClone(this.tables),
+        transferStatus: [],
+        rules: []
 
       }
     },
@@ -307,6 +486,16 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    handleAddRule() {
+      this.temp.rules.push({
+        item1: { value: '', tableKey: '', tableName: '' },
+        item2: { value: '', tableKey: '', tableName: '' },
+        item3: { value: '', tableKey: '', tableName: '' },
+        operation1: '==',
+        operation2: '=='
+      })
+      // console.log(this.temp.rules)
+    },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
@@ -326,7 +515,13 @@ export default {
       })
     },
     handleUpdate(row) {
-      console.log(row)
+      // console.log(row)
+
+      console.log('handleUpdate...')
+      if (this.$refs.transfer) {
+        console.log(this.$refs.transfer.targetData)
+      }
+
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
