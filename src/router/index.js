@@ -152,7 +152,7 @@ export const constantRoutes = [
       {
         path: '',
         name: 'MessageTemplate',
-        component: () => import('@/views/form/index'),
+        component: () => import('@/views/messageTemplate/index'),
         meta: { title: '消息模版', icon: 'form' }
       }
     ]
@@ -161,13 +161,19 @@ export const constantRoutes = [
   {
     path: '/message-push',
     component: Layout,
-    redirect: '/message-push/table',
+    redirect: '/message-push/channel-push',
     name: 'MessagePush',
     meta: { title: '消息推送', icon: 'example' },
     children: [
       {
         path: 'channel-push',
         name: 'ChannelPush',
+        component: () => import('@/views/channelPush/index'),
+        meta: { title: '频道推送', icon: 'table' }
+      },
+      {
+        path: 'pipe-push',
+        name: 'PipePush',
         component: () => import('@/views/table/index'),
         meta: { title: '渠道推送', icon: 'table' }
       },

@@ -448,18 +448,6 @@ export default {
           type: 'success'
         })
         row.status = status
-
-        // 删除行
-        /*        if (status === 'deleted') {
-          for (const v of this.listArr[this.currentTab].data) {
-            if (v.id === row.id) {
-              const index = this.listArr[this.currentTab].data.indexOf(v)
-              this.listArr[this.currentTab].data.splice(index, 1)
-              break
-            }
-          }
-        }*/
-
         this.listLoading = false
       })
     },
@@ -506,7 +494,7 @@ export default {
             this.dialogFormVisible = false
             this.$notify({
               title: '完成',
-              message: '新建数据源',
+              message: '新建',
               type: 'success',
               duration: 2000
             })

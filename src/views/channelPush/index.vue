@@ -1,8 +1,13 @@
 <template>
   <div class="container">
-    <el-row type="flex" justify="end">
-      <el-button type="primary" @click="handleCreate">添加标签</el-button>
+
+    <el-row style="margin-bottom: 10px">
+      <el-col :span="20">
+        &nbsp;
+      </el-col>
+      <el-col :span="4" align="right"><el-button type="primary" @click="handleCreate">+ 新建内容</el-button></el-col>
     </el-row>
+
     <el-row>
       <el-table
         :key="tableKey"
@@ -12,40 +17,41 @@
         fit
         highlight-current-row
         style="width: 100%;"
-        @sort-change="sortChange"
       >
-        <el-table-column label="ID" prop="id" sortable="custom" align="center" :class-name="getSortClass('id')" min-width="50">
+        <el-table-column label="ID" prop="id" align="center" min-width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签名称" prop="type" align="center" min-width="50">
+        <el-table-column label="状态" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.title }}</span>
+
+            <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
+              {{ row.status === 'enabled' ? '启用': '未启用' }}
+            </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="分类" align="center" min-width="100">
+        <el-table-column label="内容分类" align="center" min-width="100">
           <template slot-scope="{row}">
             <span>{{ row.category }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签来源" align="center" min-width="50">
+        <el-table-column label="内容标签" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.tag }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签使用" align="center" min-width="50">
+        <el-table-column label="内容标题" prop="type" width="300" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.amount }}</span>
+            <span>{{ row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" align="center" min-width="100">
-          <template slot-scope="{row}">
-            <span>{{ row.creationTime }}</span>
-          </template>
-        </el-table-column>
+
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
+            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              查看
+            </el-button>
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
@@ -64,17 +70,47 @@
       />
     </el-row>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
+    <el-dialog
+      :title="textMap[dialogStatus]"
+      :visible.sync="dialogFormVisible"
+      center
+      width="800"
+      destroy-on-close
+    >
+      <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item v-if="dialogStatus==='create'" label="输入标签名" prop="title">
+        <el-form-item label="内容标题" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
+          <el-checkbox v-model="isSubhead">使用副标题</el-checkbox>
+        </el-form-item>
+        <el-form-item v-if="isSubhead" label="副标题" prop="subhead">
+          <el-input v-model="temp.subhead" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="选择分类" prop="category">
+        <el-form-item label="内容分类" prop="category">
           <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
           </el-select>
+          <el-checkbox v-model="isUrl">使用新闻链接</el-checkbox>
+        </el-form-item>
+        <el-form-item v-if="isUrl" label="新闻链接" prop="url">
+          <el-input v-model="temp.url" style="width:400px" />
+        </el-form-item>
+        <el-form-item label="内容标签" prop="tag">
+          <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
+            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="内容标签" prop="content">
+          <quill-editor
+            ref="myQuillEditor"
+            v-model="content"
+            :options="editorOption"
+            @blur="onEditorBlur($event)"
+            @focus="onEditorFocus($event)"
+            @change="onEditorChange($event)"
+          />
         </el-form-item>
 
       </el-form>
@@ -83,7 +119,7 @@
           取消
         </el-button>
         <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          确定
+          完成
         </el-button>
       </div>
     </el-dialog>
@@ -92,35 +128,36 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, createSource, updateSource, dele } from '@/api/category'
-import waves from '@/directive/waves'
+import { fetchList, searchList, createSource, updateSource, dele } from '@/api/channelPush'
 import Pagination from '@/components/Pagination'
+// import quillConfig from './quill-config.js'
 
 const DataSourceModel = {
   dataSourceTypeOptions: [
-    { key: 'api', display_name: 'API' },
-    { key: 'api2', display_name: 'API_2' },
-    { key: 'api3', display_name: 'API_3' },
+    { key: 'api', display_name: '财务报销' },
+    { key: 'api2', display_name: 'HR' },
+    { key: 'api3', display_name: 'JIRA' },
     { key: 'api4', display_name: 'API_4' }
   ]
 }
 
 export default {
-  name: 'ComplexTable',
+  name: 'ChannelPush',
   components: { Pagination },
-  directives: { waves },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        enabled: 'success',
-        disabled: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
   data() {
     return {
+      content: `<p>内容部分</p>`,
+      // editorOption: quillConfig,  //图片上传
+      editorOption: {}, // base64
+      isSubhead: false,
+      isUrl: false,
+      keyword: '',
+      tables: [],
       tableKey: 0,
+      listType: [
+        { key: 12345, label: '新闻' },
+        { key: 54321, label: '公告' }
+      ],
       listArr: {
         data: [],
         total: 0,
@@ -137,24 +174,19 @@ export default {
       MODEL: DataSourceModel,
       temp: {
         id: undefined,
-        type: '',
-        describe: '',
-        title: ''
+        tag: '',
+        category: '',
+        title: '',
+        subhead: '',
+        url: '',
+        content: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
+        view: '查看',
         update: '编辑',
         create: '新建'
-      },
-      rules: {
-        category: [
-          { required: true, message: '请选择分类', trigger: 'change' }
-        ],
-        title: [
-          { required: true, message: '标签名称不能为空', trigger: 'blur' },
-          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
-        ]
       }
     }
   },
@@ -162,12 +194,26 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    editor() {
+      return this.$refs.myQuillEditor.quill
+    }
   },
   created() {
     this.getList()
   },
   methods: {
+    onEditorReady(editor) { // 准备编辑器
+
+    },
+    onEditorBlur() {}, // 失去焦点事件
+    onEditorFocus() {}, // 获得焦点事件
+    onEditorChange() {}, // 内容改变事件
+
+    handleRuleDelete(row) {
+      const index = this.temp.rules.indexOf(row)
+      this.temp.rules.splice(index, 1)
+    },
     getList() {
       this.listLoading = true
       fetchList(this.listArr.listQuery).then(response => {
@@ -197,11 +243,26 @@ export default {
       this.handleFilter()
     },
     resetTemp() {
+      this.isSubhead = false
+      this.isUrl = false
       this.temp = {
         id: undefined,
-        category: 'API',
-        title: '****'
+        tag: '',
+        category: '',
+        title: '',
+        subhead: '',
+        url: '',
+        content: ''
       }
+    },
+    handleSearch() {
+      this.listLoading = true
+      this.listArr.listQuery.page = 1
+      searchList(this.keyword).then(response => {
+        this.listArr.data = response.data.items
+        this.listArr.total = response.data.total
+        this.listLoading = false
+      })
     },
     handleCreate() {
       this.resetTemp()
@@ -221,7 +282,7 @@ export default {
             this.dialogFormVisible = false
             this.$notify({
               title: '完成',
-              message: '新建',
+              message: '新建数据源',
               type: 'success',
               duration: 2000
             })
@@ -230,8 +291,18 @@ export default {
       })
     },
     handleUpdate(row) {
+      console.log('handleUpdate...')
+      if (this.$refs.transfer) {
+        console.log(this.$refs.transfer.targetData)
+      }
+
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
+
+      console.log(row.subhead)
+      this.isSubhead = !!row.subhead
+      this.isUrl = !this.url
+
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -287,15 +358,8 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-  .main-dialog{
-    color: red;
-    .el-dialog{
-      min-width: 650px;
-    }
-  }
-  .main-form{
-    max-height: 600px;
-  }
+<style lang="scss">
+.ql-editor{
+  height: 200px;
+}
 </style>

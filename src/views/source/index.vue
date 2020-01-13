@@ -460,7 +460,7 @@ export default {
             this.dialogFormVisible = false
             this.$notify({
               title: '完成',
-              message: '新建数据源',
+              message: '新建',
               type: 'success',
               duration: 2000
             })
