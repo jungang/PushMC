@@ -1,11 +1,21 @@
 <template>
-  <div class="container">
+  <div id="channelPush" class="container">
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="20">
-        &nbsp;
+        <el-input v-model="keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </el-col>
-      <el-col :span="4" align="right"><el-button type="primary" @click="handleCreate">+ 新建内容</el-button></el-col>
+    </el-row>
+
+    <el-row style="margin-bottom: 10px">
+      <el-col :span="16" style="line-height: 40px;">
+        业务频道列表：
+      </el-col>
+      <el-col :span="8" align="right">
+        <el-button type="primary" @click="handleCreate">频道订阅</el-button>
+        <el-button type="primary" @click="handleCreate">+自定义业务频道</el-button>
+      </el-col>
     </el-row>
 
     <el-row>
@@ -27,18 +37,23 @@
           <template slot-scope="{row}">
 
             <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
-              {{ row.status === 'enabled' ? '启用': '未启用' }}
+              {{ row.status === 'pushed' ? '已推送': '未推送' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="内容分类" align="center" min-width="100">
+        <el-table-column label="最近推送时间" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.category }}</span>
+            <span>{{ row.lastPushTime }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="内容标签" align="center" min-width="100">
+        <el-table-column label="渠道来源" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.tag }}</span>
+            <span>{{ row.origin }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="渠道标签" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <el-tag v-for="tag in row.tag" :key="tag">{{ tag }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="内容标题" prop="type" width="300" align="center" min-width="50">
@@ -50,13 +65,22 @@
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              编辑
+            </el-button>
+            <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+              删除
+            </el-button>
+            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              复制
+            </el-button>
+            <el-button type="primary" size="mini" @click="handleUpdate(row)">
               查看
             </el-button>
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
-              编辑
+              推送
             </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
-              删除
+            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              取消推送
             </el-button>
           </template>
         </el-table-column>
@@ -73,44 +97,245 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      center
-      width="800"
+      width="1100px"
       destroy-on-close
+      @opened="handleDialogOpened"
     >
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item label="内容标题" prop="title">
+        <el-form-item label="频道名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
-          <el-checkbox v-model="isSubhead">使用副标题</el-checkbox>
-        </el-form-item>
-        <el-form-item v-if="isSubhead" label="副标题" prop="subhead">
-          <el-input v-model="temp.subhead" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="内容分类" prop="category">
+        <el-form-item label="选择频道" prop="category">
           <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
             <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
           </el-select>
-          <el-checkbox v-model="isUrl">使用新闻链接</el-checkbox>
-        </el-form-item>
-        <el-form-item v-if="isUrl" label="新闻链接" prop="url">
-          <el-input v-model="temp.url" style="width:400px" />
-        </el-form-item>
-        <el-form-item label="内容标签" prop="tag">
-          <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
-          </el-select>
         </el-form-item>
 
-        <el-form-item label="内容标签" prop="content">
-          <quill-editor
-            ref="myQuillEditor"
-            v-model="content"
-            :options="editorOption"
-            @blur="onEditorBlur($event)"
-            @focus="onEditorFocus($event)"
-            @change="onEditorChange($event)"
-          />
+        <el-form-item label="数据表" prop="title">
+          100
+        </el-form-item>
+
+        <el-form-item label="频道类型" prop="type">
+          默认
+        </el-form-item>
+
+        <el-form-item label="频道标签" prop="tag">
+          <el-tag v-for="tag in temp.tag" :key="tag">{{ tag }}</el-tag>
+        </el-form-item>
+
+        <el-form-item label="频道规则" prop="tag">
+
+          <el-row>
+            <el-col :span="12">
+              <el-button type="primary" @click="handleAddRule">+添加规则条目</el-button>
+            </el-col>
+            <el-col :span="12" align="right">
+              <el-checkbox v-model="additionalOptionShow">高级选项</el-checkbox>
+            </el-col>
+          </el-row>
+          <el-table
+            :data="temp.rules"
+            width="90%"
+          >
+            <el-table-column
+              type="index"
+              label="序号"
+              align="center"
+            />
+            <el-table-column
+              prop="item1.tableKey"
+              label="选择数据项"
+              width="340"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+                <el-input v-model="row.item1.value" placeholder="请输入内容" style="width:45%" />
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="条件"
+              width="100"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.operation1" placeholder="请选择" style="width: 60px">
+                  <el-option
+                    v-for="item in ruleOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="选择数据项"
+              width="340"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.item2.tableName" placeholder="请选择" style="width:50%">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+                <el-input v-model="row.item2.value" placeholder="请输入内容" style="width:45%" />
+              </template>
+            </el-table-column>
+
+            <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
+              <template slot-scope="{row}">
+                <el-button size="mini" type="danger" @click="handleRuleDelete(row,'deleted')">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-row v-if="additionalOptionShow">
+            高级选项
+            <el-table
+              :data="temp.additionalOption"
+            >
+              <el-table-column
+                prop="priority"
+                label="优先级"
+                width="100"
+                size="small"
+              >
+                <template slot-scope="{row}">
+                  <el-input v-model="row.priority" size="small" placeholder="请输入内容" />
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="rule"
+                label="规则"
+                width="300"
+              >
+                <template slot-scope="{row}">
+                  <el-select v-model="row.rule" size="small" placeholder="请选择" style="width:50%">
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </template>
+              </el-table-column>
+              <el-table-column
+                label="操作"
+                width="150"
+              >
+                <el-button size="small">删除</el-button>
+                <el-button size="small">添加</el-button>
+              </el-table-column>
+            </el-table>
+          </el-row>
+
+        </el-form-item>
+
+        <el-form-item label="选择发送对象" prop="targetType">
+          <el-row>
+
+            <el-radio-group v-model="temp.targetType">
+              <el-radio :label="1">按推送对象组</el-radio>
+              <el-radio :label="2">按人员</el-radio>
+            </el-radio-group>
+
+          </el-row>
+          <el-row>
+            <el-table
+              ref="multipleTable"
+              :data="temp.targetes"
+              @selection-change="handleSelectionChange"
+            >
+              <el-table-column
+                type="selection"
+              />
+              <el-table-column
+                label="名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.title }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="人数"
+              >
+                <template slot-scope="{row}">
+                  {{ row.amount }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="状态"
+                show-overflow-tooltip
+              >
+                <template slot-scope="{row}">
+                  <el-tag :type="row.status | statusFilter">
+                    {{ row.status === 'enabled' ? '已启用': '未启用' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="创建时间"
+              >
+                <template slot-scope="{row}">
+                  {{ row.createDate }}
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-row>
+
+        </el-form-item>
+
+        <el-form-item label="推送通道" prop="pushChannel">
+          <el-row>
+            <el-table
+              ref="pushChannelTable"
+              :data="channelTypeList.items"
+              style="width:400px"
+              @selection-change="handleSelectionChangePushChannel"
+            >
+              <el-table-column
+                type="selection"
+              />
+              <el-table-column
+                label="通道类型"
+              >
+                <template slot-scope="{row}">
+                  {{ row.type }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="通道名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.label }}
+                </template>
+              </el-table-column>
+
+            </el-table>
+          </el-row>
+
         </el-form-item>
 
       </el-form>
@@ -129,6 +354,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { fetchList, searchList, createSource, updateSource, dele } from '@/api/channelPush'
+import { channelType } from '@/api/common'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
 
@@ -144,8 +370,52 @@ const DataSourceModel = {
 export default {
   name: 'ChannelPush',
   components: { Pagination },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        pushed: 'success',
+        notPush: 'danger',
+        enabled: 'success',
+        disabled: 'danger'
+      }
+      return statusMap[status]
+    }
+  },
   data() {
     return {
+      channelTypeList: [],
+      additionalOptionShow: false,
+      ruleOptions: [
+        {
+          value: '==',
+          label: '=='
+        }, {
+          value: '!=',
+          label: '!='
+        }, {
+          value: '>',
+          label: '>'
+        }, {
+          value: '<',
+          label: '<'
+        }],
+      options: [
+        {
+          value: '选项1',
+          label: '黄金糕'
+        }, {
+          value: '选项2',
+          label: '双皮奶'
+        }, {
+          value: '选项3',
+          label: '蚵仔煎'
+        }, {
+          value: '选项4',
+          label: '龙须面'
+        }, {
+          value: '选项5',
+          label: '北京烤鸭'
+        }],
       content: `<p>内容部分</p>`,
       // editorOption: quillConfig,  //图片上传
       editorOption: {}, // base64
@@ -179,13 +449,16 @@ export default {
         title: '',
         subhead: '',
         url: '',
-        content: ''
+        content: '',
+        targetType: 1,
+        pushChannels: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
+        channelPushSet: '频道推送设置（订阅频道）',
         view: '查看',
-        update: '编辑',
+        update: '频道推送设置（订阅频道）',
         create: '新建'
       }
     }
@@ -201,8 +474,42 @@ export default {
   },
   created() {
     this.getList()
+    this.getChannelTypeList()
   },
   methods: {
+    handleDialogOpened() {
+      const rows = this.channelTypeList.items.filter((item, index) => {
+        return this.temp.pushChannels.find((item2, index2) => item2.label === item.label)
+      })
+      this.pushChannelSelection(rows)
+    },
+    pushChannelSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.pushChannelTable.toggleRowSelection(row)
+        })
+      } else {
+        this.$refs.pushChannelTable.clearSelection()
+      }
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    handleSelectionChangePushChannel(val) {
+      this.multipleSelection = val
+    },
+    handleAddRule() {
+      console.log(this.temp.rules)
+      console.log(this.temp)
+      this.temp.rules.push({
+        item1: { value: '', tableKey: '', tableName: '' },
+        item2: { value: '', tableKey: '', tableName: '' },
+        item3: { value: '', tableKey: '', tableName: '' },
+        operation1: '==',
+        operation2: '=='
+      })
+      // console.log(this.temp.rules)
+    },
     onEditorReady(editor) { // 准备编辑器
 
     },
@@ -219,6 +526,13 @@ export default {
       fetchList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
+        this.listLoading = false
+      })
+    },
+    getChannelTypeList() {
+      this.listLoading = true
+      channelType().then(response => {
+        this.channelTypeList = response.data
         this.listLoading = false
       })
     },
@@ -252,7 +566,9 @@ export default {
         title: '',
         subhead: '',
         url: '',
-        content: ''
+        content: '',
+        additionalOption: false,
+        rules: []
       }
     },
     handleSearch() {
@@ -291,7 +607,7 @@ export default {
       })
     },
     handleUpdate(row) {
-      console.log('handleUpdate...')
+      // console.log('handleUpdate...')
       if (this.$refs.transfer) {
         console.log(this.$refs.transfer.targetData)
       }
@@ -299,7 +615,7 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
 
-      console.log(row.subhead)
+      // console.log(row.subhead)
       this.isSubhead = !!row.subhead
       this.isUrl = !this.url
 
@@ -362,4 +678,20 @@ export default {
 .ql-editor{
   height: 200px;
 }
+  #channelPush{
+    tr{
+      button{
+        padding: 7px;
+        margin-left: 0;
+      }
+    }
+    .el-dialog{
+      margin-top: 50px !important;
+    }
+    .el-dialog__body{
+      height:700px;
+      max-height: 700px;
+      overflow-y: scroll;
+    }
+  }
 </style>

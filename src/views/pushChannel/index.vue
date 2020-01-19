@@ -68,7 +68,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
         <el-form-item label="通道类型" prop="type">
-          <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.type" :label="key"> {{ item }} </el-radio>
+          <el-radio v-for=" (item, key) in channelTypeList.items" :key="key" v-model="temp.type" :label="item.type"> {{ item.label }} </el-radio>
         </el-form-item>
         <el-form-item label="通道名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
