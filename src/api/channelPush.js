@@ -63,10 +63,33 @@ export function createSource(data) {
   })
 }
 
-export function updateSource(data) {
+export function updateChannel(data) {
   return request({
     url: '/channel-push/update',
     method: 'post',
     data: { data: data }
+  })
+}
+export function copyChannel(data) {
+  return request({
+    url: '/channel-push/copy',
+    method: 'post',
+    data: { data: data }
+  })
+}
+
+export function push(data) {
+  return request({
+    url: '/channel-push/push',
+    method: 'post',
+    data: { data: data }
+  })
+}
+
+export function unPush(data, opt) {
+  return request({
+    url: '/channel-push/un-push',
+    method: 'post',
+    data: { data: data, opt: opt }
   })
 }

@@ -13,8 +13,7 @@
         业务频道列表：
       </el-col>
       <el-col :span="8" align="right">
-        <el-button type="primary" @click="showSubscribePanel">频道订阅</el-button>
-        <el-button type="primary" @click="handleCreate">+自定义业务频道</el-button>
+        <el-button type="primary" @click="handleCreate">+渠道推送</el-button>
       </el-col>
     </el-row>
 
@@ -33,7 +32,7 @@
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="频道推送状态" align="center" min-width="50">
+        <el-table-column label="推送状态" align="center" min-width="50">
           <template slot-scope="{row}">
 
             <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
@@ -41,19 +40,24 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="业务频道名称" prop="type" width="300" align="center" min-width="50">
+        <el-table-column label="最近推送时间" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.title }}</span>
+            <span>{{ row.lastPushTime }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签" align="center" min-width="100">
+        <el-table-column label="渠道来源" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <span>{{ row.origin }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="渠道标签" align="center" min-width="100">
           <template slot-scope="{row}">
             <el-tag v-for="tag in row.tag" :key="tag" style="margin-right: 10px">{{ tag }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="来源" align="center" min-width="100">
+        <el-table-column label="渠道推送名称" prop="type" width="300" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.title }}</span>
           </template>
         </el-table-column>
 
@@ -108,29 +112,17 @@
     >
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item label="频道名称" prop="title">
+        <el-form-item label="渠道推送名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="选择频道" prop="category">
+        <el-form-item label="选择渠道数据" prop="category">
           <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
             <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="数据表" prop="title">
-          100
-        </el-form-item>
-
-        <el-form-item label="频道类型" prop="type">
-          默认
-        </el-form-item>
-
-        <el-form-item label="频道标签" prop="tag">
-          <el-tag v-for="tag in temp.tag" :key="tag">{{ tag }}</el-tag>
-        </el-form-item>
-
-        <el-form-item label="频道规则" prop="tag">
+        <el-form-item label="渠道规则" prop="tag">
 
           <el-row>
             <el-col :span="12">
@@ -151,12 +143,12 @@
             />
             <el-table-column
               prop="item1.tableKey"
-              label="选择数据项"
-              width="340"
+              label="渠道来源"
+              width="240"
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
+                <el-select v-model="row.item1.tableName" size="small" placeholder="请选择" style="width:50%">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -164,17 +156,16 @@
                     :value="item.value"
                   />
                 </el-select>
-                <el-input v-model="row.item1.value" placeholder="请输入内容" style="width:45%" />
               </template>
             </el-table-column>
             <el-table-column
               prop="name"
-              label="条件"
-              width="100"
+              label="选择"
+              width="200"
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.operation1" placeholder="请选择" style="width: 60px">
+                <el-select v-model="row.operation1" size="small" placeholder="请选择" style="width: 100px">
                   <el-option
                     v-for="item in ruleOptions"
                     :key="item.value"
@@ -186,12 +177,12 @@
             </el-table-column>
             <el-table-column
               prop="name"
-              label="选择数据项"
-              width="340"
+              label="属性字段"
+              width="240"
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.item2.tableName" placeholder="请选择" style="width:50%">
+                <el-select v-model="row.item2.tableName" size="small" placeholder="请选择" style="width:50%">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -199,7 +190,6 @@
                     :value="item.value"
                   />
                 </el-select>
-                <el-input v-model="row.item2.value" placeholder="请输入内容" style="width:45%" />
               </template>
             </el-table-column>
 
@@ -351,7 +341,7 @@
           <el-radio v-model="temp.pushPlan" label="instant">实时</el-radio>
 
           <el-row>
-           推送确认:
+            推送确认:
             <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
               <el-option label="按钮确认" value="1" />
               <el-option label="阅读读秒计时" value="2" />
@@ -361,7 +351,7 @@
             <span>（短信不支持确认）</span>
           </el-row>
           <el-row>
-           推送确认:
+            推送确认:
             <el-radio v-model="temp.receipt" label="true">需回传</el-radio>
             <el-radio v-model="temp.receipt" label="false">不需回传</el-radio>
             <span>（短信不支持确认）</span>
@@ -387,56 +377,6 @@
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog
-      title="频道订阅"
-      :visible.sync="dialogFormSubscribe"
-    >
-
-      <template>
-        <el-table
-          :data="channelSubscribeList"
-          stripe
-          border
-          style="width: 100%"
-        >
-          <el-table-column
-            prop="status"
-            label="订阅状态"
-          >
-            <template slot-scope="{row}">
-              <span>{{ row.status? '已订阅':'未订阅' }}</span>
-            </template>
-
-          </el-table-column>
-
-          <el-table-column
-            prop="title"
-            label="频道名称"
-          />
-          <el-table-column
-            align="center"
-            label="操作"
-          >
-            <template slot-scope="{row}">
-              <el-button v-if="row.status" type="danger" size="mini" @click="handleSubscribe(row,false)">
-                取消订阅
-              </el-button>
-              <el-button v-else type="primary" size="mini" @click="handleSubscribe(row,true)">
-                订阅
-              </el-button>
-            </template>
-
-          </el-table-column>
-        </el-table>
-      </template>
-
-      <span slot="footer" class="dialog-footer">
-        <!--        <el-button @click="dialogFormSubscribe = false">取 消</el-button>-->
-        <el-button type="primary" @click="dialogFormSubscribe = false">关闭</el-button>
-      </span>
-    </el-dialog>
-
   </div>
 </template>
 
@@ -473,7 +413,6 @@ export default {
   },
   data() {
     return {
-      radio: '1',
       channelTypeList: [],
       channelSubscribeList: [],
       pushTemplateList: [],
@@ -481,16 +420,13 @@ export default {
       ruleOptions: [
         {
           value: '==',
-          label: '=='
+          label: '等于'
         }, {
           value: '!=',
-          label: '!='
+          label: '不等于'
         }, {
-          value: '>',
-          label: '>'
-        }, {
-          value: '<',
-          label: '<'
+          value: '⊆',
+          label: '包含'
         }],
       options: [
         {
@@ -547,7 +483,6 @@ export default {
         pushChannels: []
       },
       dialogFormVisible: false,
-      dialogFormSubscribe: false,
       dialogStatus: '',
       textMap: {
         channelPushSet: '频道推送设置（订阅频道）',
@@ -680,9 +615,9 @@ export default {
         url: '',
         content: '',
         additionalOption: [],
+        pushTemplateList: [],
         targetes: [],
         pushChannels: [],
-        pushTemplateList: [],
         rules: []
       }
     },
@@ -697,9 +632,6 @@ export default {
     },
     handleClose() {
 
-    },
-    showSubscribePanel() {
-      this.dialogFormSubscribe = true
     },
     handleSubscribe(row, opt) {
       subscribe(row.id, opt).then(response => {

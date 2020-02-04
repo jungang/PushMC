@@ -62,3 +62,11 @@ export function updateSource(data) {
     data: { data: data }
   })
 }
+
+export function subscribe(data, opt) {
+  return request({
+    url: '/business-channel/subscribe',
+    method: 'post',
+    data: { data: data, opt: opt }
+  })
+}

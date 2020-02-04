@@ -174,7 +174,7 @@ export const constantRoutes = [
       {
         path: 'pipe-push',
         name: 'PipePush',
-        component: () => import('@/views/table/index'),
+        component: () => import('@/views/pipePush/index'),
         meta: { title: '渠道推送', icon: 'table' }
       },
       {

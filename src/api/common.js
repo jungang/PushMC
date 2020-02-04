@@ -24,3 +24,21 @@ export function searchPersons(query) {
     params: query
   })
 }
+
+// 频道订阅列表
+export function channelSubscribe(query) {
+  return request({
+    url: '/common/channel-Subscribe',
+    method: 'get',
+    params: query
+  })
+}
+
+// 推送模板列表
+export function pushTemplate(query) {
+  return request({
+    url: '/common/push-template',
+    method: 'get',
+    params: query
+  })
+}
