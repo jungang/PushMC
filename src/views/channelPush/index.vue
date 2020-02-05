@@ -351,7 +351,7 @@
           <el-radio v-model="temp.pushPlan" label="instant">实时</el-radio>
 
           <el-row>
-           推送确认:
+            推送确认:
             <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
               <el-option label="按钮确认" value="1" />
               <el-option label="阅读读秒计时" value="2" />
@@ -361,7 +361,7 @@
             <span>（短信不支持确认）</span>
           </el-row>
           <el-row>
-           推送确认:
+            推送确认:
             <el-radio v-model="temp.receipt" label="true">需回传</el-radio>
             <el-radio v-model="temp.receipt" label="false">不需回传</el-radio>
             <span>（短信不支持确认）</span>

@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function sourceOption(query) {
+  return request({
+    url: '/source/data-source-options',
+    method: 'get',
+    params: query
+  })
+}
+
 export function channelType(query) {
   return request({
     url: '/common/channel-type',

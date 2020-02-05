@@ -7,6 +7,13 @@ export function fetchList(query) {
     params: query
   })
 }
+export function option(query) {
+  return request({
+    url: '/source/data-source-options',
+    method: 'get',
+    params: query
+  })
+}
 
 export function changeStatus(id, status) {
   return request({
@@ -45,5 +52,13 @@ export function updateSource(data) {
     url: '/source/update',
     method: 'post',
     data: { data: data }
+  })
+}
+
+export function detail(data) {
+  return request({
+    url: '/source/detail',
+    method: 'get',
+    params: { data: data }
   })
 }

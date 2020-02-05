@@ -8,11 +8,12 @@
       </div>
       <app-main />
     </div>
+    <common />
   </div>
 </template>
 
 <script>
-import { Navbar, Sidebar, AppMain } from './components'
+import { Navbar, Sidebar, AppMain, Common } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 
 export default {
@@ -20,10 +21,14 @@ export default {
   components: {
     Navbar,
     Sidebar,
-    AppMain
+    AppMain,
+    Common
   },
   mixins: [ResizeMixin],
   computed: {
+    common() {
+      return this.$store.state.app.common
+    },
     sidebar() {
       return this.$store.state.app.sidebar
     },

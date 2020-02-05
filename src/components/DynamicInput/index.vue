@@ -16,25 +16,20 @@
         </el-input>
       </el-form-item>
 
-      <el-form-item
-        v-for="(arg, index2) in path.args"
-        :key="arg.key"
-        :prop="'paths.' + index + '.args.' + index2 + '.value'"
-        :rules="{
-          required: true, message: '参数不能为空', trigger: 'blur'
-        }"
-      >
-        <el-input
-          v-model="arg.value"
-          placeholder="参数"
-          size="mini"
-          class="dy_arg"
-        >
-          <el-button v-if="path.args.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removeArg( path.args, index2)" />
-        </el-input>
-      </el-form-item>
+      <el-row>
+        <el-col :span="6">
+          上传JSON文件：
+        </el-col>
+        <el-col :span="18">
+          <el-upload
+            action="http://rap2api.taobao.org/app/mock/data/1435500"
+            :on-success="(res,file)=>{return handleSuccess(res,file,path)}"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
 
-      <el-button size="mini" @click="addArg(path)">+参数</el-button>
+        </el-col>
+      </el-row>
 
     </div>
 
@@ -53,43 +48,29 @@ export default {
       type: Array
     }
   },
+  data() {
+    return {}
+  },
   computed: {},
   created() {
     console.log(this.data)
   },
   methods: {
+    handleSuccess(file, fileList, path) {
+      path.fileUrl = file.url
+    },
     removePath(item) {
       var index = this.data.indexOf(item)
       if (index !== -1) {
         this.data.splice(index, 1)
       }
     },
-    removeArg(args, index) {
-      console.log(index)
-      // var index = this.data.indexOf(item)
-      if (index !== -1) {
-        args.splice(index, 1)
-      }
-    },
     addPath() {
       this.data.push({
         value: '',
-        key: Date.now(),
-        args: [
-          {
-            value: '',
-            key: Date.now()
-          }
-        ]
-      })
-      console.log(this.temp)
-    },
-    addArg(path) {
-      console.log(path)
-      path.args.push({
-        value: '',
         key: Date.now()
       })
+      console.log(this.temp)
     }
   }
 }

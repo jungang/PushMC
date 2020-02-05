@@ -3,8 +3,15 @@
     <el-row>
       数据源列表
     </el-row>
-    <el-row type="flex" justify="end">
-      <el-button type="primary" @click="handleCreate">新建数据源</el-button>
+    <el-row>
+      <el-select
+        v-model="listArr.listQuery.filter"
+        @change="filter"
+      >
+        <el-option label="全部" value="all" />
+        <el-option label="已审批" value="approved" />
+        <el-option label="待审批" value="unsolved" />
+      </el-select>
     </el-row>
     <el-table
       :key="tableKey"
@@ -243,6 +250,10 @@ export default {
     this.getDataSourceModel()
   },
   methods: {
+    filter() {
+      this.listArr.listQuery.page = 1
+      this.getList()
+    },
     getDataSourceModel() {
       this.listLoading = true
       option().then(response => {
@@ -274,14 +285,14 @@ export default {
 
         // 删除行
         /*        if (status === 'deleted') {
-          for (const v of this.listArr.data) {
-            if (v.id === row.id) {
-              const index = this.listArr.data.indexOf(v)
-              this.listArr.data.splice(index, 1)
-              break
+            for (const v of this.listArr.data) {
+              if (v.id === row.id) {
+                const index = this.listArr.data.indexOf(v)
+                this.listArr.data.splice(index, 1)
+                break
+              }
             }
-          }
-        }*/
+          }*/
 
         this.listLoading = false
       })

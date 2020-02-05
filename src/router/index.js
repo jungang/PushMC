@@ -72,10 +72,17 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: '',
+        path: '/index',
         name: 'DataTag',
-        component: () => import('@/views/datatag/index'),
+        component: () => import('@/views/dataTag/index'),
         meta: { title: '数据标注', icon: 'form' }
+      },
+      {
+        path: '/edit',
+        name: 'Edit',
+        component: () => import('@/views/dataTag/edit'),
+        meta: { title: '标注', icon: 'form' },
+        hidden: true
       }
     ]
   },
@@ -209,14 +216,27 @@ export const constantRoutes = [
   },
 
   {
-    path: '/form',
+    path: '/statistics',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
+        name: 'Statistics',
+        component: () => import('@/views/statistics/index'),
         meta: { title: '推送统计', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/examine',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Examine',
+        component: () => import('@/views/examine/index'),
+        meta: { title: '内容审批', icon: 'form' }
       }
     ]
   }
