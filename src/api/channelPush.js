@@ -7,6 +7,13 @@ export function fetchList(query) {
     params: query
   })
 }
+export function contentPushList(query) {
+  return request({
+    url: '/channel-push/content-push-list',
+    method: 'get',
+    params: query
+  })
+}
 
 export function changeStatus(id, status) {
   return request({

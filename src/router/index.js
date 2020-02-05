@@ -180,7 +180,7 @@ export const constantRoutes = [
       {
         path: 'content-push',
         name: 'ContentPush',
-        component: () => import('@/views/tree/index'),
+        component: () => import('@/views/contentPush/index'),
         meta: { title: '内容推送', icon: 'tree' }
       }
     ]
@@ -196,14 +196,14 @@ export const constantRoutes = [
       {
         path: 'user',
         name: 'User',
-        component: () => import('@/views/table/index'),
-        meta: { title: '用户权限', icon: 'table' }
+        component: () => import('@/views/permission/index'),
+        meta: { title: '用户角色', icon: 'table' }
       },
       {
         path: 'role',
         name: 'Role',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '用户角色', icon: 'tree' }
+        component: () => import('@/views/permission/role'),
+        meta: { title: '用户权限', icon: 'tree' }
       }
     ]
   },

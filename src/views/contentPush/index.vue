@@ -13,7 +13,7 @@
         业务频道列表：
       </el-col>
       <el-col :span="8" align="right">
-        <el-button type="primary" @click="handleCreate">+渠道推送</el-button>
+        <el-button type="primary" @click="handleCreate">+新建内容推送</el-button>
       </el-col>
     </el-row>
 
@@ -45,14 +45,19 @@
             <span>{{ row.lastPushTime }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="渠道来源" align="center" min-width="100">
+        <el-table-column label="内容分类" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.contentType==="notice"?"公告":"新闻" }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="渠道标签" align="center" min-width="100">
+        <el-table-column label="内容标签" align="center" min-width="100">
           <template slot-scope="{row}">
             <el-tag v-for="tag in row.tag" :key="tag" style="margin-right: 10px">{{ tag }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="内容来源" prop="type" width="300" align="center" min-width="50">
+          <template slot-scope="{row}">
+            <span>{{ row.contentOrigin==="default"?"默认":"自定义" }}</span>
           </template>
         </el-table-column>
         <el-table-column label="渠道推送名称" prop="type" width="300" align="center" min-width="50">
@@ -112,17 +117,11 @@
     >
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item label="渠道推送名称" prop="title">
+        <el-form-item label="内容推送名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="选择渠道数据" prop="category">
-          <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="渠道规则" prop="tag">
+        <el-form-item label="内容规则" prop="tag">
 
           <el-row>
             <el-col :span="12">
@@ -143,7 +142,7 @@
             />
             <el-table-column
               prop="item1.tableKey"
-              label="渠道来源"
+              label="内容类型"
               width="240"
               align="center"
             >
@@ -177,7 +176,7 @@
             </el-table-column>
             <el-table-column
               prop="name"
-              label="属性字段"
+              label="内容标签"
               width="240"
               align="center"
             >
@@ -382,7 +381,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, createSource, dele, fetchList, push, unPush, searchList, updateChannel } from '@/api/channelPush'
+import { copyChannel, createSource, dele, contentPushList, push, unPush, searchList, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
@@ -430,21 +429,12 @@ export default {
         }],
       options: [
         {
-          value: '选项1',
-          label: '黄金糕'
+          value: 'notice',
+          label: '公告'
         }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
+          value: 'news',
+          label: '新闻'
+        },],
       content: `<p>内容部分</p>`,
       // editorOption: quillConfig,  //图片上传
       editorOption: {}, // base64
@@ -556,7 +546,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      fetchList(this.listArr.listQuery).then(response => {
+      contentPushList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
