@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function sourceOption(query) {
   return request({
-    url: '/source/data-source-options',
+    url: '/common/options',
     method: 'get',
     params: query
   })

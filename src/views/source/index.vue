@@ -138,7 +138,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, option, createSource, updateSource, changeStatus, detail } from '@/api/source'
+import { fetchList, createSource, updateSource, changeStatus, detail } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -176,11 +176,6 @@ export default {
       total: 0,
       listLoading: true,
       importanceOptions: [1, 2, 3],
-      MODEL: {
-        updatePlanOptions: {
-          hour: []
-        }
-      },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
@@ -236,20 +231,15 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   created() {
     this.getList()
-    this.getDataSourceModel()
   },
   methods: {
-    getDataSourceModel() {
-      this.listLoading = true
-      option().then(response => {
-        this.MODEL = response.data
-        this.listLoading = false
-      })
-    },
     getList() {
       this.listLoading = true
       fetchList(this.listArr.listQuery).then(response => {
@@ -333,7 +323,6 @@ export default {
     },
     handleUpdate(row) {
       detail(row).then(response => {
-        console.log(response.data.item)
         this.temp = response.data.item
         this.temp.timestamp = new Date(this.temp.timestamp)
         this.dialogStatus = 'update'

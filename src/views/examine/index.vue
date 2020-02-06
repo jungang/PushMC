@@ -149,7 +149,10 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   created() {
     this.getList()
@@ -157,7 +160,7 @@ export default {
   methods: {
     filter() {
       this.list.listQuery.page = 1
-      this.getList()
+      this.getTables()
     },
     getList() {
       this.listLoading = true

@@ -32,15 +32,22 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function createTag(data) {
   return request({
     url: '/category/create',
     method: 'post',
     data: { data: data }
   })
 }
+export function saveCategory(data) {
+  return request({
+    url: '/category/createCategory',
+    method: 'post',
+    data: { data: data }
+  })
+}
 
-export function updateSource(data) {
+export function updateTag(data) {
   return request({
     url: '/category/update',
     method: 'post',

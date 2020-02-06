@@ -53,7 +53,7 @@ export default {
   },
   computed: {},
   created() {
-    console.log(this.data)
+    // console.log(this.data)
   },
   methods: {
     handleSuccess(file, fileList, path) {

@@ -15,6 +15,13 @@ export function fetchTables(query) {
     params: query
   })
 }
+export function fetchDataItem(query) {
+  return request({
+    url: '/business-channel/data-item',
+    method: 'get',
+    params: { data: JSON.stringify(query) }
+  })
+}
 export function searchList(keyWord) {
   return request({
     url: '/business-channel/list',
@@ -31,7 +38,7 @@ export function dele(id, status) {
   })
 }
 
-export function fetchSource(id) {
+export function detail(id) {
   return request({
     url: '/business-channel/detail',
     method: 'get',

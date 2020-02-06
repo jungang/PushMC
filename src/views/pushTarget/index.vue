@@ -326,7 +326,10 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   watch: {
     filterText(val) {
@@ -451,21 +454,7 @@ export default {
         this.listLoading = false
       })
     },
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
+
     resetTemp() {
       this.temp = {
         id: undefined,

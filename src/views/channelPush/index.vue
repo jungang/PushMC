@@ -114,7 +114,7 @@
 
         <el-form-item label="选择频道" prop="category">
           <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
+            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select>
         </el-form-item>
 
@@ -448,15 +448,6 @@ import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
 
-const DataSourceModel = {
-  dataSourceTypeOptions: [
-    { key: 'api', display_name: '财务报销' },
-    { key: 'api2', display_name: 'HR' },
-    { key: 'api3', display_name: 'JIRA' },
-    { key: 'api4', display_name: 'API_4' }
-  ]
-}
-
 export default {
   name: 'ChannelPush',
   components: { Pagination },
@@ -534,7 +525,6 @@ export default {
         }
       },
       listLoading: true,
-      MODEL: DataSourceModel,
       temp: {
         id: undefined,
         tag: '',
@@ -564,6 +554,9 @@ export default {
       'name',
       'roles'
     ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    },
     editor() {
       return this.$refs.myQuillEditor.quill
     }
@@ -651,22 +644,6 @@ export default {
     handleFilter() {
       this.listArr.listQuery.page = 1
       this.getList()
-    },
-
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
     },
     resetTemp() {
       this.isSubhead = false

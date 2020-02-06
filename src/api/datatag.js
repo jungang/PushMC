@@ -12,6 +12,6 @@ export function saveTag(data) {
   return request({
     url: '/data-tag/save-tag',
     method: 'post',
-    params: { data: data }
+    data: { data: data }
   })
 }

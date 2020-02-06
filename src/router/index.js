@@ -70,15 +70,18 @@ export const constantRoutes = [
   {
     path: '/data-tag',
     component: Layout,
+    redirect: '/data-tag/list',
+    name: 'DataTag',
+    meta: { title: '数据标注', icon: 'example' },
     children: [
       {
-        path: '/index',
-        name: 'DataTag',
+        path: 'list',
+        name: 'List',
         component: () => import('@/views/dataTag/index'),
         meta: { title: '数据标注', icon: 'form' }
       },
       {
-        path: '/edit',
+        path: 'edit',
         name: 'Edit',
         component: () => import('@/views/dataTag/edit'),
         meta: { title: '标注', icon: 'form' },

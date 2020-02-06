@@ -12,19 +12,25 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   created() {
     this.init()
   },
   methods: {
     init() {
-      console.log('init............')
-      this.getDataSourceModel()
+      this.getDataSourceModel() // 取基础数据源类型
     },
     getDataSourceModel() {
       sourceOption().then(response => {
-        console.log(response)
+        try {
+          this.$store.state.publicData.model = response.data
+        } catch (err) {
+          console.log('err', err)
+        }
       })
     }
   }

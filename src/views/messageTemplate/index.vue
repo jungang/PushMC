@@ -161,7 +161,6 @@ import { mapGetters } from 'vuex'
 import { fetchList, searchList, changeStatus, createSource, updateSource, dele } from '@/api/messageTemplate'
 import Pagination from '@/components/Pagination'
 
-
 export default {
   name: 'PushContent',
   components: { Pagination },
@@ -219,6 +218,9 @@ export default {
       'name',
       'roles'
     ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    },
     editor() {
       return this.$refs.myQuillEditor.quill
     }

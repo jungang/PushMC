@@ -387,15 +387,6 @@ import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
 
-const DataSourceModel = {
-  dataSourceTypeOptions: [
-    { key: 'api', display_name: '财务报销' },
-    { key: 'api2', display_name: 'HR' },
-    { key: 'api3', display_name: 'JIRA' },
-    { key: 'api4', display_name: 'API_4' }
-  ]
-}
-
 export default {
   name: 'ChannelPush',
   components: { Pagination },
@@ -434,7 +425,7 @@ export default {
         }, {
           value: 'news',
           label: '新闻'
-        },],
+        }],
       content: `<p>内容部分</p>`,
       // editorOption: quillConfig,  //图片上传
       editorOption: {}, // base64
@@ -460,7 +451,6 @@ export default {
         }
       },
       listLoading: true,
-      MODEL: DataSourceModel,
       temp: {
         id: undefined,
         tag: '',
@@ -489,6 +479,9 @@ export default {
       'name',
       'roles'
     ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    },
     editor() {
       return this.$refs.myQuillEditor.quill
     }
@@ -578,21 +571,6 @@ export default {
       this.getList()
     },
 
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
     resetTemp() {
       this.isSubhead = false
       this.isUrl = false

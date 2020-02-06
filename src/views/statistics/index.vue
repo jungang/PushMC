@@ -386,7 +386,10 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   created() {
     this.getBusinessChannelList()

@@ -112,15 +112,6 @@ import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import { changeStatus } from '@/api/source'
 
-const DataSourceModel = {
-  dataSourceTypeOptions: [
-    { key: 'api', display_name: 'API' },
-    { key: 'api2', display_name: 'API_2' },
-    { key: 'api3', display_name: 'API_3' },
-    { key: 'api4', display_name: 'API_4' }
-  ]
-}
-
 export default {
   name: 'PushChannel',
   components: { Pagination },
@@ -155,7 +146,6 @@ export default {
         }
       },
       listLoading: true,
-      MODEL: DataSourceModel,
       temp: {
         id: undefined,
         type: '',
@@ -183,7 +173,10 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   async created() {
     await this.getChannelType()
@@ -231,21 +224,7 @@ export default {
         this.listLoading = false
       })
     },
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
+
     resetTemp() {
       this.temp = {
         id: undefined,
