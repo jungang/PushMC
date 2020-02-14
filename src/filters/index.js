@@ -94,3 +94,13 @@ export function examineStatus(str) {
   if (store.state.publicData.model.examineStatus.length <= 0) return false
   return store.state.publicData.model.examineStatus.find((item) => item.key === str).label
 }
+
+export function channelType(str) {
+  if (store.state.publicData.model.channelType.length <= 0) return false
+  return store.state.publicData.model.channelType.find((item) => item.key === str).label
+}
+
+export function templateOrigin(str) {
+  if (store.state.publicData.model.templateOrigin.length <= 0) return false
+  return store.state.publicData.model.templateOrigin.find((item) => item.key === str).label
+}

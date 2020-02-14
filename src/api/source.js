@@ -2,7 +2,8 @@ import request from '@/utils/request'
 
 export function fetchList(query) {
   return request({
-    url: '/source/list',
+    // url: '/source/list', //rap2
+    url: '/source/page',
     method: 'get',
     params: query
   })
@@ -43,7 +44,7 @@ export function createSource(data) {
   return request({
     url: '/source/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 

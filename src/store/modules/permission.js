@@ -56,6 +56,30 @@ const actions = {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
       commit('SET_ROUTES', accessedRoutes)
+      // console.log(accessedRoutes)
+      resolve(accessedRoutes)
+    })
+  },
+
+  generateAsyncRouter: function({ commit }, arg) {
+    const { roles, roleTypes } = arg
+    return new Promise(resolve => {
+      let accessedRoutes = []
+      if (roles.includes('admin')) {
+        accessedRoutes = asyncRoutes || []
+      } else {
+        roleTypes.forEach(item => {
+          asyncRoutes.forEach(item2 => {
+            if (item.path === item2.path) {
+              accessedRoutes.push(item2)
+            }
+          })
+        })
+
+        // accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      }
+      commit('SET_ROUTES', accessedRoutes)
+      console.log(accessedRoutes)
       resolve(accessedRoutes)
     })
   }

@@ -266,7 +266,7 @@
           <el-row>
             <el-table
               ref="multipleTable"
-              :data="temp.targetes"
+              :data="groupsArr"
               @selection-change="handleSelectionChange"
             >
               <el-table-column
@@ -442,7 +442,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, createSource, dele, fetchList, push, unPush, searchList, updateChannel } from '@/api/channelPush'
+import { copyChannel, createSource, dele, fetchList, detail, groups, push, unPush, searchList, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
@@ -469,6 +469,7 @@ export default {
       channelSubscribeList: [],
       pushTemplateList: [],
       additionalOptionShow: false,
+      groupsArr: [],
       ruleOptions: [
         {
           value: '==',
@@ -566,8 +567,14 @@ export default {
     this.getChannelTypeList()
     this.getChannelSubscribe()
     this.getPushTemplateList()
+    this.getGroups()
   },
   methods: {
+    getGroups() {
+      groups().then(response => {
+        this.groupsArr = response.data
+      })
+    },
     handleDialogOpened() {
       const rows = this.channelTypeList.items.filter((item, index) => {
         return this.temp.pushChannels.find((item2, index2) => item2.label === item.label)
@@ -735,22 +742,17 @@ export default {
     },
 
     handleUpdate(row, opt) {
-      // console.log('handleUpdate...')
-      /*      if (this.$refs.transfer) {
-        console.log(this.$refs.transfer.targetData)
-      }*/
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      // console.log(row.subhead)
-      this.isSubhead = !!row.subhead
-      this.isUrl = !this.url
+
+      detail(row).then((res) => {
+                this.temp = res.data.item
 
       this.dialogStatus = opt || 'update'
-
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
+      })
+
     },
 
     pushData() {

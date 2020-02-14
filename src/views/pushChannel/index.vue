@@ -21,14 +21,19 @@
             <span>{{ row.index }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="通道类型" prop="type" align="center" min-width="50">
-          <template slot-scope="{row}">
-            <span>{{ channelTypeList[row.type] }}</span>
-          </template>
-        </el-table-column>
         <el-table-column label="通道名称" align="center" min-width="100">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="通道描述" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <span>{{ row.describe }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="通道类型" prop="type" align="center" min-width="50">
+          <template slot-scope="{row}">
+            <span>{{ row.type | channelType }}</span>
           </template>
         </el-table-column>
         <el-table-column label="状态" align="center" min-width="50">
@@ -68,12 +73,11 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
         <el-form-item label="通道类型" prop="type">
-          <el-radio v-for=" (item, key) in channelTypeList.items" :key="key" v-model="temp.type" :label="item.type"> {{ item.label }} </el-radio>
+          <el-radio v-for=" (item, key) in MODEL.channelType" :key="key" v-model="temp.type" :label="item.key"> {{ item.label }} </el-radio>
         </el-form-item>
         <el-form-item label="通道名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
-
         <el-form-item label="通道状态" prop="status">
           <el-radio v-model="temp.status" label="enabled">启用</el-radio>
           <el-radio v-model="temp.status" label="disabled ">未启用</el-radio>
@@ -106,7 +110,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, createSource, update, dele } from '@/api/pushChannel'
+import { fetchList, detail, create, update, dele } from '@/api/pushChannel'
 import { channelType } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -245,7 +249,7 @@ export default {
         if (valid) {
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
           this.temp.author = 'jun'
-          createSource(this.temp).then(() => {
+          create(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
@@ -259,12 +263,13 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      detail(row).then((res) => {
+        this.temp = res.data.item
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
     updateData() {

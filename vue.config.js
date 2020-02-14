@@ -8,7 +8,8 @@ function resolve(dir) {
 
 const name = defaultSettings.title || 'vue Admin Template' // page title
 
-const rap2 = `http://rap2api.taobao.org/app/mock/241291/dev-api`
+// const rap2 = `http://rap2api.taobao.org/app/mock/241291/dev-api`
+const rap2 = `http://39.98.167.246:9910/smartpush/`
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.

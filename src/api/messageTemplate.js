@@ -8,6 +8,14 @@ export function fetchList(query) {
   })
 }
 
+export function detail(query) {
+  return request({
+    url: '/message-template/detail',
+    method: 'get',
+    params: query
+  })
+}
+
 export function changeStatus(id, status) {
   return request({
     url: '/message-template/status',

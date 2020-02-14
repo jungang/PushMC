@@ -1,0 +1,46 @@
+[
+  {
+    "id": "01",
+    "path": "/source"
+  },
+  {
+    "id": "02",
+    "path": "/data-tag"
+  },
+  {
+    "id": "03",
+    "path": "/category"
+  },
+  {
+    "id": "04",
+    "path": "/business-channel"
+  },
+  {
+    "id": "05",
+    "path": "/push-content"
+  },
+  {
+    "id": "06",
+    "path": "/push-channel"
+  },
+  {
+    "id": "07",
+    "path": "/push-target"
+  },
+  {
+    "id": "08",
+    "path": "/message-template"
+  },
+  {
+    "id": "09",
+    "path": "/message-push"
+  },
+  {
+    "id": "10",
+    "path": "/permission"
+  },
+  {
+    "id": "11",
+    "path": "/statistics"
+  }
+]

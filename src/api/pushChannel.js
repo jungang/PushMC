@@ -7,6 +7,13 @@ export function fetchList(query) {
     params: query
   })
 }
+export function detail(query) {
+  return request({
+    url: '/push-channel/detail',
+    method: 'get',
+    params: query
+  })
+}
 
 export function dele(id, status) {
   return request({
@@ -32,7 +39,7 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function create(data) {
   return request({
     url: '/push-channel/create',
     method: 'post',

@@ -28,12 +28,12 @@
         </el-table-column>
         <el-table-column label="模版类型" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.type }}</span>
+            <span>{{ row.type === 'text' ? '文本' : '图文' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="模板来源" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.origin | templateOrigin }}</span>
           </template>
         </el-table-column>
         <el-table-column label="模板名称" prop="type" width="300" align="center" min-width="50">
@@ -158,7 +158,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, searchList, changeStatus, createSource, updateSource, dele } from '@/api/messageTemplate'
+import { fetchList, searchList, detail, changeStatus, createSource, updateSource, dele } from '@/api/messageTemplate'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -328,22 +328,13 @@ export default {
       })
     },
     handleUpdate(row) {
-      console.log('handleUpdate...')
-      if (this.$refs.transfer) {
-        console.log(this.$refs.transfer.targetData)
-      }
-
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-
-      // console.log(row.subhead)
-      this.isSubhead = !!row.subhead
-      this.isUrl = !this.url
-
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      detail(row).then((res) => {
+        this.temp = res.data.item
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
     updateData() {

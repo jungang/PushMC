@@ -10,6 +10,8 @@ const state = {
     tags: [], // 标签
     contentTag: [], // 内容标签
     examineStatus: [], // 审批状态
+    channelType: [], // 通道类型
+    templateOrigin: [], // 模板来源
     businessSource: [] // 业务频道 业务源
   }
 }
