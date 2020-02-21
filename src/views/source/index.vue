@@ -64,7 +64,7 @@
           <el-button v-if="row.status==='deleted'" size="mini" @click="handleModifyStatus(row,'draft')">
             恢复
           </el-button>
-          <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleModifyStatus(row,'deleted')">
+          <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -75,6 +75,7 @@
       :total="listArr.total"
       :page.sync="listArr.listQuery.page"
       :limit.sync="listArr.listQuery.limit"
+      hide-on-single-page
       @pagination="getList()"
     />
 
@@ -138,7 +139,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, createSource, updateSource, changeStatus, detail } from '@/api/source'
+import { fetchSourceList, dele, createSource, updateSource, changeStatus, detail } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -181,6 +182,7 @@ export default {
       temp: {
         id: undefined,
         type: '',
+        typeTitle: '',
         updatePlanHours: '',
         updatePlanTimes: '',
         describe: '',
@@ -188,7 +190,8 @@ export default {
         serverAddress: '',
         secretKey: '1111',
         paths: [{
-          value: ''
+          title: '',
+          value: '{}'
         }]
       },
       dialogFormVisible: false,
@@ -242,8 +245,8 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listArr.listQuery).then(response => {
-        console.log(response)
+      fetchSourceList(this.listArr.listQuery).then(response => {
+        // console.log(response)
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -258,6 +261,7 @@ export default {
 
       this.getList()
     },
+
     handleModifyStatus(row, status) {
       changeStatus(row.id, status).then(response => {
         this.$message({
@@ -280,6 +284,28 @@ export default {
         this.listLoading = false
       })
     },
+
+    handleDelete(row) {
+      dele(row.id).then(response => {
+        this.$notify({
+          title: 'Success',
+          message: 'Delete Successfully',
+          type: 'success',
+          duration: 2000
+        })
+
+        for (const v of this.listArr.data) {
+          if (v.id === row.id) {
+            const index = this.listArr.data.indexOf(v)
+            this.listArr.data.splice(index, 1)
+            break
+          }
+        }
+
+        this.listLoading = false
+      })
+    },
+
     resetTemp() {
       this.temp = {
         id: undefined,
@@ -291,8 +317,8 @@ export default {
         updatePlanHours: '4',
         updatePlanTimes: '8',
         paths: [{
-          value: '****',
-          key: Date.now()
+          title: '',
+          value: '{}'
         }],
         describe: '*****'
       }
@@ -309,30 +335,9 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.id = 0 // mock a id
-          this.temp.author = 'jun'
-          this.temp.appId = ''
-          this.temp.dataSource = ''
-          this.temp.dataSourceTitle = ''
-          this.temp.interval = ''
-          this.temp.password = ''
-          this.temp.status = ''
-          this.temp.type = ''
-          this.temp.typeTitle = ''
-          this.temp.username = ''
-          this.temp = {
-            'dataSource': 'business',
-            'dataSourceTitle': '业务数据源22',
-            'paths': [{
-              'title': 'news',
-              'value': '{"definitions":{},"$schema":"http://json-schema.org/draft-07/schema#","$id":"http://example.com/root.json","type":"object","title":"The Root Schema","required":["title","subTitle","cover","classifyId","classifyTitle","isUrl","url","content","authorId","authorName","needCheck"],"properties":{"title":{"$id":"#/properties/title","type":"string","title":"The Title Schema","default":"","examples":["标题"],"pattern":"^(.*)$"},"subTitle":{"$id":"#/properties/subTitle","type":"string","title":"The Subtitle Schema","default":"","examples":["副标题"],"pattern":"^(.*)$"},"cover":{"$id":"#/properties/cover","type":"string","title":"The Cover Schema","default":"","examples":["image url"],"pattern":"^(.*)$"},"classifyId":{"$id":"#/properties/classifyId","type":"integer","title":"The Classifyid Schema","default":0,"examples":[1]},"classifyTitle":{"$id":"#/properties/classifyTitle","type":"string","title":"The Classifytitle Schema","default":"","examples":["分类标题"],"pattern":"^(.*)$"},"isUrl":{"$id":"#/properties/isUrl","type":"boolean","title":"The Isurl Schema","default":false,"examples":[true]},"url":{"$id":"#/properties/url","type":"string","title":"The Url Schema","default":"","examples":["new url"],"pattern":"^(.*)$"},"content":{"$id":"#/properties/content","type":"string","title":"The Content Schema","default":"","examples":["内容"],"pattern":"^(.*)$"},"authorId":{"$id":"#/properties/authorId","type":"string","title":"The Authorid Schema","default":"","examples":["作者ID"],"pattern":"^(.*)$"},"authorName":{"$id":"#/properties/authorName","type":"string","title":"The Authorname Schema","default":"","examples":["作者名字"],"pattern":"^(.*)$"},"needCheck":{"$id":"#/properties/needCheck","type":"integer","title":"The Needcheck Schema","default":0,"examples":[1]}}}'
-            }],
-            'status': 'enabled',
-            'title': '数据源08622',
-            'type': 'API',
-            'typeTitle': 'API',
-            'updatePlanHours': 1,
-            'updatePlanTimes': 4
-          }
+          this.temp.dataSourceTitle = this.temp.title
+          this.temp.typeTitle = this.temp.type
+          this.temp.dataSource = 'business'
 
           createSource(this.temp).then(() => {
             console.log('createSource...')
@@ -350,9 +355,8 @@ export default {
       })
     },
     handleUpdate(row) {
-      detail(row).then(response => {
-        this.temp = response.data.item
-        this.temp.timestamp = new Date(this.temp.timestamp)
+      detail({ id: row.id }).then(response => {
+        this.temp = response.data
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -384,16 +388,7 @@ export default {
         }
       })
     },
-    handleDelete(row) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
-    },
+
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => {
         if (j === 'timestamp') {

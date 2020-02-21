@@ -53,7 +53,7 @@
       </el-table-column>
       <el-table-column label="数据表" align="center" min-width="50">
         <template slot-scope="{row}">
-          <span>{{ row.tableCount }}</span>
+          <span>{{ row.paths.length }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
@@ -69,6 +69,7 @@
       :total="listArr.total"
       :page.sync="listArr.listQuery.page"
       :limit.sync="listArr.listQuery.limit"
+      hide-on-single-page
       @pagination="getList()"
     />
 
@@ -77,7 +78,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, detail } from '@/api/source'
+import { fetchSourceList, detail } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -184,7 +185,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      fetchList(this.listArr.listQuery).then(response => {
+      fetchSourceList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -197,8 +198,8 @@ export default {
       this.getList()
     },
     handleUpdate(row) {
-      detail(row).then(response => {
-        this.$router.push({ name: 'Edit', params: response.data.item })
+      detail({ id: row.id }).then(response => {
+        this.$router.push({ name: 'Edit', params: response.data })
       })
     }
   }

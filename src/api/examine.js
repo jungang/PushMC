@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function list(query) {
   return request({
-    url: '/examine/list',
+    url: '/push-content/examine/list',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function list(query) {
 
 export function detail(query) {
   return request({
-    url: '/examine/detail',
+    url: '/push-content/detail',
     method: 'get',
     params: query
   })
@@ -19,7 +19,7 @@ export function detail(query) {
 export function action(query) {
   return request({
     url: '/examine/action',
-    method: 'post',
+    method: 'put',
     params: query
   })
 }

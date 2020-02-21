@@ -18,7 +18,7 @@
       >
         <el-table-column label="序号" prop="index" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.index }}</span>
+            <span>{{ row.id }}</span>
           </template>
         </el-table-column>
         <el-table-column label="名称" align="center" min-width="80">
@@ -43,7 +43,7 @@
 
         <el-table-column label="创建时间" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.createTime }}</span>
+            <span>{{ row.updateTime }}</span>
           </template>
         </el-table-column>
 
@@ -69,6 +69,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -91,7 +92,7 @@
           <el-radio-button label="department">按组织结构</el-radio-button>
           <el-radio-button label="personnel">按人员</el-radio-button>
         </el-radio-group>-->
-        <PickPersons ref="pickPersons" :data.sync="temp.persons" />
+        <PickPersons ref="pickPersons" :data.sync="temp.smGroupItems" />
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -109,7 +110,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { fetchList, detail, create, update, dele } from '@/api/pushTarget'
-import { department, searchPersons } from '@/api/common'
+import { department, domain, searchPersons } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import PickPersons from '@/components/pickPersons'
@@ -142,6 +143,7 @@ export default {
       treePersons: [],
       isIndeterminate: true,
       filterText: '',
+      domainData: [],
       departmentData: [],
       defaultProps: {
         children: 'children',
@@ -150,14 +152,6 @@ export default {
       tabTo: 'department',
       tableKey: 0,
       tableKey2: 0,
-      personsArr: {
-        total: 0,
-        listQuery: {
-          keyword: '',
-          page: 1,
-          limit: 20
-        }
-      },
       multipleSelection: [],
       listArr: {
         data: [],
@@ -177,7 +171,7 @@ export default {
         type: '',
         describe: '',
         title: '',
-        persons: []
+        smGroupItems: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -225,12 +219,6 @@ export default {
         this.listLoading = false
       })
     },
-    handleSearchPersons() {
-      // this.listLoading = true
-      console.log(this.personsArr.listQuery)
-      this.personsArr.listQuery.page = 1
-      this.getPersonsList()
-    },
     handleSelectionChange(val) {
       this.multipleSelection = val
       console.log('handleSelectionChange...')
@@ -248,12 +236,10 @@ export default {
     resetChecked() {
     },
     dialogOpened() {
-      this.personsArr.listQuery.keyword = ''
-      this.personsArr.listQuery.page = 1
-      this.getPersonsList()
     },
     getPersonsList() {
       searchPersons(this.personsArr.listQuery).then(res => {
+        console.log('..................................!!!!!')
         // console.log(res)
         this.personsArr.items = res.data.items
         this.personsArr.total = res.data.total
@@ -284,7 +270,7 @@ export default {
 
     handleCheck(status, nodes) {
       nodes.checkedNodes.forEach((item) => {
-        item.persons.forEach((person) => {
+        item.smGroupItems.forEach((person) => {
           // console.log(person)
           this.treePersons.push(person)
           // this.temp.treePersons.push(person)
@@ -299,7 +285,10 @@ export default {
       return data.label.indexOf(value) !== -1
     },
     async getDepartmentData() {
-      await department().then(response => {
+      await domain({ domain: 'gocom' }).then(response => {
+        this.domainData = response.data.items
+      })
+      await department({ domain: 'xykj' }).then(response => {
         this.departmentData = response.data
         // console.log(this.departmentData)
         this.listLoading = false
@@ -334,7 +323,7 @@ export default {
         id: undefined,
         category: 'API',
         title: '****',
-        persons: []
+        smGroupItems: []
       }
       this.dynamicTags = []
     },
@@ -349,9 +338,18 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.persons = this.dynamicTags
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
+          console.log(this.$refs.pickPersons.dynamicTags)
+          // this.temp.smGroupItems = this.dynamicTags
+          this.temp.smGroupItems = this.$refs.pickPersons.dynamicTags
+          this.temp.status = 'enabled'
+
+          this.temp.smGroupItems.forEach(item => {
+            item.type = item.type || '1'
+            item.itemId = item.itemId || item.userid
+            item.itemName = item.itemName || item.truename
+          })
+
+
           create(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
@@ -367,11 +365,11 @@ export default {
     },
 
     handleUpdate(row) {
-      detail(row).then((res) => {
-        this.temp = res.data.item
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data
         this.treePersons = []
         this.currentRow = row
-        this.dynamicTags = [...row.persons]
+        this.dynamicTags = [...row.smGroupItems]
         this.checkAll = true
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
@@ -382,10 +380,19 @@ export default {
     },
 
     updateData() {
-      this.temp.persons = this.dynamicTags
+      // this.temp.smGroupItems = this.dynamicTags
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.persons = this.$refs.pickPersons.dynamicTags
+          this.temp.smGroupItems = this.$refs.pickPersons.dynamicTags
+
+          this.temp.smGroupItems.forEach(item => {
+            item.type = item.type || '1'
+            item.itemId = item.itemId || item.userid
+            item.itemName = item.itemName || item.truename
+
+            console.log(item)
+          })
+
           const tempData = Object.assign({}, this.temp)
           update(tempData).then(() => {
             for (const v of this.listArr.data) {

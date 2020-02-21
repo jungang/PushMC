@@ -7,6 +7,7 @@ export function fetchList(query) {
     params: query
   })
 }
+
 export function detail(query) {
   return request({
     url: '/push-content/detail',
@@ -33,7 +34,7 @@ export function searchList(keyWord) {
 export function dele(id, status) {
   return request({
     url: '/push-content/delete',
-    method: 'post',
+    method: 'delete',
     params: { id, status }
   })
 }
@@ -58,14 +59,14 @@ export function create(data) {
   return request({
     url: '/push-content/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
 export function update(data) {
   return request({
     url: '/push-content/update',
-    method: 'post',
-    data: { data: data }
+    method: 'put',
+    data: data
   })
 }

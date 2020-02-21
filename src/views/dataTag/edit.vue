@@ -6,8 +6,7 @@
         <el-table
           ref="singleTable"
           :key="businessTableKey"
-          v-loading="listLoading"
-          :data="listArr[currentTab].data"
+          :data="listArr"
           highlight-current-row
           style="width: 100%"
           @current-change="handleCurrentChange"
@@ -17,15 +16,9 @@
             label="数据表列表"
           />
         </el-table>
-        <pagination
-          small
-          layout="prev, pager, next"
-          :total="listArr[currentTab].total"
-          @pagination="getList(currentTab)"
-        />
       </el-col>
       <el-col :span="18">
-        <div v-if="listArr.business.transfer.length > 0" style="text-align: center">
+        <div v-if="transfer.length > 0" style="text-align: center">
           <XcomTagTransfer
             ref="transfer"
             v-model="value"
@@ -37,7 +30,11 @@
               noChecked: '${total}',
               hasChecked: '${checked}/${total}'
             }"
-            :data="listArr.business.transfer"
+            :props="{
+              key: 'id',
+              label: 'title'
+            }"
+            :data="transfer"
             @change="handleChange"
           >
             <span slot-scope="{ h, option }" style="display: block">
@@ -78,40 +75,23 @@
 import { mapGetters } from 'vuex'
 // import { fetchList, fetchPv, createSource, updateSource, changeStatus } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import { deepClone } from '@//utils/index.js'
+import { deepClone } from '@/utils/index.js'
 import XcomTagTransfer from '@/components/tagTransfer/index'
-import { fetchList, saveTag } from '@/api/datatag' // waves directive
+import { saveTag } from '@/api/datatag' // waves directive
 
 export default {
   name: 'DataTag',
-  components: { Pagination, XcomTagTransfer },
+  components: { XcomTagTransfer },
   directives: { waves },
   data() {
     return {
       dialogVisible: false,
       businessTableKey: 0,
       currentRow: {
-        multProperties: []
+        title: ''
       },
-      currentTab: 'business',
-      listArr: {
-        business: {
-          data: [],
-          total: 0,
-          transfer: [],
-          listQuery: {
-            sheet: 'business',
-            page: 1,
-            limit: 20,
-            importance: undefined,
-            title: undefined,
-            type: undefined,
-            sort: '+id'
-          }
-        },
-        businessTransfer: []
-      },
+      listArr: [],
+      transfer: [],
       value: [],
       listLoading: true,
       dialogStatus: '',
@@ -133,8 +113,8 @@ export default {
     }
   },
   created() {
-    this.getList('business')
-    console.log(this.$route.params)
+    this.listArr = this.$route.params.paths
+    console.log(this.listArr)
   },
   methods: {
     openDailog() {
@@ -145,16 +125,16 @@ export default {
     handleSave() {
       this.listLoading = true
       this.currentRow.prefix = this.saveQuery.prefix
-      this.currentRow.dataSource = this.currentTab
 
+      console.log(this.saveQuery)
       this.saveQuery.targetData.forEach(item => {
-        console.log(item.key)
-        const index = this.currentRow.multProperties.findIndex((t, i, arr) => t.key === item.key)
-        this.currentRow.multProperties[index].newLabel = item.label
+        console.log(item.id)
+        const index = this.currentRow.smColumns.findIndex((t, i, arr) => t.id === item.id)
+        this.currentRow.smColumns[index].newTitle = item.title
       })
 
-      console.log(this.currentRow.multProperties)
-      saveTag(this.currentRow).then(res => {
+      console.log(this.currentRow.smColumns)
+      saveTag([this.currentRow]).then(res => {
         this.listLoading = false
         this.$notify({
           title: '完成',
@@ -166,36 +146,17 @@ export default {
 
       this.dialogVisible = false
     },
-    getList(sheetStr) {
-      sheetStr = sheetStr || 'business'
-      this.listLoading = true
-      fetchList(this.listArr[sheetStr].listQuery).then(response => {
-        // this.list = response.data.items
-        this.listArr[sheetStr].data = response.data.items
-        // this.total = response.data.total
-        this.listArr[sheetStr].total = response.data.total
-        // console.log(this.listArr)
-        // Just to simulate the time of the request
-        // setTimeout(() => {
-        this.listLoading = false
-        // }, 1.5 * 1000)
-      })
-    },
     setCurrent(row) {
       this.$refs.singleTable.setCurrentRow(row)
     },
     handleCurrentChange(val) {
       if (val) {
-        this.listArr[this.currentTab].transfer = deepClone(val.multProperties)
+        this.transfer = deepClone(val.smColumns)
         this.currentRow = val
       } else {
         console.log('handleCurrentChange...')
-        this.listArr[this.currentTab].transfer = []
       }
       this.value = []
-    },
-    handleTabClick(tab, event) {
-      this.currentTab = tab.name
     },
     handleChange(value, direction, movedKeys) {
     }

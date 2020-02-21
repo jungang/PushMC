@@ -3,7 +3,7 @@
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="20">
-        <el-input v-model="keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-input v-model="listArr.listQuery.keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </el-col>
     </el-row>
@@ -48,7 +48,7 @@
         </el-table-column>
         <el-table-column label="标签" align="center" min-width="100">
           <template slot-scope="{row}">
-            <el-tag v-for="tag in row.tag" :key="tag" style="margin-right: 10px">{{ tag }}</el-tag>
+            <el-tag >{{ row.tag }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="来源" align="center" min-width="100">
@@ -94,6 +94,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -673,7 +674,7 @@ export default {
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.keyword).then(response => {
+      this.getList().then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -742,17 +743,15 @@ export default {
     },
 
     handleUpdate(row, opt) {
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data.item
 
-      detail(row).then((res) => {
-                this.temp = res.data.item
-
-      this.dialogStatus = opt || 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+        this.dialogStatus = opt || 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
-      })
-
     },
 
     pushData() {

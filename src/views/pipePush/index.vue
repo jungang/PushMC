@@ -52,7 +52,7 @@
         </el-table-column>
         <el-table-column label="渠道标签" align="center" min-width="100">
           <template slot-scope="{row}">
-            <el-tag v-for="tag in row.tag" :key="tag" style="margin-right: 10px">{{ tag }}</el-tag>
+            <el-tag >{{ row.tag }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="渠道推送名称" prop="type" width="300" align="center" min-width="50">
@@ -98,6 +98,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>

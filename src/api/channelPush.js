@@ -34,7 +34,7 @@ export function contentPushList(query) {
 export function changeStatus(id, status) {
   return request({
     url: '/channel-push/status',
-    method: 'post',
+    method: 'put',
     params: { id, status }
   })
 }
@@ -57,7 +57,7 @@ export function searchList(keyWord) {
 export function dele(id, status) {
   return request({
     url: '/channel-push/delete',
-    method: 'post',
+    method: 'delete',
     params: { id, status }
   })
 }
@@ -82,22 +82,22 @@ export function createSource(data) {
   return request({
     url: '/channel-push/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
 export function updateChannel(data) {
   return request({
     url: '/channel-push/update',
-    method: 'post',
-    data: { data: data }
+    method: 'put',
+    data: data
   })
 }
 export function copyChannel(data) {
   return request({
     url: '/channel-push/copy',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
@@ -105,7 +105,7 @@ export function push(data) {
   return request({
     url: '/channel-push/push',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 

@@ -16,6 +16,13 @@ export function channelType(query) {
   })
 }
 
+export function domain(query) {
+  return request({
+    url: '/common/domain',
+    method: 'get',
+    params: query
+  })
+}
 export function department(query) {
   return request({
     url: '/common/department',

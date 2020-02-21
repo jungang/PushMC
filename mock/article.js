@@ -104,7 +104,7 @@ export default [
 
   {
     url: '/article/update',
-    type: 'post',
+    type: 'put',
     response: _ => {
       return {
         code: 20000,

@@ -10,13 +10,38 @@
           required: true, message: '路径不能为空', trigger: 'blur'
         }"
       >
-        <el-input v-model="path.value" placeholder="输入路径地址" class="dy_path">
-          <template slot="prepend">路径 {{ index }}</template>
-          <el-button v-if="data.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
-        </el-input>
+        <span>路径 {{ index + 1 }} </span>
+
+        <el-row>
+          <el-col :span="3">
+            title
+          </el-col>
+          <el-col :span="21">
+            <el-input
+              v-model="path.title"
+              placeholder=""
+              class="dy_path"
+            >
+              <el-button v-if="data.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
+            </el-input>
+          </el-col>
+          <el-col :span="3">
+            schema
+          </el-col>
+          <el-col :span="21">
+            <el-input
+              v-model="path.value"
+              type="textarea"
+              :rows="5"
+              placeholder="输入schema"
+              class="dy_path"
+            />
+          </el-col>
+        </el-row>
+
       </el-form-item>
 
-      <el-row>
+      <!--      <el-row>
         <el-col :span="6">
           上传JSON文件：
         </el-col>
@@ -29,7 +54,7 @@
           </el-upload>
 
         </el-col>
-      </el-row>
+      </el-row>-->
 
     </div>
 
@@ -67,8 +92,8 @@ export default {
     },
     addPath() {
       this.data.push({
-        value: '',
-        key: Date.now()
+        title: '',
+        value: ''
       })
       console.log(this.temp)
     }
@@ -79,7 +104,7 @@ export default {
 <style lang="scss" scoped>
   .dy_path{
     margin-bottom: 10px;
-    margin-top: 20px;
+    margin-top: 0px;
   }
   .dy_arg{
     width: 190px;

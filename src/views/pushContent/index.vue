@@ -30,17 +30,17 @@
         </el-table-column>
         <el-table-column label="内容分类" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.category | tagCategory }}</span>
+            <span>{{ row.category }}</span>
           </template>
         </el-table-column>
         <el-table-column label="内容标签" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.tag | contentTag }}</span>
+            <span>{{ row.tag }}</span>
           </template>
         </el-table-column>
         <el-table-column label="审批状态" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.status | examineStatus }}</span>
+            <span>{{ row.status }}</span>
           </template>
         </el-table-column>
         <el-table-column label="内容标题" prop="type" width="300" align="center" min-width="50">
@@ -68,6 +68,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -89,8 +90,8 @@
         </el-form-item>
 
         <el-form-item label="内容分类" prop="category">
-          <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.tagCategory" :key="item.key" :label="item.label" :value="item.key" />
+          <el-select v-model="temp.categoryId" class="filter-item" placeholder="请选择">
+            <el-option v-for="item in listCategory" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
           <el-checkbox v-model="isUrl">使用新闻链接</el-checkbox>
         </el-form-item>
@@ -98,19 +99,16 @@
           <el-input v-model="temp.url" style="width:400px" />
         </el-form-item>
         <el-form-item label="内容标签" prop="tag">
-          <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.contentTag" :key="item.key" :label="item.label" :value="item.key" />
+          <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
+            <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="内容标签" prop="content">
+        <el-form-item label="正文" prop="content">
           <quill-editor
             ref="myQuillEditor"
-            v-model="content"
+            v-model="temp.content"
             :options="editorOption"
-            @blur="onEditorBlur($event)"
-            @focus="onEditorFocus($event)"
-            @change="onEditorChange($event)"
           />
         </el-form-item>
 
@@ -134,6 +132,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { fetchList, detail, searchList, create, update, dele } from '@/api/pushContent'
+import { fetchCategory, fetchLabel } from '@/api/category'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
 
@@ -154,6 +153,8 @@ export default {
         { key: 12345, label: '新闻' },
         { key: 54321, label: '公告' }
       ],
+      listCategory: [],
+      listLabel: [],
       listArr: {
         data: [],
         total: 0,
@@ -199,18 +200,23 @@ export default {
   },
   created() {
     this.getList()
+    this.getCategory()
+    this.getLabel()
   },
   methods: {
-    onEditorReady(editor) { // 准备编辑器
-
-    },
-    onEditorBlur() {}, // 失去焦点事件
-    onEditorFocus() {}, // 获得焦点事件
-    onEditorChange() {}, // 内容改变事件
-
     handleRuleDelete(row) {
       const index = this.temp.rules.indexOf(row)
       this.temp.rules.splice(index, 1)
+    },
+    getCategory() {
+      fetchCategory(this.listArr.listQuery).then(response => {
+        this.listCategory = response.data.items
+      })
+    },
+    getLabel() {
+      fetchLabel(this.listArr.listQuery).then(response => {
+        this.listLabel = response.data.items
+      })
     },
     getList() {
       this.listLoading = true
@@ -258,8 +264,9 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
+          this.temp.category = this.listCategory.find(item => item.id === this.temp.categoryId).title
+          this.temp.status = 'draft'
+          this.temp.contentType = 'content'
           create(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
@@ -275,9 +282,9 @@ export default {
     },
 
     handleUpdate(row, opt) {
-      detail(row).then((res) => {
+      detail({ id: row.id }).then((res) => {
         this.dialogStatus = opt || 'update'
-        this.temp = res.data.item
+        this.temp = res.data
 
         this.isSubhead = !!row.subhead
         this.isUrl = !this.url
@@ -292,7 +299,8 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+
+          tempData.contentType = 'content'
           update(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {

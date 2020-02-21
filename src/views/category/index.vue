@@ -26,7 +26,7 @@
         </el-table-column>
         <el-table-column label="分类" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.category }}</span>
+            <span>{{ row.categoryId }}</span>
           </template>
         </el-table-column>
         <el-table-column label="标签来源" align="center" min-width="50">
@@ -60,6 +60,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -71,9 +72,9 @@
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="选择分类" prop="category">
-          <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.tagCategory" :key="item.key" :label="item.label" :value="item.key" />
+        <el-form-item label="选择分类" prop="categoryId">
+          <el-select v-model="temp.categoryId" class="filter-item" placeholder="请选择">
+            <el-option v-for="item in listArr.data" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
 
@@ -142,9 +143,11 @@ export default {
       },
       listLoading: true,
       temp: {
-        id: undefined,
-        type: '',
-        describe: '',
+        amount: 0,
+        category: '',
+        id: 0,
+        origin: 'CUSTOM',
+        categoryId: '',
         title: ''
       },
       dialogFormVisible: false,
@@ -155,7 +158,7 @@ export default {
         create: '新建'
       },
       rules: {
-        category: [
+        categoryId: [
           { required: true, message: '请选择分类', trigger: 'change' }
         ],
         title: [
@@ -193,9 +196,12 @@ export default {
 
     resetTemp() {
       this.temp = {
-        id: undefined,
+        amount: 0,
         category: '',
-        title: '****'
+        id: 0,
+        origin: 'CUSTOM',
+        categoryId: '',
+        title: ''
       }
     },
     handleCreateCategory() {
@@ -213,8 +219,13 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
+          this.temp.category = this.listArr.data.find(item => {
+            if (item.id === this.temp.categoryId) {
+              return item
+            }
+          }
+          ).title
+
           createTag(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
@@ -229,7 +240,7 @@ export default {
       })
     },
     createCategory() {
-      saveCategory(this.temp.title).then(() => {
+      saveCategory({ title: this.temp.title }).then(() => {
         this.getList()
         this.dialogCategoryVisible = false
         this.$notify({
@@ -242,18 +253,27 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
+
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+
+          tempData.origin = 'CUSTOM'
+          tempData.amount = 0
+          tempData.category = this.listArr.data.find(item => {
+            if (item.id === tempData.categoryId) {
+              return item
+            }
+          }
+          ).title
+
           updateTag(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {

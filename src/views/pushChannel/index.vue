@@ -18,7 +18,7 @@
       >
         <el-table-column label="序号" prop="index" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.index }}</span>
+            <span>{{ row.id }}</span>
           </template>
         </el-table-column>
         <el-table-column label="通道名称" align="center" min-width="100">
@@ -66,6 +66,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -263,8 +264,8 @@ export default {
       })
     },
     handleUpdate(row) {
-      detail(row).then((res) => {
-        this.temp = res.data.item
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {

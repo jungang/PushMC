@@ -11,7 +11,7 @@ export function fetchList(query) {
 export function dele(id, status) {
   return request({
     url: '/permission/delete',
-    method: 'post',
+    method: 'delete',
     params: { id, status }
   })
 }
@@ -20,15 +20,15 @@ export function create(data) {
   return request({
     url: '/permission/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
 export function update(data) {
   return request({
     url: '/permission/update',
-    method: 'post',
-    data: { data: data }
+    method: 'put',
+    data: data
   })
 }
 
@@ -36,6 +36,6 @@ export function allPermission(data) {
   return request({
     url: '/permission/all',
     method: 'get',
-    data: { data: data }
+    data: data
   })
 }

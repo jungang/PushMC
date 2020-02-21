@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function fetchList(query) {
+export function fetchSourceList(query) {
   return request({
     // url: '/source/list', //rap2
     url: '/source/page',
@@ -18,8 +18,8 @@ export function option(query) {
 
 export function changeStatus(id, status) {
   return request({
-    url: '/source/status',
-    method: 'post',
+    url: '/push-target/status',
+    method: 'put',
     params: { id, status }
   })
 }
@@ -51,8 +51,8 @@ export function createSource(data) {
 export function updateSource(data) {
   return request({
     url: '/source/update',
-    method: 'post',
-    data: { data: data }
+    method: 'put',
+    data: data
   })
 }
 
@@ -60,6 +60,14 @@ export function detail(data) {
   return request({
     url: '/source/detail',
     method: 'get',
-    params: { data: data }
+    params: data
+  })
+}
+
+export function dele(id, status) {
+  return request({
+    url: '/source/delete',
+    method: 'delete',
+    params: { id, status }
   })
 }

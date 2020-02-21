@@ -27,12 +27,12 @@
       </el-table-column>
       <el-table-column label="审批状态" prop="title" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.status | statusFilter }}</span>
+          <span>{{ row.status }}</span>
         </template>
       </el-table-column>
       <el-table-column label="分类" prop="channelTag" align="center" min-width="100">
         <template slot-scope="{row}">
-          <span>{{ row.category | categoryFilter }}</span>
+          <span>{{ row.category }}</span>
         </template>
       </el-table-column>
       <el-table-column label="标签" align="center" min-width="50">
@@ -42,7 +42,7 @@
       </el-table-column>
       <el-table-column label="创建时间" align="center" min-width="50">
         <template slot-scope="{row}">
-          <span>{{ row.createTime }}</span>
+          <span>{{ row.updateTime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="50" class-name="small-padding fixed-width">
@@ -50,7 +50,7 @@
           <el-button size="mini" @click="handleView(row)">
             查看
           </el-button>
-          <el-button :disabled="row.status!=='unsolved'" type="primary" size="mini" @click="handleExamine(row)">
+          <el-button :disabled="row.status==='examine_pass'" type="primary" size="mini" @click="handleExamine(row)">
             审批
           </el-button>
         </template>
@@ -61,6 +61,7 @@
       :total="list.total"
       :page.sync="list.listQuery.page"
       :limit.sync="list.listQuery.limit"
+      hide-on-single-page
       @pagination="getList()"
     />
 
@@ -70,9 +71,9 @@
         <el-col :span="4">内容标题：</el-col><el-col :span="20">   {{ examineDetails.title }}</el-col>
         <el-col :span="4">内容分类：</el-col><el-col :span="20">   {{ examineDetails.category }}</el-col>
         <el-col :span="4">内容标签：</el-col><el-col :span="20">   {{ examineDetails.tag }}</el-col>
-        <el-col :span="4">内容正文：</el-col><el-col :span="18">   {{ examineDetails.text }}</el-col>
-        <el-col :span="4">创建时间：</el-col><el-col :span="20">   {{ examineDetails.createTime }}</el-col>
-        <el-col :span="4">提交人：</el-col><el-col :span="20">     {{ examineDetails.creator }}</el-col>
+        <el-col :span="4">内容正文：</el-col><el-col :span="18">   {{ examineDetails.content }}</el-col>
+        <el-col :span="4">创建时间：</el-col><el-col :span="20">   {{ examineDetails.updateTime }}</el-col>
+        <el-col :span="4">提交人：</el-col><el-col :span="20">     {{ examineDetails.authorName }}</el-col>
         <el-col :span="4">审批历史：</el-col><el-col :span="20">   {{ examineDetails.history }}</el-col>
       </el-row>
 
@@ -160,7 +161,7 @@ export default {
   methods: {
     filter() {
       this.list.listQuery.page = 1
-      this.getTables()
+      this.getList()
     },
     getList() {
       this.listLoading = true
@@ -173,18 +174,27 @@ export default {
     handleAction(status) {
       this.listLoading = true
       this.examineDetails.action = status
-      action(this.examineDetails).then(response => {
+      const data = {
+        id: this.examineDetails.id,
+        action: status
+      }
+      action(data).then(response => {
         this.listLoading = false
         this.dialogFormVisible = false
+        this.getList()
       })
     },
 
     handleView(row) {
+      detail({ id: row.id }).then(response => {
+        this.examineDetails = response.data
+        this.listLoading = false
+      })
       this.dialogStatus = 'view'
       this.dialogFormVisible = true
     },
     handleExamine(row) {
-      detail(row).then(response => {
+      detail({ id: row.id }).then(response => {
         this.examineDetails = response.data
         this.listLoading = false
       })

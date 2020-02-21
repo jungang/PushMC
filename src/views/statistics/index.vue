@@ -80,6 +80,7 @@
           :total="list_bc.total"
           :page.sync="list_bc.listQuery.page"
           :limit.sync="list_bc.listQuery.limit"
+          hide-on-single-page
           @pagination="getBusinessChannelList()"
         />
       </el-tab-pane>
@@ -166,6 +167,7 @@
           :total="list_c.total"
           :page.sync="list_c.listQuery.page"
           :limit.sync="list_c.listQuery.limit"
+          hide-on-single-page
           @pagination="getContentList()"
         />
       </el-tab-pane>
@@ -242,6 +244,7 @@
           :total="list_p.total"
           :page.sync="list_p.listQuery.page"
           :limit.sync="list_p.listQuery.limit"
+          hide-on-single-page
           @pagination="getPipeList()"
         />
       </el-tab-pane>
@@ -458,7 +461,7 @@ export default {
       this.dialogStatus = 'view'
       this.dialogFormVisible = true
       this.detailList.data = []
-      detail(row).then(res => {
+      detail({ id: row.id }).then(res => {
         this.detailList.data = res.data.items
       })
     },

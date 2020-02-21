@@ -19,7 +19,7 @@ export function detail(query) {
 export function changeStatus(id, status) {
   return request({
     url: '/message-template/status',
-    method: 'post',
+    method: 'put',
     params: { id, status }
   })
 }
@@ -42,7 +42,7 @@ export function searchList(keyWord) {
 export function dele(id, status) {
   return request({
     url: '/message-template/delete',
-    method: 'post',
+    method: 'delete',
     params: { id, status }
   })
 }
@@ -63,18 +63,18 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function create(data) {
   return request({
     url: '/message-template/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
 export function updateSource(data) {
   return request({
     url: '/message-template/update',
-    method: 'post',
-    data: { data: data }
+    method: 'put',
+    data: data
   })
 }

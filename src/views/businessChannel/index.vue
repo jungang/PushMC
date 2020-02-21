@@ -36,12 +36,12 @@
         </el-table-column>
         <el-table-column label="标签" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.tag | tags }}</span>
+            <span>{{ row.tag }}</span>
           </template>
         </el-table-column>
         <el-table-column label="数据表" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.count }}</span>
+            <span>{{ row.tables === null ? '0' : row.tables.length }}</span>
           </template>
         </el-table-column>
 
@@ -61,6 +61,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -82,19 +83,24 @@
 
           <el-form-item label="选择业务源" prop="businessSource">
             <el-select
-              v-model="temp.businessSource"
+              v-model="temp.resourceId"
               class="filter-item"
               placeholder="请选择"
               @change="filter"
             >
-              <el-option v-for="item in MODEL.businessSource" :key="item.key" :label="item.label" :value="item.key" />
+              <el-option v-for="item in listSource" :key="item.id" :label="item.title" :value="item.id" />
             </el-select>
           </el-form-item>
 
           <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
+
             <XcomTagTransfer
               ref="transfer"
               v-model="tempValue"
+              :props="{
+                key: 'id',
+                label: 'title'
+              }"
               :data="temp.tables"
               :left-default-checked="temp.transferStatus"
               :right-default-checked="temp.transferStatus"
@@ -111,8 +117,8 @@
             />
           </el-row>
           <el-form-item label="选择标签" prop="tag">
-            <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
-              <el-option v-for="item in MODEL.tags" :key="item.key" :label="item.label" :value="item.key" />
+            <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
+              <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
             </el-select>
           </el-form-item>
         </div>
@@ -153,11 +159,11 @@
             <el-table-column
               prop="name"
               label="条件"
-              width="100"
+              width="200"
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.operation1" placeholder="请选择" style="width: 60px">
+                <el-select v-model="row.operation1" placeholder="请选择" style="width: 100px">
                   <el-option
                     v-for="item in ruleOptions"
                     :key="item.value"
@@ -218,8 +224,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { deepClone } from '@//utils/index.js'
-import { fetchList, fetchTables, fetchDataItem, detail, searchList, createSource, updateSource, dele } from '@/api/businessChannel'
+import { deepClone } from '@/utils/index.js'
+import { fetchList, detail, searchList, createSource, update, dele } from '@/api/businessChannel'
+import { fetchLabel } from '@/api/category'
+import { fetchSourceList, fetchSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
 import XcomTagTransfer from '@/components/tagTransfer/index'
 
@@ -247,6 +255,8 @@ export default {
       keyword: '',
       tables: [],
       tableKey: 0,
+      listLabel: [],
+      listSource: [],
       listArr: {
         data: [],
         total: 0,
@@ -264,6 +274,7 @@ export default {
       tempValueMax: 3,
       temp: {
         id: undefined,
+        tagId: '',
         tag: '',
         title: '',
         tables: []
@@ -297,13 +308,20 @@ export default {
   },
   created() {
     this.getList()
+    this.getSourceList()
+    this.getLabel()
   },
   methods: {
     nextStep() {
-      fetchDataItem(this.$refs.transfer.value).then(response => {
-        this.options = response.data.items
-        this.step = 'step2'
+      this.options = []
+      this.$refs.transfer.value.forEach((item) => {
+        const arr = this.temp.tables.find(obj => obj.id === item)
+        console.log(arr)
+        this.options = this.options.concat(arr.smColumns)
       })
+      console.log(this.options)
+
+      this.step = 'step2'
     },
     filter() {
       this.getTables()
@@ -363,10 +381,15 @@ export default {
         })
       }
     },
-
+    getLabel() {
+      fetchLabel(this.temp.resourceId).then(response => {
+        this.listLabel = response.data.items
+      })
+    },
     getTables() {
-      fetchTables().then(response => {
-        this.temp.tables = response.data
+      fetchSource(this.temp.resourceId).then(response => {
+        this.temp.tables = response.data.paths
+        console.log(this.temp.tables)
       })
     },
     getList() {
@@ -375,6 +398,11 @@ export default {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
+      })
+    },
+    getSourceList() {
+      fetchSourceList().then(response => {
+        this.listSource = response.data.items
       })
     },
     handleFilter() {
@@ -424,8 +452,15 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
+          this.temp.tag = this.listLabel.find(o => o.id === this.temp.tagId).title
+          this.temp.resourceTitle = this.listSource.find(o => o.id === this.temp.resourceId).title
+          this.temp.status = 'enabled'
+
+          this.temp.tables.forEach(item => {
+            item.resourceId = item.id
+            item.resourceTitle = item.title
+          })
+
           createSource(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
@@ -441,8 +476,12 @@ export default {
     },
     handleUpdate(row) {
       // console.log(row)
-      detail(row).then((res) => {
-        this.temp = res.data.item
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data
+        this.temp.tables = []
+        this.temp.resourceId = this.temp.resourceId || 1
+        this.temp.rules = this.temp.rules || []
+
         this.getTables()
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
@@ -455,8 +494,12 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateSource(tempData).then(() => {
+
+          tempData.tables.forEach(item => {
+            item.resourceId = item.id
+            item.resourceTitle = item.title
+          })
+          update(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {
                 const index = this.listArr.data.indexOf(v)
@@ -476,7 +519,7 @@ export default {
       })
     },
     handleDelete(row) {
-      dele(row.id, status).then(response => {
+      dele({ id: row.id }).then(response => {
         this.$notify({
           title: '完成',
           message: '删除',

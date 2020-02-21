@@ -46,7 +46,7 @@
         <el-row>
           <el-table
             ref="multipleTable"
-            :key="tableKey2"
+            :key="Math.random()"
             v-loading="listLoading"
             :data="personsArr.items"
             border
@@ -62,7 +62,7 @@
 
             <el-table-column label="姓名" align="center" min-width="30">
               <template slot-scope="{row}">
-                <span>{{ row.name }}</span>
+                <span>{{ row.truename }}</span>
               </template>
             </el-table-column>
 
@@ -74,19 +74,19 @@
 
             <el-table-column label="组织" align="center" min-width="50">
               <template slot-scope="{row}">
-                <span>{{ row.org }}</span>
+                <span>{{ row.sourcefrom }}</span>
               </template>
             </el-table-column>
 
             <el-table-column label="职务" align="center" min-width="50">
               <template slot-scope="{row}">
-                <span>{{ row.title }}</span>
+                <span>{{ row.duty }}</span>
               </template>
             </el-table-column>
 
             <el-table-column label="电话" align="center" min-width="50">
               <template slot-scope="{row}">
-                <span>{{ row.phone }}</span>
+                <span>{{ row.telphone }}</span>
               </template>
             </el-table-column>
 
@@ -122,7 +122,7 @@
           :disable-transitions="false"
           @close="handleClose(tag)"
         >
-          {{ tag.name }}
+          {{ tag.name || tag.truename }}
         </el-tag>
       </el-form-item>
 
@@ -160,19 +160,22 @@ export default {
       checkedPerson: [],
       multipleSelection: [],
       plaza: [],
-      listLoading: true,
+      listLoading: false,
       dynamicTags: [],
       personsArr: {
+        items: [],
         total: 0,
         listQuery: {
           keyword: '',
           page: 1,
-          limit: 20
+          limit: 10
         }
       }
     }
   },
-  computed: {},
+  computed: {
+
+  },
   watch: {
     data(val) {
       this.init(val)
@@ -193,20 +196,44 @@ export default {
       this.tabTo = 'department'
       this.$refs.tree.setCheckedKeys([])
     },
+
     getPersonsList() {
       searchPersons(this.personsArr.listQuery).then(res => {
-        // console.log(res)
         this.personsArr.items = res.data.items
         this.personsArr.total = res.data.total
-        this.listLoading = false
       })
     },
     async getDepartmentData() {
-      await department().then(response => {
-        this.departmentData = response.data
-        // console.log(this.departmentData)
-        this.listLoading = false
+      await department({ domain: 'xykj' }).then(response => {
+        // console.log('format..')
+        this.departmentData = this.format(response.data)
       })
+    },
+    format(data) {
+      const resData = this.recursive(data)
+      // console.log('resData--', resData)
+      return resData
+    },
+    recursive(arr) {
+      arr.forEach(item => {
+        item.label = item.deptname || item.departname
+        item.id = item.pathid
+
+        if (item.hasOwnProperty('personnel')) {
+          item.persons = item.personnel.items
+          item.persons.forEach(item => {
+            item.name = item.truename
+            // console.log(item)
+          })
+        }
+
+        if (item.hasOwnProperty('children')) {
+          item.children = item.children.items
+          this.recursive(item.children)
+        }
+      })
+
+      return arr
     },
     filterNode(value, data) {
       if (!value) return true
@@ -219,11 +246,13 @@ export default {
     },
     handleCheck(status, nodes) {
       nodes.checkedNodes.forEach((item) => {
-        item.persons.forEach((person) => {
-          // console.log(person)
-          this.treePersons.push(person)
-          // this.temp.treePersons.push(person)
-        })
+        if (item.hasOwnProperty('persons')) {
+          item.persons.forEach((person) => {
+            this.treePersons.push(person)
+          })
+        } else {
+          console.log('node not has any person')
+        }
       })
       console.log(this.plaza.length)
       this.plaza = this.treePersons
@@ -239,8 +268,6 @@ export default {
       this.isIndeterminate = checkedCount > 0 && checkedCount < this.plaza.length
     },
     handleSearchPersons() {
-      // this.listLoading = true
-      console.log(this.personsArr.listQuery)
       this.personsArr.listQuery.page = 1
       this.getPersonsList()
     },
