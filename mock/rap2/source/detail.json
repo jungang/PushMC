@@ -1,0 +1,40 @@
+{
+  "code": 20000,
+  "msg": "",
+  "data": {
+    "item": {
+      "id": 4833357,
+      "describe": "外标公向资十系际油连满相都观区关他角",
+      "title": "商平理周想风调程话文备",
+      "status": "disabled",
+      "type": "DB",
+      "paths": [
+        {
+          "value": "http://dummyimage.com/180x150"
+        },
+        {
+          "value": "http://dummyimage.com/120x600"
+        },
+        {
+          "value": "http://dummyimage.com/468x60"
+        },
+        {
+          "value": "http://dummyimage.com/468x60"
+        },
+        {
+          "value": "http://dummyimage.com/120x600"
+        },
+        {
+          "value": "http://dummyimage.com/120x90"
+        },
+        {
+          "value": "http://dummyimage.com/240x400"
+        }
+      ],
+      "serverAddress": "http://dummyimage.com/336x280",
+      "secretKey": "qPYNYZwrm&sHISN&SBOO%YYh4fivep0&4Bi*3KRp3ulmC#yP9!",
+      "updatePlanHours": 3,
+      "updatePlanTimes": 3
+    }
+  }
+}

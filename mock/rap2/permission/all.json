@@ -1,0 +1,92 @@
+{
+  "code": 20000,
+  "data": [
+    {
+      "id": "01",
+      "path": "/source",
+      "label": "数据源",
+      "children": []
+    },
+    {
+      "id": "02",
+      "path": "/data-tag",
+      "label": "数据标注",
+      "children": []
+    },
+    {
+      "id": "03",
+      "path": "/category",
+      "label": "标签分类",
+      "children": []
+    },
+    {
+      "id": "04",
+      "path": "/business-channel",
+      "label": "业务频道",
+      "children": []
+    },
+    {
+      "id": "05",
+      "path": "/push-content",
+      "label": "推送内容",
+      "children": []
+    },
+    {
+      "id": "06",
+      "path": "/push-channel",
+      "label": "推送通道",
+      "children": []
+    },
+    {
+      "id": "07",
+      "path": "/push-target",
+      "label": "推送对象",
+      "children": []
+    },
+    {
+      "id": "08",
+      "path": "/message-template",
+      "label": "消息模版",
+      "children": []
+    },
+    {
+      "id": "09",
+      "path": "/message-push",
+      "label": "消息推送",
+      "children": [
+        {
+          "id": "0901",
+          "path": "channel-push",
+          "label": "频道推送"
+        },
+        {
+          "id": "0902",
+          "path": "pipe-push",
+          "label": "渠道推送"
+        },
+        {
+          "id": "0903",
+          "path": "content-push",
+          "label": "内容推送"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "path": "/permission",
+      "label": "用户权限",
+      "children": [
+        {
+          "id": "1001",
+          "path": "user",
+          "label": "用户角色"
+        },
+        {
+          "path": "role",
+          "id": "1002",
+          "label": "用户权限"
+        }
+      ]
+    }
+  ]
+}
