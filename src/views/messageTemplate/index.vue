@@ -23,12 +23,12 @@
       >
         <el-table-column label="序号" prop="id" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.index }}</span>
+            <span>{{ row.id }}</span>
           </template>
         </el-table-column>
         <el-table-column label="模版类型" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.type }}</span>
+            <span>{{ row.type === 'text' ? '文本' : '图文' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="模板来源" align="center" min-width="100">
@@ -73,6 +73,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -158,9 +159,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, searchList, changeStatus, createSource, updateSource, dele } from '@/api/messageTemplate'
+import { fetchList, searchList, detail, changeStatus, create, updateSource, dele } from '@/api/messageTemplate'
 import Pagination from '@/components/Pagination'
-
 
 export default {
   name: 'PushContent',
@@ -201,6 +201,8 @@ export default {
       temp: {
         id: undefined,
         category: '',
+        origin: 'CUSTOM',
+        status: 'enabled',
         title: '',
         content: ''
       },
@@ -219,6 +221,9 @@ export default {
       'name',
       'roles'
     ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    },
     editor() {
       return this.$refs.myQuillEditor.quill
     }
@@ -280,6 +285,8 @@ export default {
       this.isUrl = false
       this.temp = {
         id: undefined,
+        status: 'enabled',
+        origin: 'CUSTOM',
         title: '',
         content: '{内容标题}'
       }
@@ -299,8 +306,9 @@ export default {
       if (type === 'text') {
         this.temp.type = 'text'
         this.temp.content = '{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }'
+      } else {
+        this.temp.type = 'template'
       }
-
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -310,9 +318,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
-          createSource(this.temp).then(() => {
+          create(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
@@ -326,29 +332,21 @@ export default {
       })
     },
     handleUpdate(row) {
-      console.log('handleUpdate...')
-      if (this.$refs.transfer) {
-        console.log(this.$refs.transfer.targetData)
-      }
-
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-
-      // console.log(row.subhead)
-      this.isSubhead = !!row.subhead
-      this.isUrl = !this.url
-
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+
+          tempData.origin = 'CUSTOM'
           updateSource(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {

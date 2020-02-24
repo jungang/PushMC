@@ -11,11 +11,11 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 import '@/styles/index.scss' // global css
 
-import * as filters from './filters' // global filters
-
 import App from './App'
 import store from './store'
 import router from './router'
+
+import * as filters from './filters' // global filters
 
 import '@/icons' // icon
 import '@/permission' // permission control

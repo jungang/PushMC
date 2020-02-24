@@ -18,7 +18,7 @@
       >
         <el-table-column label="序号" prop="index" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.index }}</span>
+            <span>{{ row.id }}</span>
           </template>
         </el-table-column>
         <el-table-column label="名称" align="center" min-width="80">
@@ -43,7 +43,7 @@
 
         <el-table-column label="创建时间" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.createTime }}</span>
+            <span>{{ row.updateTime }}</span>
           </template>
         </el-table-column>
 
@@ -69,6 +69,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -81,9 +82,9 @@
       @opened="dialogOpened"
       @close="dialogClose"
     >
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
 
-        <el-form-item label="推送对象" prop="title">
+        <el-form-item label="推送对象组名称：" prop="title">
           <el-input v-model="temp.title" placeholder="输入对象组名称" style="width:400px" />
         </el-form-item>
 
@@ -91,134 +92,7 @@
           <el-radio-button label="department">按组织结构</el-radio-button>
           <el-radio-button label="personnel">按人员</el-radio-button>
         </el-radio-group>-->
-        <el-tabs v-model="tabTo" type="card">
-          <el-tab-pane label="按组织结构" name="department">
-
-            <el-row>
-              <el-col :span="12">
-
-                <el-input
-                  v-model="filterText"
-                  placeholder="输入关键字进行过滤"
-                />
-
-                <el-tree
-                  ref="tree"
-                  :data="departmentData"
-                  class="department-tree"
-                  :props="defaultProps"
-                  node-key="id"
-                  show-checkbox
-                  default-expand-all
-                  :filter-node-method="filterNode"
-                  highlight-current
-                  @check-change="handleChangeCheck"
-                  @check="handleCheck"
-                />
-
-              </el-col>
-              <el-col :span="12" class="checkZone">
-                <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
-                <el-checkbox-group v-model="checkedPerson" @change="handlecheckedPersonChange">
-                  <el-checkbox v-for="person in plaza" :key="person.id" :label="person">{{ person.name }}</el-checkbox>
-                </el-checkbox-group>
-              </el-col>
-            </el-row>
-
-          </el-tab-pane>
-          <el-tab-pane label="按人员" name="personnel">
-            <el-row style="margin-bottom: 10px">
-              <el-col>
-                按人员姓名查找：<el-input v-model="personsArr.listQuery.keyword" placeholder="输入人员姓名，多个人员以 ，逗号间隔，录入王磊 , 李刚" clearable style="width: 400px" />
-                <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearchPersons">查询</el-button>
-              </el-col>
-            </el-row>
-
-            <el-row>
-              <el-table
-                ref="multipleTable"
-                :key="tableKey2"
-                v-loading="listLoading"
-                :data="personsArr.items"
-                border
-                fit
-                highlight-current-row
-                style="width: 100%;"
-                @selection-change="handleSelectionChange"
-              >
-                <el-table-column
-                  type="selection"
-                  width="35"
-                />
-
-                <el-table-column label="姓名" align="center" min-width="30">
-                  <template slot-scope="{row}">
-                    <span>{{ row.name }}</span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column label="地区" prop="area" align="center" min-width="50">
-                  <template slot-scope="{row}">
-                    <span>{{ row.area }}</span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column label="组织" align="center" min-width="50">
-                  <template slot-scope="{row}">
-                    <span>{{ row.org }}</span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column label="职务" align="center" min-width="50">
-                  <template slot-scope="{row}">
-                    <span>{{ row.title }}</span>
-                  </template>
-                </el-table-column>
-
-                <el-table-column label="电话" align="center" min-width="50">
-                  <template slot-scope="{row}">
-                    <span>{{ row.phone }}</span>
-                  </template>
-                </el-table-column>
-
-              </el-table>
-              <pagination
-                v-show="personsArr.total>0"
-                hide-on-single-page
-                small
-                :total="personsArr.total"
-                :page.sync="personsArr.listQuery.page"
-                :limit.sync="personsArr.listQuery.limit"
-                @pagination="getPersonsList()"
-              />
-            </el-row>
-
-          </el-tab-pane>
-        </el-tabs>
-
-        <el-row type="flex" justify="end">
-          <el-col :span="6">
-            <el-button @click="addPersons">
-              加入已选择
-            </el-button>
-          </el-col>
-        </el-row>
-
-        <el-row>
-
-          <el-form-item label="已选人员" prop="persons">
-            <el-tag
-              v-for="tag in dynamicTags"
-              :key="tag.id"
-              closable
-              :disable-transitions="false"
-              @close="handleClose(tag)"
-            >
-              {{ tag.name }}
-            </el-tag>
-          </el-form-item>
-
-        </el-row>
+        <PickPersons ref="pickPersons" :data.sync="temp.smGroupItems" />
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -235,16 +109,17 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, createSource, update, dele } from '@/api/pushTarget'
-import { department, searchPersons } from '@/api/common'
+import { fetchList, detail, create, update, dele } from '@/api/pushTarget'
+import { department, domain, searchPersons } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
+import PickPersons from '@/components/pickPersons'
 import { changeStatus } from '@/api/source'
 import { searchList } from '@/api/pushContent'
 
 export default {
   name: 'PushChannel',
-  components: { Pagination },
+  components: { Pagination, PickPersons },
   directives: { waves },
 
   filters: {
@@ -268,6 +143,7 @@ export default {
       treePersons: [],
       isIndeterminate: true,
       filterText: '',
+      domainData: [],
       departmentData: [],
       defaultProps: {
         children: 'children',
@@ -276,14 +152,6 @@ export default {
       tabTo: 'department',
       tableKey: 0,
       tableKey2: 0,
-      personsArr: {
-        total: 0,
-        listQuery: {
-          keyword: '',
-          page: 1,
-          limit: 20
-        }
-      },
       multipleSelection: [],
       listArr: {
         data: [],
@@ -303,7 +171,7 @@ export default {
         type: '',
         describe: '',
         title: '',
-        persons: []
+        smGroupItems: []
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -326,7 +194,10 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   watch: {
     filterText(val) {
@@ -348,12 +219,6 @@ export default {
         this.listLoading = false
       })
     },
-    handleSearchPersons() {
-      // this.listLoading = true
-      console.log(this.personsArr.listQuery)
-      this.personsArr.listQuery.page = 1
-      this.getPersonsList()
-    },
     handleSelectionChange(val) {
       this.multipleSelection = val
       console.log('handleSelectionChange...')
@@ -371,12 +236,10 @@ export default {
     resetChecked() {
     },
     dialogOpened() {
-      this.personsArr.listQuery.keyword = ''
-      this.personsArr.listQuery.page = 1
-      this.getPersonsList()
     },
     getPersonsList() {
       searchPersons(this.personsArr.listQuery).then(res => {
+        console.log('..................................!!!!!')
         // console.log(res)
         this.personsArr.items = res.data.items
         this.personsArr.total = res.data.total
@@ -387,7 +250,7 @@ export default {
     dialogClose() {
       this.plaza = []
       this.tabTo = 'department'
-      this.$refs.tree.setCheckedKeys([])
+      // this.$refs.tree.setCheckedKeys([])
     },
 
     handleCheckAllChange(val) {
@@ -407,7 +270,7 @@ export default {
 
     handleCheck(status, nodes) {
       nodes.checkedNodes.forEach((item) => {
-        item.persons.forEach((person) => {
+        item.smGroupItems.forEach((person) => {
           // console.log(person)
           this.treePersons.push(person)
           // this.temp.treePersons.push(person)
@@ -422,7 +285,10 @@ export default {
       return data.label.indexOf(value) !== -1
     },
     async getDepartmentData() {
-      await department().then(response => {
+      await domain({ domain: 'gocom' }).then(response => {
+        this.domainData = response.data.items
+      })
+      await department({ domain: 'xykj' }).then(response => {
         this.departmentData = response.data
         // console.log(this.departmentData)
         this.listLoading = false
@@ -451,27 +317,13 @@ export default {
         this.listLoading = false
       })
     },
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
+
     resetTemp() {
       this.temp = {
         id: undefined,
         category: 'API',
         title: '****',
-        persons: []
+        smGroupItems: []
       }
       this.dynamicTags = []
     },
@@ -486,10 +338,19 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.persons = this.dynamicTags
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
-          createSource(this.temp).then(() => {
+          console.log(this.$refs.pickPersons.dynamicTags)
+          // this.temp.smGroupItems = this.dynamicTags
+          this.temp.smGroupItems = this.$refs.pickPersons.dynamicTags
+          this.temp.status = 'enabled'
+
+          this.temp.smGroupItems.forEach(item => {
+            item.type = item.type || '1'
+            item.itemId = item.itemId || item.userid
+            item.itemName = item.itemName || item.truename
+          })
+
+
+          create(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
@@ -502,30 +363,37 @@ export default {
         }
       })
     },
+
     handleUpdate(row) {
-      console.log(row)
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-
-      this.treePersons = []
-      this.currentRow = row
-      // this.plaza = [...row.persons]
-
-      this.dynamicTags = [...row.persons]
-      // this.checkedPerson = [...row.persons]
-      this.checkAll = true
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data
+        this.treePersons = []
+        this.currentRow = row
+        this.dynamicTags = [...row.smGroupItems]
+        this.checkAll = true
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
+
     updateData() {
-      this.temp.persons = this.dynamicTags
+      // this.temp.smGroupItems = this.dynamicTags
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.temp.smGroupItems = this.$refs.pickPersons.dynamicTags
+
+          this.temp.smGroupItems.forEach(item => {
+            item.type = item.type || '1'
+            item.itemId = item.itemId || item.userid
+            item.itemName = item.itemName || item.truename
+
+            console.log(item)
+          })
+
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp)
           update(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {

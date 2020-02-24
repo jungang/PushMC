@@ -3,7 +3,7 @@
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="20">
-        <el-input v-model="keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-input v-model="listArr.listQuery.keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </el-col>
     </el-row>
@@ -13,7 +13,7 @@
         业务频道列表：
       </el-col>
       <el-col :span="8" align="right">
-        <el-button type="primary" @click="handleCreate">频道订阅</el-button>
+        <el-button type="primary" @click="showSubscribePanel">频道订阅</el-button>
         <el-button type="primary" @click="handleCreate">+自定义业务频道</el-button>
       </el-col>
     </el-row>
@@ -33,7 +33,7 @@
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="状态" align="center" min-width="50">
+        <el-table-column label="频道推送状态" align="center" min-width="50">
           <template slot-scope="{row}">
 
             <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
@@ -41,45 +41,49 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="最近推送时间" align="center" min-width="100">
-          <template slot-scope="{row}">
-            <span>{{ row.lastPushTime }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="渠道来源" align="center" min-width="100">
-          <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="渠道标签" align="center" min-width="100">
-          <template slot-scope="{row}">
-            <el-tag v-for="tag in row.tag" :key="tag">{{ tag }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="内容标题" prop="type" width="300" align="center" min-width="50">
+        <el-table-column label="业务频道名称" prop="type" width="300" align="center" min-width="50">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="标签" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <el-tag >{{ row.tag }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="来源" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <span>{{ row.origin }}</span>
           </template>
         </el-table-column>
 
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button :disabled="row.status==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
-              删除
-            </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+
+            <el-popconfirm
+              confirm-button-text="好的"
+              cancel-button-text="取消"
+              icon="el-icon-info"
+              icon-color="red"
+              :title="'删除 '+row.title + '?'"
+              @onConfirm="handleDelete(row,'deleted')"
+            >
+              <el-button slot="reference" :disabled="row.status==='pushed'" type="danger" size="mini">删除</el-button>
+            </el-popconfirm>
+
+            <el-button type="primary" size="mini" @click="handleUpdate(row, 'copy')">
               复制
             </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button type="primary" size="mini" @click="handleView(row)">
               查看
             </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button v-if="row.status==='notPush'" type="primary" size="mini" @click="handleUpdate(row,'push')">
               推送
             </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button v-if="row.status==='pushed'" type="primary" size="mini" @click="handleUnPush(row, false)">
               取消推送
             </el-button>
           </template>
@@ -90,6 +94,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -99,6 +104,7 @@
       :visible.sync="dialogFormVisible"
       width="1100px"
       destroy-on-close
+      :class="'form'"
       @opened="handleDialogOpened"
     >
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
@@ -109,7 +115,7 @@
 
         <el-form-item label="选择频道" prop="category">
           <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
+            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.label" :value="item.key" />
           </el-select>
         </el-form-item>
 
@@ -261,7 +267,7 @@
           <el-row>
             <el-table
               ref="multipleTable"
-              :data="temp.targetes"
+              :data="groupsArr"
               @selection-change="handleSelectionChange"
             >
               <el-table-column
@@ -338,34 +344,110 @@
 
         </el-form-item>
 
+        <el-form-item label="推送模板" prop="templateKey">
+          <el-radio v-for=" (item, key) in pushTemplateList" :key="key" v-model="temp.templateKey" :label="item.key"> {{ item.label }} </el-radio>
+        </el-form-item>
+
+        <el-form-item label="推送时间" prop="templateKey">
+          <el-radio v-model="temp.pushPlan" label="instant">实时</el-radio>
+
+          <el-row>
+            推送确认:
+            <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
+              <el-option label="按钮确认" value="1" />
+              <el-option label="阅读读秒计时" value="2" />
+              <el-option label="不需要确认" value="3" />
+            </el-select>
+            <el-input v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
+            <span>（短信不支持确认）</span>
+          </el-row>
+          <el-row>
+            推送确认:
+            <el-radio v-model="temp.receipt" label="true">需回传</el-radio>
+            <el-radio v-model="temp.receipt" label="false">不需回传</el-radio>
+            <span>（短信不支持确认）</span>
+          </el-row>
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          取消
+          {{ dialogStatus==='view'? '关闭' : '取消' }}
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData()">
           完成
+        </el-button>
+        <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">
+          完成
+        </el-button>
+        <el-button v-if="dialogStatus==='copy'" type="primary" @click="copyData()">
+          完成
+        </el-button>
+        <el-button v-if="dialogStatus==='push'" type="primary" @click="pushData()">
+          推送
         </el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      title="频道订阅"
+      :visible.sync="dialogFormSubscribe"
+    >
+
+      <template>
+        <el-table
+          :data="channelSubscribeList"
+          stripe
+          border
+          style="width: 100%"
+        >
+          <el-table-column
+            prop="status"
+            label="订阅状态"
+          >
+            <template slot-scope="{row}">
+              <span>{{ row.status? '已订阅':'未订阅' }}</span>
+            </template>
+
+          </el-table-column>
+
+          <el-table-column
+            prop="title"
+            label="频道名称"
+          />
+          <el-table-column
+            align="center"
+            label="操作"
+          >
+            <template slot-scope="{row}">
+              <el-button v-if="row.status" type="danger" size="mini" @click="handleSubscribe(row,false)">
+                取消订阅
+              </el-button>
+              <el-button v-else type="primary" size="mini" @click="handleSubscribe(row,true)">
+                订阅
+              </el-button>
+            </template>
+
+          </el-table-column>
+        </el-table>
+      </template>
+
+      <span slot="footer" class="dialog-footer">
+        <!--        <el-button @click="dialogFormSubscribe = false">取 消</el-button>-->
+        <el-button type="primary" @click="dialogFormSubscribe = false">关闭</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, searchList, createSource, updateSource, dele } from '@/api/channelPush'
-import { channelType } from '@/api/common'
+import { copyChannel, createSource, dele, fetchList, detail, groups, push, unPush, searchList, updateChannel } from '@/api/channelPush'
+import { subscribe } from '@/api/businessChannel'
+import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
-
-const DataSourceModel = {
-  dataSourceTypeOptions: [
-    { key: 'api', display_name: '财务报销' },
-    { key: 'api2', display_name: 'HR' },
-    { key: 'api3', display_name: 'JIRA' },
-    { key: 'api4', display_name: 'API_4' }
-  ]
-}
 
 export default {
   name: 'ChannelPush',
@@ -383,8 +465,12 @@ export default {
   },
   data() {
     return {
+      radio: '1',
       channelTypeList: [],
+      channelSubscribeList: [],
+      pushTemplateList: [],
       additionalOptionShow: false,
+      groupsArr: [],
       ruleOptions: [
         {
           value: '==',
@@ -441,7 +527,6 @@ export default {
         }
       },
       listLoading: true,
-      MODEL: DataSourceModel,
       temp: {
         id: undefined,
         tag: '',
@@ -454,11 +539,14 @@ export default {
         pushChannels: []
       },
       dialogFormVisible: false,
+      dialogFormSubscribe: false,
       dialogStatus: '',
       textMap: {
         channelPushSet: '频道推送设置（订阅频道）',
         view: '查看',
-        update: '频道推送设置（订阅频道）',
+        update: '编辑',
+        copy: '复制',
+        push: '推送',
         create: '新建'
       }
     }
@@ -468,6 +556,9 @@ export default {
       'name',
       'roles'
     ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    },
     editor() {
       return this.$refs.myQuillEditor.quill
     }
@@ -475,8 +566,16 @@ export default {
   created() {
     this.getList()
     this.getChannelTypeList()
+    this.getChannelSubscribe()
+    this.getPushTemplateList()
+    this.getGroups()
   },
   methods: {
+    getGroups() {
+      groups().then(response => {
+        this.groupsArr = response.data
+      })
+    },
     handleDialogOpened() {
       const rows = this.channelTypeList.items.filter((item, index) => {
         return this.temp.pushChannels.find((item2, index2) => item2.label === item.label)
@@ -536,48 +635,69 @@ export default {
         this.listLoading = false
       })
     },
+    getChannelSubscribe() {
+      this.listLoading = true
+      channelSubscribe().then(response => {
+        this.channelSubscribeList = response.data.items
+        this.listLoading = false
+      })
+    },
+    getPushTemplateList() {
+      this.listLoading = true
+      pushTemplate().then(response => {
+        this.pushTemplateList = response.data.items
+        this.listLoading = false
+      })
+    },
     handleFilter() {
       this.listArr.listQuery.page = 1
       this.getList()
-    },
-
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
     },
     resetTemp() {
       this.isSubhead = false
       this.isUrl = false
       this.temp = {
         id: undefined,
-        tag: '',
+        tag: [],
         category: '',
         title: '',
         subhead: '',
         url: '',
         content: '',
-        additionalOption: false,
+        additionalOption: [],
+        targetes: [],
+        pushChannels: [],
+        pushTemplateList: [],
         rules: []
       }
     },
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.keyword).then(response => {
+      this.getList().then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
+      })
+    },
+    handleClose() {
+
+    },
+    showSubscribePanel() {
+      this.dialogFormSubscribe = true
+    },
+    handleSubscribe(row, opt) {
+      subscribe(row.id, opt).then(response => {
+        this.listLoading = false
+        row.status = opt
+        console.log(response)
+      })
+    },
+    handleUnPush(row, opt) {
+      unPush(row.id, opt).then(response => {
+        this.listLoading = false
+        row.status = opt ? 'pushed' : 'notPush'
+        console.log(response)
       })
     },
     handleCreate() {
@@ -606,31 +726,66 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
-      // console.log('handleUpdate...')
-      if (this.$refs.transfer) {
-        console.log(this.$refs.transfer.targetData)
-      }
 
+    handleView(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
-
       // console.log(row.subhead)
       this.isSubhead = !!row.subhead
       this.isUrl = !this.url
 
-      this.dialogStatus = 'update'
+      this.dialogStatus = 'view'
+
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
+
+    handleUpdate(row, opt) {
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data.item
+
+        this.dialogStatus = opt || 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      })
+    },
+
+    pushData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          push(tempData).then((res) => {
+            this.temp.status = 'pushed'
+            for (const v of this.listArr.data) {
+              if (v.id === this.temp.id) {
+                const index = this.listArr.data.indexOf(v)
+                this.listArr.data.splice(index, 1, this.temp)
+                break
+              }
+            }
+            this.dialogFormVisible = false
+            this.$notify({
+              title: '完成',
+              message: '推送成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateSource(tempData).then(() => {
+          updateChannel(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {
                 const index = this.listArr.data.indexOf(v)
@@ -649,6 +804,26 @@ export default {
         }
       })
     },
+
+    copyData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          copyChannel(tempData).then((res) => {
+            this.getList()
+            this.dialogFormVisible = false
+            this.$notify({
+              title: '完成',
+              message: '复制成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+
     handleDelete(row) {
       dele(row.id, status).then(response => {
         this.$notify({
@@ -685,13 +860,16 @@ export default {
         margin-left: 0;
       }
     }
-    .el-dialog{
-      margin-top: 50px !important;
+    .form{
+      .el-dialog{
+        margin-top: 50px !important;
+      }
+      .el-dialog__body{
+        height:700px;
+        max-height: 700px;
+        overflow-y: scroll;
+      }
     }
-    .el-dialog__body{
-      height:700px;
-      max-height: 700px;
-      overflow-y: scroll;
-    }
+
   }
 </style>

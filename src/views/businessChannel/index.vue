@@ -23,9 +23,8 @@
         fit
         highlight-current-row
         style="width: 100%;"
-        @sort-change="sortChange"
       >
-        <el-table-column label="ID" prop="id" sortable="custom" align="center" :class-name="getSortClass('id')" min-width="50">
+        <el-table-column label="ID" prop="id" align="center" min-width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
@@ -42,7 +41,7 @@
         </el-table-column>
         <el-table-column label="数据表" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.tables.length }}</span>
+            <span>{{ row.tables === null ? '0' : row.tables.length }}</span>
           </template>
         </el-table-column>
 
@@ -62,6 +61,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -80,10 +80,27 @@
           <el-form-item v-if="dialogStatus==='create'" label="输入名称" prop="title">
             <el-input v-model="temp.title" style="width:400px" />
           </el-form-item>
+
+          <el-form-item label="选择业务源" prop="businessSource">
+            <el-select
+              v-model="temp.resourceId"
+              class="filter-item"
+              placeholder="请选择"
+              @change="filter"
+            >
+              <el-option v-for="item in listSource" :key="item.id" :label="item.title" :value="item.id" />
+            </el-select>
+          </el-form-item>
+
           <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
+
             <XcomTagTransfer
               ref="transfer"
               v-model="tempValue"
+              :props="{
+                key: 'id',
+                label: 'title'
+              }"
               :data="temp.tables"
               :left-default-checked="temp.transferStatus"
               :right-default-checked="temp.transferStatus"
@@ -100,8 +117,8 @@
             />
           </el-row>
           <el-form-item label="选择标签" prop="tag">
-            <el-select v-model="temp.tag" class="filter-item" placeholder="请选择">
-              <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.display_name" />
+            <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
+              <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
             </el-select>
           </el-form-item>
         </div>
@@ -131,9 +148,9 @@
                 <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
                   <el-option
                     v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    :key="item.id"
+                    :label="item.title"
+                    :value="item.id"
                   />
                 </el-select>
                 <el-input v-model="row.item1.value" placeholder="请输入内容" style="width:45%" />
@@ -142,11 +159,11 @@
             <el-table-column
               prop="name"
               label="条件"
-              width="100"
+              width="200"
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.operation1" placeholder="请选择" style="width: 60px">
+                <el-select v-model="row.operation1" placeholder="请选择" style="width: 100px">
                   <el-option
                     v-for="item in ruleOptions"
                     :key="item.value"
@@ -166,47 +183,12 @@
                 <el-select v-model="row.item2.tableName" placeholder="请选择" style="width:50%">
                   <el-option
                     v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    :key="item.id"
+                    :label="item.title"
+                    :value="item.id"
                   />
                 </el-select>
                 <el-input v-model="row.item2.value" placeholder="请输入内容" style="width:45%" />
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="条件"
-              width="100"
-              align="center"
-            >
-              <template slot-scope="{row}">
-                <el-select v-model="row.operation2" placeholder="=" style="width: 60px">
-                  <el-option
-                    v-for="item in ruleOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="选择数据项"
-              width="300"
-              align="center"
-            >
-              <template slot-scope="{row}">
-                <el-select v-model="row.item3.tableName" placeholder="请选择" style="width:50%">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-                <el-input v-model="row.item3.value" placeholder="请输入内容" style="width:45%" />
               </template>
             </el-table-column>
 
@@ -226,7 +208,7 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button v-if="step==='step1'" type="primary" @click="step='step2'">
+        <el-button v-if="step==='step1'" type="primary" @click="nextStep">
           下一步
         </el-button>
         <el-button v-if="step==='step2'" type="primary" @click="step='step1'">
@@ -242,19 +224,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { deepClone } from '@//utils/index.js'
-import { fetchList, fetchTables, searchList, createSource, updateSource, dele } from '@/api/businessChannel'
+import { deepClone } from '@/utils/index.js'
+import { fetchList, detail, searchList, createSource, update, dele } from '@/api/businessChannel'
+import { fetchLabel } from '@/api/category'
+import { fetchSourceList, fetchSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
 import XcomTagTransfer from '@/components/tagTransfer/index'
-
-const DataSourceModel = {
-  dataSourceTypeOptions: [
-    { key: 'api', display_name: '财务报销' },
-    { key: 'api2', display_name: 'HR' },
-    { key: 'api3', display_name: 'JIRA' },
-    { key: 'api4', display_name: 'API_4' }
-  ]
-}
 
 export default {
   name: 'BusinessChannel',
@@ -275,46 +250,13 @@ export default {
           value: '<',
           label: '<'
         }],
-      options: [
-        {
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
+      options: [],
       value: '',
-      tableData: [
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }],
-
       keyword: '',
       tables: [],
       tableKey: 0,
+      listLabel: [],
+      listSource: [],
       listArr: {
         data: [],
         total: 0,
@@ -328,11 +270,11 @@ export default {
         }
       },
       listLoading: true,
-      MODEL: DataSourceModel,
       tempValue: [],
       tempValueMax: 3,
       temp: {
         id: undefined,
+        tagId: '',
         tag: '',
         title: '',
         tables: []
@@ -359,13 +301,31 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   created() {
     this.getList()
-    this.getTables()
+    this.getSourceList()
+    this.getLabel()
   },
   methods: {
+    nextStep() {
+      this.options = []
+      this.$refs.transfer.value.forEach((item) => {
+        const arr = this.temp.tables.find(obj => obj.id === item)
+        console.log(arr)
+        this.options = this.options.concat(arr.smColumns)
+      })
+      console.log(this.options)
+
+      this.step = 'step2'
+    },
+    filter() {
+      this.getTables()
+    },
     handleRuleDelete(row) {
       const index = this.temp.rules.indexOf(row)
       this.temp.rules.splice(index, 1)
@@ -400,6 +360,7 @@ export default {
       if (direction === 'right') {
         console.log(this.$refs.transfer.leftChecked)
         console.log(this.$refs.transfer)
+        console.log(this.$refs.transfer.value)
 
         /*        document.querySelectorAll('span.is-checked').forEach(function(item,index) {
           console.log(index)
@@ -420,12 +381,15 @@ export default {
         })
       }
     },
-
+    getLabel() {
+      fetchLabel(this.temp.resourceId).then(response => {
+        this.listLabel = response.data.items
+      })
+    },
     getTables() {
-      this.listLoading = true
-      fetchTables().then(response => {
-        this.tables = response.data
-        this.listLoading = false
+      fetchSource(this.temp.resourceId).then(response => {
+        this.temp.tables = response.data.paths
+        console.log(this.temp.tables)
       })
     },
     getList() {
@@ -436,25 +400,14 @@ export default {
         this.listLoading = false
       })
     },
+    getSourceList() {
+      fetchSourceList().then(response => {
+        this.listSource = response.data.items
+      })
+    },
     handleFilter() {
       this.listArr.listQuery.page = 1
       this.getList()
-    },
-
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
     },
     resetTemp() {
       this.tempValue = []
@@ -499,8 +452,15 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
+          this.temp.tag = this.listLabel.find(o => o.id === this.temp.tagId).title
+          this.temp.resourceTitle = this.listSource.find(o => o.id === this.temp.resourceId).title
+          this.temp.status = 'enabled'
+
+          this.temp.tables.forEach(item => {
+            item.resourceId = item.id
+            item.resourceTitle = item.title
+          })
+
           createSource(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
@@ -516,26 +476,30 @@ export default {
     },
     handleUpdate(row) {
       // console.log(row)
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data
+        this.temp.tables = []
+        this.temp.resourceId = this.temp.resourceId || 1
+        this.temp.rules = this.temp.rules || []
 
-      console.log('handleUpdate...')
-      if (this.$refs.transfer) {
-        console.log(this.$refs.transfer.targetData)
-      }
-
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+        this.getTables()
+        this.dialogStatus = 'update'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateSource(tempData).then(() => {
+
+          tempData.tables.forEach(item => {
+            item.resourceId = item.id
+            item.resourceTitle = item.title
+          })
+          update(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {
                 const index = this.listArr.data.indexOf(v)
@@ -555,7 +519,7 @@ export default {
       })
     },
     handleDelete(row) {
-      dele(row.id, status).then(response => {
+      dele({ id: row.id }).then(response => {
         this.$notify({
           title: '完成',
           message: '删除',

@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function sourceOption(query) {
+  return request({
+    url: '/common/options',
+    method: 'get',
+    params: query
+  })
+}
+
 export function channelType(query) {
   return request({
     url: '/common/channel-type',
@@ -8,6 +16,13 @@ export function channelType(query) {
   })
 }
 
+export function domain(query) {
+  return request({
+    url: '/common/domain',
+    method: 'get',
+    params: query
+  })
+}
 export function department(query) {
   return request({
     url: '/common/department',
@@ -20,6 +35,24 @@ export function department(query) {
 export function searchPersons(query) {
   return request({
     url: '/common/search-persons',
+    method: 'get',
+    params: query
+  })
+}
+
+// 频道订阅列表
+export function channelSubscribe(query) {
+  return request({
+    url: '/common/channel-Subscribe',
+    method: 'get',
+    params: query
+  })
+}
+
+// 推送模板列表
+export function pushTemplate(query) {
+  return request({
+    url: '/common/push-template',
     method: 'get',
     params: query
   })

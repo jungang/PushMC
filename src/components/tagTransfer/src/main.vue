@@ -37,7 +37,9 @@
         <i class="el-icon-arrow-right" />
       </el-button>
     </div>
+
     <transfer-panel
+      v-if="type === 'businessChannel'"
       ref="rightPanel"
       :type="type"
       v-bind="$props"
@@ -45,6 +47,22 @@
       :title="titles[1] || t('el.transfer.titles.1')"
       :default-checked="rightDefaultChecked"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
+      :custom-prefix="prefix"
+      class="right-panel"
+      @checked-change="onTargetCheckedChange"
+    >
+      <slot name="right-footer" />
+    </transfer-panel>
+    <transfer-panel
+      v-else
+      ref="rightPanel"
+      :type="type"
+      v-bind="$props"
+      :data="targetData"
+      :title="titles[1] || t('el.transfer.titles.1')"
+      :default-checked="rightDefaultChecked"
+      :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
+      :is-show-input="true"
       :custom-prefix="prefix"
       class="right-panel"
       @checked-change="onTargetCheckedChange"

@@ -1,0 +1,1441 @@
+{
+  "code": 20000,
+  "msg": "",
+  "data": {
+    "total": 4531,
+    "items": [
+      {
+        "lastPushTime": "1976-08-05 20:15:47",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "少时下再制",
+        "id": 8765401,
+        "status": "pushed",
+        "origin": "唐静",
+        "rule": "克光成信量属",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 3,
+            "rule": "低近都"
+          },
+          {
+            "priority": 5,
+            "rule": "取历个"
+          },
+          {
+            "priority": 2,
+            "rule": "越断容别么资"
+          },
+          {
+            "priority": 3,
+            "rule": "西进响"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "极低手道红",
+            "amount": 47,
+            "status": "disabled",
+            "createDate": "2008-08-14 18:19:29"
+          },
+          {
+            "title": "问外千适",
+            "amount": 32,
+            "status": "disabled",
+            "createDate": "1970-08-09 09:57:40"
+          }
+        ],
+        "targetType": 1,
+        "pushChannels": [
+          {
+            "type": "sms",
+            "id": 1,
+            "label": "短信"
+          },
+          {
+            "type": "app",
+            "id": 2,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 3,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 4,
+            "label": "微信"
+          },
+          {
+            "type": "openApi",
+            "id": 5,
+            "label": "openApi"
+          }
+        ],
+        "templateKey": "tmp2",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 232,
+        "receipt": "false",
+        "contentType": "news",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "2009-05-10 07:18:21",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "议往的八报共步整前",
+        "id": 5209611,
+        "status": "notPush",
+        "origin": "黄艳",
+        "rule": "车半后热",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 2,
+            "rule": "也容广今史"
+          },
+          {
+            "priority": 3,
+            "rule": "决如性儿"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "是基己活查便米",
+            "amount": 16,
+            "status": "disabled",
+            "createDate": "2011-05-20 21:08:40"
+          },
+          {
+            "title": "斯看也平",
+            "amount": 82,
+            "status": "enabled",
+            "createDate": "2018-11-09 00:57:47"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "smartCall",
+            "id": 6,
+            "label": "智能客服"
+          },
+          {
+            "type": "sms",
+            "id": 7,
+            "label": "短信"
+          }
+        ],
+        "templateKey": "tmp3",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 56,
+        "receipt": "true",
+        "contentType": "notice",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "2008-10-28 13:50:17",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "提儿六种能斗",
+        "id": 7550750,
+        "status": "pushed",
+        "origin": "曾娟",
+        "rule": "上增越事说",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 2,
+            "rule": "养国阶"
+          },
+          {
+            "priority": 6,
+            "rule": "路放查只她设"
+          },
+          {
+            "priority": 9,
+            "rule": "亲又府从历"
+          },
+          {
+            "priority": 3,
+            "rule": "口难军"
+          },
+          {
+            "priority": 4,
+            "rule": "在复才"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "治改万接",
+            "amount": 10,
+            "status": "enabled",
+            "createDate": "1981-10-08 10:14:01"
+          },
+          {
+            "title": "总力总国面",
+            "amount": 31,
+            "status": "enabled",
+            "createDate": "1991-08-01 19:09:26"
+          },
+          {
+            "title": "包广器权",
+            "amount": 50,
+            "status": "enabled",
+            "createDate": "1983-03-22 19:16:39"
+          },
+          {
+            "title": "局片整山保",
+            "amount": 88,
+            "status": "disabled",
+            "createDate": "2009-04-09 00:23:16"
+          },
+          {
+            "title": "口设反北空反件",
+            "amount": 16,
+            "status": "enabled",
+            "createDate": "1986-05-05 02:48:55"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "app",
+            "id": 8,
+            "label": "app"
+          }
+        ],
+        "templateKey": "tmp5",
+        "pushPlan": "instant",
+        "pushPlanOption": 4,
+        "receiptSecond": 665,
+        "receipt": "false",
+        "contentType": "notice",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "2000-01-24 11:20:00",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "该路法她",
+        "id": 1340598,
+        "status": "notPush",
+        "origin": "邵艳",
+        "rule": "原基到",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 4,
+            "rule": "斯头县成义才"
+          },
+          {
+            "priority": 1,
+            "rule": "通证子广切加"
+          },
+          {
+            "priority": 7,
+            "rule": "使之改合土相质"
+          },
+          {
+            "priority": 3,
+            "rule": "交改建接民是"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "学群始成易",
+            "amount": 73,
+            "status": "disabled",
+            "createDate": "1993-10-16 06:16:09"
+          },
+          {
+            "title": "斯位什他建",
+            "amount": 48,
+            "status": "disabled",
+            "createDate": "2000-06-18 10:36:55"
+          },
+          {
+            "title": "点调京为",
+            "amount": 51,
+            "status": "enabled",
+            "createDate": "1991-12-20 13:20:38"
+          },
+          {
+            "title": "品解样业等选",
+            "amount": 92,
+            "status": "disabled",
+            "createDate": "2006-02-13 20:00:26"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "business",
+            "id": 9,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 10,
+            "label": "微信"
+          }
+        ],
+        "templateKey": "tmp3",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 885,
+        "receipt": "true",
+        "contentType": "notice",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "1999-01-01 03:46:49",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "却最土色决构单战处",
+        "id": 5304668,
+        "status": "notPush",
+        "origin": "秦平",
+        "rule": "常回示际",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 8,
+            "rule": "把适已小才律"
+          },
+          {
+            "priority": 4,
+            "rule": "平器亲率最写"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "级得资办",
+            "amount": 99,
+            "status": "disabled",
+            "createDate": "2001-08-10 03:20:56"
+          },
+          {
+            "title": "代所半路",
+            "amount": 57,
+            "status": "enabled",
+            "createDate": "1992-05-31 20:03:12"
+          },
+          {
+            "title": "列治北",
+            "amount": 10,
+            "status": "disabled",
+            "createDate": "1970-06-05 21:23:10"
+          },
+          {
+            "title": "维极集员",
+            "amount": 60,
+            "status": "enabled",
+            "createDate": "1972-07-22 04:41:10"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "openApi",
+            "id": 11,
+            "label": "openApi"
+          },
+          {
+            "type": "smartCall",
+            "id": 12,
+            "label": "智能客服"
+          },
+          {
+            "type": "sms",
+            "id": 13,
+            "label": "短信"
+          }
+        ],
+        "templateKey": "tmp4",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 954,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "2013-09-23 22:55:53",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "府音打题行入",
+        "id": 8292001,
+        "status": "notPush",
+        "origin": "江秀兰",
+        "rule": "看思式农八拉",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 7,
+            "rule": "大较意就一"
+          },
+          {
+            "priority": 3,
+            "rule": "节话干参圆"
+          },
+          {
+            "priority": 5,
+            "rule": "了南品"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "习成区开",
+            "amount": 58,
+            "status": "enabled",
+            "createDate": "1995-05-08 00:06:03"
+          },
+          {
+            "title": "方变给算示",
+            "amount": 61,
+            "status": "disabled",
+            "createDate": "2007-09-20 13:46:13"
+          },
+          {
+            "title": "北全你月每",
+            "amount": 1,
+            "status": "enabled",
+            "createDate": "1977-05-03 02:50:04"
+          },
+          {
+            "title": "圆长而决",
+            "amount": 59,
+            "status": "disabled",
+            "createDate": "1986-04-10 16:16:50"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "app",
+            "id": 14,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 15,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 16,
+            "label": "微信"
+          },
+          {
+            "type": "openApi",
+            "id": 17,
+            "label": "openApi"
+          },
+          {
+            "type": "smartCall",
+            "id": 18,
+            "label": "智能客服"
+          }
+        ],
+        "templateKey": "tmp4",
+        "pushPlan": "instant",
+        "pushPlanOption": 2,
+        "receiptSecond": 63,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "1979-05-11 19:33:30",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "八想铁采接严她量",
+        "id": 8356065,
+        "status": "notPush",
+        "origin": "田霞",
+        "rule": "的型指给电",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 6,
+            "rule": "通族么级"
+          },
+          {
+            "priority": 6,
+            "rule": "消适质低实"
+          },
+          {
+            "priority": 2,
+            "rule": "且消到省"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "收权太",
+            "amount": 51,
+            "status": "disabled",
+            "createDate": "1986-09-20 15:19:22"
+          },
+          {
+            "title": "你区关对可青",
+            "amount": 46,
+            "status": "disabled",
+            "createDate": "1975-09-08 21:14:48"
+          },
+          {
+            "title": "养人社己史",
+            "amount": 38,
+            "status": "enabled",
+            "createDate": "2007-03-14 06:42:33"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "sms",
+            "id": 19,
+            "label": "短信"
+          },
+          {
+            "type": "app",
+            "id": 20,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 21,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 22,
+            "label": "微信"
+          },
+          {
+            "type": "openApi",
+            "id": 23,
+            "label": "openApi"
+          },
+          {
+            "type": "smartCall",
+            "id": 24,
+            "label": "智能客服"
+          }
+        ],
+        "templateKey": "tmp3",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 431,
+        "receipt": "false",
+        "contentType": "notice",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "1977-12-29 06:08:37",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "你为年需低调京看员革",
+        "id": 4718850,
+        "status": "notPush",
+        "origin": "邓磊",
+        "rule": "电形我进快",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 2,
+            "rule": "土派高性电"
+          },
+          {
+            "priority": 4,
+            "rule": "议二民快没"
+          },
+          {
+            "priority": 10,
+            "rule": "作展中的性被于"
+          },
+          {
+            "priority": 2,
+            "rule": "任头京她没照"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "知布维党起集",
+            "amount": 50,
+            "status": "disabled",
+            "createDate": "1979-02-17 18:36:28"
+          },
+          {
+            "title": "划花圆该以走",
+            "amount": 50,
+            "status": "enabled",
+            "createDate": "1973-05-19 11:32:24"
+          },
+          {
+            "title": "委做际被之工",
+            "amount": 66,
+            "status": "disabled",
+            "createDate": "2001-07-04 22:03:10"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "sms",
+            "id": 25,
+            "label": "短信"
+          },
+          {
+            "type": "app",
+            "id": 26,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 27,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 28,
+            "label": "微信"
+          }
+        ],
+        "templateKey": "tmp4",
+        "pushPlan": "instant",
+        "pushPlanOption": 4,
+        "receiptSecond": 151,
+        "receipt": "true",
+        "contentType": "notice",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "1979-08-02 19:10:35",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "值内取王往参工决转",
+        "id": 7315495,
+        "status": "pushed",
+        "origin": "罗杰",
+        "rule": "多公写定压音元",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 8,
+            "rule": "导铁用头界样式"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "文了主且出却",
+            "amount": 8,
+            "status": "disabled",
+            "createDate": "1998-09-17 07:41:09"
+          },
+          {
+            "title": "命门验劳价龙",
+            "amount": 51,
+            "status": "enabled",
+            "createDate": "2014-07-16 15:12:54"
+          },
+          {
+            "title": "数音关地走第",
+            "amount": 64,
+            "status": "disabled",
+            "createDate": "2016-07-25 05:30:19"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "openApi",
+            "id": 29,
+            "label": "openApi"
+          }
+        ],
+        "templateKey": "tmp4",
+        "pushPlan": "instant",
+        "pushPlanOption": 4,
+        "receiptSecond": 185,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "1982-11-10 05:34:32",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "育革节国究管制理而能",
+        "id": 5583434,
+        "status": "pushed",
+        "origin": "傅明",
+        "rule": "面属总院年关小",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 4,
+            "rule": "把克者取党许"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "华方构发意信组",
+            "amount": 94,
+            "status": "enabled",
+            "createDate": "2019-03-24 14:06:20"
+          },
+          {
+            "title": "见当情术强",
+            "amount": 10,
+            "status": "enabled",
+            "createDate": "1986-11-20 09:02:52"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [],
+        "templateKey": "tmp4",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 213,
+        "receipt": "false",
+        "contentType": "news",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "1975-10-22 04:02:12",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "容整光向平门许或广内",
+        "id": 4085799,
+        "status": "pushed",
+        "origin": "魏娟",
+        "rule": "此用些于眼",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 9,
+            "rule": "叫动识级难"
+          },
+          {
+            "priority": 3,
+            "rule": "年例低级"
+          },
+          {
+            "priority": 5,
+            "rule": "至与路权压毛九"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "压些事众以设",
+            "amount": 21,
+            "status": "disabled",
+            "createDate": "2017-05-26 23:36:19"
+          },
+          {
+            "title": "上去反动工或容",
+            "amount": 36,
+            "status": "enabled",
+            "createDate": "2002-08-26 01:33:10"
+          },
+          {
+            "title": "八人按式传作传",
+            "amount": 79,
+            "status": "enabled",
+            "createDate": "1999-07-18 12:26:39"
+          },
+          {
+            "title": "个却路路必因",
+            "amount": 81,
+            "status": "enabled",
+            "createDate": "1973-03-05 18:16:26"
+          }
+        ],
+        "targetType": 1,
+        "pushChannels": [
+          {
+            "type": "smartCall",
+            "id": 30,
+            "label": "智能客服"
+          },
+          {
+            "type": "sms",
+            "id": 31,
+            "label": "短信"
+          },
+          {
+            "type": "app",
+            "id": 32,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 33,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 34,
+            "label": "微信"
+          },
+          {
+            "type": "openApi",
+            "id": 35,
+            "label": "openApi"
+          }
+        ],
+        "templateKey": "tmp5",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 289,
+        "receipt": "false",
+        "contentType": "notice",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "1986-08-22 02:57:37",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "各复七条平作和利根",
+        "id": 9889568,
+        "status": "notPush",
+        "origin": "黄艳",
+        "rule": "过值当造整他位",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 8,
+            "rule": "何家比手"
+          },
+          {
+            "priority": 10,
+            "rule": "具无命消热"
+          },
+          {
+            "priority": 6,
+            "rule": "音如步代深"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "个成任少照",
+            "amount": 83,
+            "status": "disabled",
+            "createDate": "1997-09-19 17:37:41"
+          },
+          {
+            "title": "消道青事",
+            "amount": 5,
+            "status": "disabled",
+            "createDate": "1973-01-20 05:19:00"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "smartCall",
+            "id": 36,
+            "label": "智能客服"
+          },
+          {
+            "type": "sms",
+            "id": 37,
+            "label": "短信"
+          },
+          {
+            "type": "app",
+            "id": 38,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 39,
+            "label": "business"
+          }
+        ],
+        "templateKey": "tmp2",
+        "pushPlan": "instant",
+        "pushPlanOption": 2,
+        "receiptSecond": 939,
+        "receipt": "false",
+        "contentType": "news",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "1983-11-05 05:22:32",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "土广什起区般传气各",
+        "id": 8763666,
+        "status": "notPush",
+        "origin": "邓刚",
+        "rule": "看完装文",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 7,
+            "rule": "消社调资路达新"
+          },
+          {
+            "priority": 9,
+            "rule": "飞引利没"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "角起识利王思",
+            "amount": 33,
+            "status": "enabled",
+            "createDate": "2014-04-22 13:23:35"
+          },
+          {
+            "title": "建走历包与",
+            "amount": 69,
+            "status": "disabled",
+            "createDate": "1974-09-06 17:52:24"
+          },
+          {
+            "title": "五般采文术",
+            "amount": 10,
+            "status": "enabled",
+            "createDate": "1980-01-06 00:29:14"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "wx",
+            "id": 40,
+            "label": "微信"
+          },
+          {
+            "type": "openApi",
+            "id": 41,
+            "label": "openApi"
+          },
+          {
+            "type": "smartCall",
+            "id": 42,
+            "label": "智能客服"
+          },
+          {
+            "type": "sms",
+            "id": 43,
+            "label": "短信"
+          }
+        ],
+        "templateKey": "tmp5",
+        "pushPlan": "instant",
+        "pushPlanOption": 2,
+        "receiptSecond": 375,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "1998-03-28 06:46:01",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "见三眼快装眼共斗青小八近",
+        "id": 4107385,
+        "status": "notPush",
+        "origin": "夏军",
+        "rule": "来口没作",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 7,
+            "rule": "入家就什于从置"
+          },
+          {
+            "priority": 3,
+            "rule": "出消得专农"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "规即化节象",
+            "amount": 3,
+            "status": "enabled",
+            "createDate": "1986-05-01 09:12:54"
+          },
+          {
+            "title": "六者能调",
+            "amount": 22,
+            "status": "enabled",
+            "createDate": "1992-09-13 17:55:40"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "app",
+            "id": 44,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 45,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 46,
+            "label": "微信"
+          }
+        ],
+        "templateKey": "tmp2",
+        "pushPlan": "instant",
+        "pushPlanOption": 3,
+        "receiptSecond": 490,
+        "receipt": "true",
+        "contentType": "notice",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "2004-03-02 21:45:24",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "件及容备比解都",
+        "id": 6608365,
+        "status": "pushed",
+        "origin": "杜娜",
+        "rule": "更强省记角分",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 2,
+            "rule": "速标然局太入"
+          },
+          {
+            "priority": 6,
+            "rule": "系市最到"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "员提由得只",
+            "amount": 82,
+            "status": "enabled",
+            "createDate": "1974-08-18 21:45:50"
+          },
+          {
+            "title": "己性积空",
+            "amount": 29,
+            "status": "disabled",
+            "createDate": "1993-02-02 19:49:40"
+          },
+          {
+            "title": "级利动于可",
+            "amount": 81,
+            "status": "disabled",
+            "createDate": "1997-08-20 22:51:02"
+          },
+          {
+            "title": "照路住合",
+            "amount": 53,
+            "status": "disabled",
+            "createDate": "2002-12-12 01:05:42"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "openApi",
+            "id": 47,
+            "label": "openApi"
+          },
+          {
+            "type": "smartCall",
+            "id": 48,
+            "label": "智能客服"
+          },
+          {
+            "type": "sms",
+            "id": 49,
+            "label": "短信"
+          },
+          {
+            "type": "app",
+            "id": 50,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 51,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 52,
+            "label": "微信"
+          }
+        ],
+        "templateKey": "tmp4",
+        "pushPlan": "instant",
+        "pushPlanOption": 2,
+        "receiptSecond": 538,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "1991-10-14 03:54:45",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "做程它",
+        "id": 3182671,
+        "status": "notPush",
+        "origin": "任敏",
+        "rule": "体以地包力",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 3,
+            "rule": "受点家习"
+          },
+          {
+            "priority": 3,
+            "rule": "议题交"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "热世派长无区科",
+            "amount": 64,
+            "status": "disabled",
+            "createDate": "2009-10-13 01:24:23"
+          },
+          {
+            "title": "先形今因立权展",
+            "amount": 62,
+            "status": "disabled",
+            "createDate": "1997-05-10 12:48:29"
+          },
+          {
+            "title": "品干叫根然道",
+            "amount": 88,
+            "status": "enabled",
+            "createDate": "1975-08-06 18:04:03"
+          },
+          {
+            "title": "角和少生将",
+            "amount": 42,
+            "status": "disabled",
+            "createDate": "1997-08-11 17:07:43"
+          }
+        ],
+        "targetType": 1,
+        "pushChannels": [
+          {
+            "type": "openApi",
+            "id": 53,
+            "label": "openApi"
+          }
+        ],
+        "templateKey": "tmp3",
+        "pushPlan": "instant",
+        "pushPlanOption": 4,
+        "receiptSecond": 931,
+        "receipt": "true",
+        "contentType": "notice",
+        "contentOrigin": "default"
+      },
+      {
+        "lastPushTime": "2000-03-28 20:55:46",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "场命和节委厂始表",
+        "id": 9704870,
+        "status": "pushed",
+        "origin": "贾娜",
+        "rule": "历传军化",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 6,
+            "rule": "断话治作你况"
+          },
+          {
+            "priority": 2,
+            "rule": "特部只此且"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "把值王气段",
+            "amount": 56,
+            "status": "disabled",
+            "createDate": "2009-10-24 15:49:56"
+          },
+          {
+            "title": "只级流",
+            "amount": 19,
+            "status": "enabled",
+            "createDate": "1997-12-18 19:26:36"
+          }
+        ],
+        "targetType": 2,
+        "pushChannels": [
+          {
+            "type": "smartCall",
+            "id": 54,
+            "label": "智能客服"
+          },
+          {
+            "type": "sms",
+            "id": 55,
+            "label": "短信"
+          }
+        ],
+        "templateKey": "tmp2",
+        "pushPlan": "instant",
+        "pushPlanOption": 4,
+        "receiptSecond": 326,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "1998-01-16 06:55:58",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "每志且节下",
+        "id": 8538499,
+        "status": "notPush",
+        "origin": "姚丽",
+        "rule": "行里文米按",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 6,
+            "rule": "长分东教合"
+          },
+          {
+            "priority": 7,
+            "rule": "必养究体七分"
+          },
+          {
+            "priority": 8,
+            "rule": "记往色"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "选头院叫",
+            "amount": 21,
+            "status": "disabled",
+            "createDate": "2002-11-23 05:39:35"
+          },
+          {
+            "title": "写经式非民华上",
+            "amount": 12,
+            "status": "disabled",
+            "createDate": "1982-12-08 02:52:28"
+          },
+          {
+            "title": "该史真思派",
+            "amount": 92,
+            "status": "disabled",
+            "createDate": "1991-08-27 21:56:35"
+          },
+          {
+            "title": "年京学地色",
+            "amount": 84,
+            "status": "disabled",
+            "createDate": "1978-06-05 11:54:49"
+          }
+        ],
+        "targetType": 1,
+        "pushChannels": [
+          {
+            "type": "app",
+            "id": 56,
+            "label": "app"
+          },
+          {
+            "type": "business",
+            "id": 57,
+            "label": "business"
+          },
+          {
+            "type": "wx",
+            "id": 58,
+            "label": "微信"
+          },
+          {
+            "type": "openApi",
+            "id": 59,
+            "label": "openApi"
+          }
+        ],
+        "templateKey": "tmp6",
+        "pushPlan": "instant",
+        "pushPlanOption": 4,
+        "receiptSecond": 628,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "1988-05-12 23:20:09",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "计美增日局学本细会提参量",
+        "id": 8419316,
+        "status": "notPush",
+        "origin": "周霞",
+        "rule": "角给看行",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 7,
+            "rule": "委满义眼海出"
+          },
+          {
+            "priority": 4,
+            "rule": "米叫京系"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "质立可改候",
+            "amount": 73,
+            "status": "enabled",
+            "createDate": "1988-04-25 05:14:36"
+          },
+          {
+            "title": "问集达最",
+            "amount": 89,
+            "status": "disabled",
+            "createDate": "1987-11-02 14:52:16"
+          }
+        ],
+        "targetType": 1,
+        "pushChannels": [
+          {
+            "type": "smartCall",
+            "id": 60,
+            "label": "智能客服"
+          }
+        ],
+        "templateKey": "tmp2",
+        "pushPlan": "instant",
+        "pushPlanOption": 5,
+        "receiptSecond": 758,
+        "receipt": "true",
+        "contentType": "news",
+        "contentOrigin": "custom"
+      },
+      {
+        "lastPushTime": "1987-08-27 07:40:35",
+        "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+        "tag": [
+          "tag1",
+          "tag2"
+        ],
+        "title": "组千带压",
+        "id": 1859082,
+        "status": "pushed",
+        "origin": "傅强",
+        "rule": "何研从济指例究",
+        "rules": [],
+        "additionalOption": [
+          {
+            "priority": 4,
+            "rule": "维传术石住"
+          },
+          {
+            "priority": 9,
+            "rule": "现使养"
+          }
+        ],
+        "targetes": [
+          {
+            "title": "社度根员术这",
+            "amount": 23,
+            "status": "enabled",
+            "createDate": "2009-10-14 18:44:27"
+          },
+          {
+            "title": "石论很信教织",
+            "amount": 18,
+            "status": "enabled",
+            "createDate": "1998-02-04 19:03:00"
+          }
+        ],
+        "targetType": 1,
+        "pushChannels": [],
+        "templateKey": "tmp5",
+        "pushPlan": "instant",
+        "pushPlanOption": 2,
+        "receiptSecond": 566,
+        "receipt": "false",
+        "contentType": "news",
+        "contentOrigin": "custom"
+      }
+    ]
+  }
+}

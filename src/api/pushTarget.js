@@ -7,11 +7,18 @@ export function fetchList(query) {
     params: query
   })
 }
+export function detail(query) {
+  return request({
+    url: '/push-target/detail',
+    method: 'get',
+    params: query
+  })
+}
 
 export function dele(id, status) {
   return request({
     url: '/push-target/delete',
-    method: 'post',
+    method: 'delete',
     params: { id, status }
   })
 }
@@ -32,18 +39,18 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function create(data) {
   return request({
     url: '/push-target/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
 export function update(data) {
   return request({
     url: '/push-target/update',
-    method: 'post',
-    data: { data: data }
+    method: 'put',
+    data: data
   })
 }

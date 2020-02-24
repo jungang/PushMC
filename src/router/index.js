@@ -54,6 +54,19 @@ export const constantRoutes = [
       meta: { title: '首页', icon: 'dashboard' }
     }]
   },
+
+  // 404 page must be placed at the end !!!
+  { path: '*',
+    redirect: '/404',
+    hidden: true
+  }
+]
+
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ */
+export const asyncRoutes = [
   {
     path: '/source',
     component: Layout,
@@ -62,7 +75,10 @@ export const constantRoutes = [
         path: '',
         name: 'Source',
         component: () => import('@/views/source/index'),
-        meta: { title: '数据源', icon: 'form' }
+        meta: {
+          title: '数据源',
+          icon: 'form'
+        }
       }
     ]
   },
@@ -70,12 +86,21 @@ export const constantRoutes = [
   {
     path: '/data-tag',
     component: Layout,
+    redirect: '/data-tag/list',
+    name: 'DataTag',
     children: [
       {
-        path: '',
-        name: 'DataTag',
-        component: () => import('@/views/datatag/index'),
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/dataTag/index'),
         meta: { title: '数据标注', icon: 'form' }
+      },
+      {
+        path: 'edit',
+        name: 'Edit',
+        component: () => import('@/views/dataTag/edit'),
+        meta: { title: '标注', icon: 'form' },
+        hidden: true
       }
     ]
   },
@@ -86,9 +111,12 @@ export const constantRoutes = [
     children: [
       {
         path: '',
-        name: 'category',
+        name: 'Category',
         component: () => import('@/views/category/index'),
-        meta: { title: '标签分类', icon: 'form' }
+        meta: {
+          title: '标签分类',
+          icon: 'form'
+        }
       }
     ]
   },
@@ -174,13 +202,13 @@ export const constantRoutes = [
       {
         path: 'pipe-push',
         name: 'PipePush',
-        component: () => import('@/views/table/index'),
+        component: () => import('@/views/pipePush/index'),
         meta: { title: '渠道推送', icon: 'table' }
       },
       {
         path: 'content-push',
         name: 'ContentPush',
-        component: () => import('@/views/tree/index'),
+        component: () => import('@/views/contentPush/index'),
         meta: { title: '内容推送', icon: 'tree' }
       }
     ]
@@ -196,109 +224,50 @@ export const constantRoutes = [
       {
         path: 'user',
         name: 'User',
-        component: () => import('@/views/table/index'),
-        meta: { title: '用户权限', icon: 'table' }
+        component: () => import('@/views/permission/index'),
+        meta: { title: '用户角色', icon: 'table' }
       },
       {
         path: 'role',
         name: 'Role',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '用户角色', icon: 'tree' }
+        component: () => import('@/views/permission/role'),
+        meta: { title: '用户权限', icon: 'tree' }
       }
     ]
   },
 
   {
-    path: '/form',
+    path: '/statistics',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
+        name: 'Statistics',
+        component: () => import('@/views/statistics/index'),
         meta: { title: '推送统计', icon: 'form' }
       }
     ]
-  }
-]
-
-/**
- * asyncRoutes
- * the routes that need to be dynamically loaded based on user roles
- */
-export const asyncRoutes = [
+  },
   {
-    path: '/nested',
+    path: '/examine',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
     meta: {
-      title: 'Nested',
+      title: '',
       icon: 'nested',
-      roles: ['admin', 'editor']
+      roles: ['admin']
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
-      },
-      {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
+        path: 'index',
+        name: 'Examine',
+        component: () => import('@/views/examine/index'),
+        meta: {
+          title: '内容审批',
+          icon: 'form'
+        }
       }
     ]
-  },
-
-  {
-    path: 'external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
-      }
-    ]
-  },
-
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  }
 ]
 
 const createRouter = () => new Router({

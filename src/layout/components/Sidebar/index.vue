@@ -31,6 +31,9 @@ export default {
       'permission_routes',
       'sidebar'
     ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    },
     activeMenu() {
       const route = this.$route
       const { meta, path } = route

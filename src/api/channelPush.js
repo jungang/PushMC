@@ -7,11 +7,34 @@ export function fetchList(query) {
     params: query
   })
 }
+export function detail(query) {
+  return request({
+    url: '/channel-push/detail',
+    method: 'get',
+    params: query
+  })
+}
+
+export function groups(query) {
+  return request({
+    url: '/push-target/groups',
+    method: 'get',
+    params: query
+  })
+}
+
+export function contentPushList(query) {
+  return request({
+    url: '/channel-push/content-push-list',
+    method: 'get',
+    params: query
+  })
+}
 
 export function changeStatus(id, status) {
   return request({
     url: '/channel-push/status',
-    method: 'post',
+    method: 'put',
     params: { id, status }
   })
 }
@@ -34,7 +57,7 @@ export function searchList(keyWord) {
 export function dele(id, status) {
   return request({
     url: '/channel-push/delete',
-    method: 'post',
+    method: 'delete',
     params: { id, status }
   })
 }
@@ -59,14 +82,37 @@ export function createSource(data) {
   return request({
     url: '/channel-push/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
-export function updateSource(data) {
+export function updateChannel(data) {
   return request({
     url: '/channel-push/update',
+    method: 'put',
+    data: data
+  })
+}
+export function copyChannel(data) {
+  return request({
+    url: '/channel-push/copy',
     method: 'post',
-    data: { data: data }
+    data: data
+  })
+}
+
+export function push(data) {
+  return request({
+    url: '/channel-push/push',
+    method: 'post',
+    data: data
+  })
+}
+
+export function unPush(data, opt) {
+  return request({
+    url: '/channel-push/un-push',
+    method: 'post',
+    data: { data: data, opt: opt }
   })
 }

@@ -15,6 +15,13 @@ export function getInfo(token) {
     params: { token }
   })
 }
+export function getPermission(roles) {
+  return request({
+    url: '/user/permission',
+    method: 'get',
+    params: { roles }
+  })
+}
 
 export function logout() {
   return request({

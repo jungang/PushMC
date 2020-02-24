@@ -1,0 +1,19 @@
+{
+  "code": 20000,
+  "data": {
+    "roleTypes": [
+      {
+        "id": "07",
+        "path": "/push-target"
+      },
+      {
+        "id": "08",
+        "path": "/message-template"
+      },
+      {
+        "id": "09",
+        "path": "/message-push"
+      }
+    ]
+  }
+}
