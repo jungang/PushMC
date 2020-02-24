@@ -7,10 +7,47 @@
     </el-row>
 
     <el-row>
-      地图
-      <div id="map" />
+      <p>数据图表</p>
     </el-row>
+    <el-row :gutter="20" class="nav-link">
+      <el-col :span="8">
+        <h4>业务频道推送</h4>
 
+        <p>step1: 初始化设置</p>
+        <router-link :to="{path:'/data-tag'}"> <el-tag>标签分类</el-tag></router-link>
+        <router-link :to="{path:'/business-channel'}"> <el-tag type="info">业务频道</el-tag></router-link>
+        <router-link :to="{path:'/push-channel'}"> <el-tag>推送通道</el-tag></router-link>
+
+        <p>step2: 设置业务频道推送</p>
+        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>频道推送</el-tag></router-link>
+        <p>step3: 完成推送</p>
+        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>推送统计</el-tag></router-link>
+        <el-tag type="warning">推送统计</el-tag>
+
+      </el-col>
+      <el-col :span="8">
+        <h4>内容推送</h4>
+        <p>step1: 初始化设置</p>
+        <el-tag type="warning">标签分类</el-tag>
+        <el-tag type="warning">推送内容</el-tag>
+        <el-tag type="warning">推送通道</el-tag>
+        <p>step2: 设置内容推送规则</p>
+        <el-tag type="warning">内容推送</el-tag>
+        <p>step3: 完成推送</p>
+        <el-tag type="warning">推送统计</el-tag>
+
+      </el-col>
+      <el-col :span="8">
+        <h4>渠道推送</h4>
+        <p>step1: 初始化设置</p>
+        <el-tag type="warning">推送通道</el-tag>
+        <p>step2: 设置渠道推送规则</p>
+        <el-tag type="warning">渠道推送</el-tag>
+        <p>step3: 完成推送</p>
+        <el-tag type="warning">推送统计</el-tag>
+
+      </el-col>
+    </el-row>
   </div>
 
 </template>
@@ -18,7 +55,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import BMap from 'BMap'
+// import BMap from 'BMap'
 
 export default {
   name: 'Dashboard',
@@ -31,7 +68,6 @@ export default {
       }
     }
   },
-
   computed: {
     ...mapGetters([
       'name',
@@ -39,25 +75,25 @@ export default {
     ])
   },
   mounted() {
-    this.createMap()
+    // this.createMap()
   },
   methods: {
-    createMap() {
-      // 百度地图API功能
-      var map = new BMap.Map('map')
-      map.centerAndZoom(new BMap.Point(116.404, 39.915), 5)
-      map.enableScrollWheelZoom()
-
-      var MAX = 10
-      var markers = []
-      var pt = null
-      var i = 0
-      for (; i < MAX; i++) {
-        pt = new BMap.Point(Math.random() * 40 + 85, Math.random() * 30 + 21)
-        markers.push(new BMap.Marker(pt))
-      }
-      // var markerClusterer = new BMapLib.MarkerClusterer(map, { markers: markers })
-    }
+    // createMap() {
+    //   // 百度地图API功能
+    //   var map = new BMap.Map('map')
+    //   map.centerAndZoom(new BMap.Point(116.404, 39.915), 5)
+    //   map.enableScrollWheelZoom()
+    //
+    //   var MAX = 10
+    //   var markers = []
+    //   var pt = null
+    //   var i = 0
+    //   for (; i < MAX; i++) {
+    //     pt = new BMap.Point(Math.random() * 40 + 85, Math.random() * 30 + 21)
+    //     markers.push(new BMap.Marker(pt))
+    //   }
+    //   // var markerClusterer = new BMapLib.MarkerClusterer(map, { markers: markers })
+    // }
 
   }
 }
@@ -74,9 +110,13 @@ export default {
   }
 }
 
-#map {
-  width: 100%;
-  height: 60vh;
+.nav-link {
+  h4{
+    text-align: center;
+  }
+  p{
+    /*font-weight: bold;*/
+  }
 }
 
 </style>
