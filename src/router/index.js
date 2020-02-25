@@ -88,12 +88,13 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/data-tag/list',
     name: 'DataTag',
+    meta: { title: '数据标注', icon: 'example' },
     children: [
       {
         path: 'list',
         name: 'List',
         component: () => import('@/views/dataTag/index'),
-        meta: { title: '数据标注', icon: 'form' }
+        meta: { title: '标注', icon: 'form' }
       },
       {
         path: 'edit',

@@ -71,17 +71,19 @@
       :visible.sync="dialogFormVisible"
       center
       destroy-on-close
+      top="5vh"
+      custom-class="bcdialog"
       :width="step==='step1'?'900px':'1300px'"
       @closed="handleDialogClose"
     >
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
 
         <div v-if="step==='step1'" class="zone-step-1">
           <el-form-item v-if="dialogStatus==='create'" label="输入名称" prop="title">
             <el-input v-model="temp.title" style="width:400px" />
           </el-form-item>
 
-          <el-form-item label="选择业务源" prop="businessSource">
+          <el-form-item label="选择数据源" prop="businessSource">
             <el-select
               v-model="temp.resourceId"
               class="filter-item"
@@ -93,7 +95,6 @@
           </el-form-item>
 
           <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
-
             <XcomTagTransfer
               ref="transfer"
               v-model="tempValue"
@@ -116,6 +117,42 @@
               @change="handleChange"
             />
           </el-row>
+
+          <el-row type="flex" justify="end">
+            <el-button type="primary" @click="handleAdd">加入已选</el-button>
+          </el-row>
+
+          <el-form-item label="*已选全部数据表：">
+
+            <el-table
+              ref="singleTable"
+              :data="temp.alternative || []"
+              highlight-current-row
+              style="width: 100%"
+              @current-change="handleCurrentChange"
+            >
+              <el-table-column
+                type="index"
+                width="50"
+              />
+              <el-table-column
+                property="date"
+                label="日期"
+                width="120"
+              />
+              <el-table-column
+                property="name"
+                label="姓名"
+                width="120"
+              />
+              <el-table-column
+                property="address"
+                label="地址"
+              />
+            </el-table>
+
+          </el-form-item>
+
           <el-form-item label="选择标签" prop="tag">
             <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
               <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
@@ -277,6 +314,7 @@ export default {
         tagId: '',
         tag: '',
         title: '',
+        alternative: [],
         tables: []
       },
       dialogFormVisible: false,
@@ -312,6 +350,18 @@ export default {
     this.getLabel()
   },
   methods: {
+    handleCurrentChange(val) {
+      this.currentRow = val
+    },
+    handleAdd() {
+      console.log('handleAdd...')
+      // this.dynamicTags = this.dynamicTags.concat(this.plaza)
+      // this.dynamicTags = this.dynamicTags.concat(this.multipleSelection)
+      // this.dynamicTags = Array.from(new Set(this.dynamicTags)) // 去重
+      console.log(this.$refs.transfer.targetData)
+      this.temp.alternative = this.temp.alternative.concat(this.$refs.transfer.targetData)
+      this.dynamicTags = Array.from(new Set(this.temp.alternative)) // 去重
+    },
     nextStep() {
       this.options = []
       this.$refs.transfer.value.forEach((item) => {
@@ -337,7 +387,7 @@ export default {
       console.log(this.tempValue)
     },
     handleCheckLeft(value, direction) {
-      console.log(this.$refs.transfer)
+      /*      console.log(this.$refs.transfer)
       const n = this.tempValue.length + value.length // 当前数量
       if (n === 3) {
         console.log('===3')
@@ -353,33 +403,32 @@ export default {
         this.temp.tables.map(item => {
           item.disabled = false
         })
-      }
+      }*/
     },
     handleCheckRight() {},
     handleChange(value, direction, movedKeys) {
       if (direction === 'right') {
-        console.log(this.$refs.transfer.leftChecked)
-        console.log(this.$refs.transfer)
-        console.log(this.$refs.transfer.value)
+        // console.log(this.$refs.transfer.leftChecked)
+        // console.log(this.$refs.transfer)
+        // console.log(this.$refs.transfer.value)
 
         /*        document.querySelectorAll('span.is-checked').forEach(function(item,index) {
           console.log(index)
           document.querySelectorAll('span.is-checked')[index].click()
         })*/
       }
-      if (value.length < 3) {
+      /*      if (value.length < 3) {
         this.temp.tables.map(item => {
           item.disabled = false
         })
-      }
-
-      if (value.length === 3) {
+      }*/
+      /*      if (value.length === 3) {
         this.temp.tables.map(item => {
           const status1 = !this.tempValue.find(key => key === item.key)
           const status2 = !value.find(key => key === item.key)
           item.disabled = status1 && status2
         })
-      }
+      }*/
     },
     getLabel() {
       fetchLabel(this.temp.resourceId).then(response => {
@@ -414,6 +463,7 @@ export default {
       this.temp = {
         id: undefined,
         category: 'API',
+        alternative: [],
         title: '****',
         tables: deepClone(this.tables),
         transferStatus: [],
@@ -543,15 +593,11 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-  .main-dialog{
-    color: red;
-    .el-dialog{
-      min-width: 650px;
-    }
+<style lang="scss">
+.bcdialog{
+  .el-dialog__body{
+    max-height: 700px;
+    overflow: auto;
   }
-  .main-form{
-    max-height: 600px;
-  }
+}
 </style>

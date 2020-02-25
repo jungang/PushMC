@@ -101,12 +101,21 @@
         </el-form-item>
 
         <el-form-item label="定时更新" prop="updatePlanHours">
-          <el-select v-model="temp.updatePlanHours" class="filter-item" placeholder="请选择" style="width:150px;">
-            <el-option v-for="item in MODEL.updatePlanOptions.hour" :key="item.key" :label="item.label" :value="item.key" />
-          </el-select>
-          <el-select v-model="temp.updatePlanTimes" class="filter-item" placeholder="请选择" style="width:100px;">
-            <el-option v-for="item in MODEL.updatePlanOptions.times" :key="item.key" :label="item.label" :value="item.key" />
-          </el-select>
+
+          <div v-if="temp.type==='API'">
+            <el-input v-model="temp.updatePlanMinute" placeholder="请输入内容" style="width: 200px">
+              <template slot="append">分钟</template>
+            </el-input>
+          </div>
+          <div v-if="temp.type==='webhooks'">
+            <el-select v-model="temp.updatePlanHours" class="filter-item" placeholder="请选择" style="width:150px;">
+              <el-option v-for="item in MODEL.updatePlanOptions.hour" :key="item.key" :label="item.label" :value="item.key" />
+            </el-select>
+            <el-select v-model="temp.updatePlanTimes" class="filter-item" placeholder="请选择" style="width:100px;">
+              <el-option v-for="item in MODEL.updatePlanOptions.times" :key="item.key" :label="item.label" :value="item.key" />
+            </el-select>
+          </div>
+
         </el-form-item>
 
         <el-form-item label="添加路径" prop="paths">
@@ -212,18 +221,18 @@ export default {
           { required: true, message: '说明不能为空', trigger: 'blur' },
           { min: 4, max: 200, message: '长度在 3 到 200 个字符', trigger: 'blur' }
         ],
-        secretKey: [
+        /*        secretKey: [
           { required: true, message: 'Secret Key不能为空', trigger: 'blur' },
           { min: 3, max: 100, message: '长度在 3 到 100 个字符', trigger: 'blur' }
-        ],
-        serverAddress: [
+        ],*/
+        /*        serverAddress: [
           { required: true, message: '服务器地址不能为空', trigger: 'blur' },
           { type: 'url', required: true, message: '服务器地址格式不正确', trigger: 'blur' },
           { min: 3, max: 100, message: '长度在 3 到 100 个字符', trigger: 'blur' }
-        ],
-        updatePlanHours: [
+        ],*/
+        /*     updatePlanHours: [
           { required: true, message: '请选择时间', trigger: 'change' }
-        ],
+        ],*/
         // eslint-disable-next-line no-dupe-keys
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }]
       },
@@ -368,7 +377,11 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
+
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+
+          console.log(tempData)
+
           updateSource(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {

@@ -18,7 +18,7 @@ export function option(query) {
 
 export function changeStatus(id, status) {
   return request({
-    url: '/push-target/status',
+    url: '/source/status',
     method: 'put',
     params: { id, status }
   })
