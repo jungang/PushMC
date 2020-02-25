@@ -22,29 +22,28 @@
         <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>频道推送</el-tag></router-link>
         <p>step3: 完成推送</p>
         <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>推送统计</el-tag></router-link>
-        <el-tag type="warning">推送统计</el-tag>
 
       </el-col>
       <el-col :span="8">
         <h4>内容推送</h4>
         <p>step1: 初始化设置</p>
-        <el-tag type="warning">标签分类</el-tag>
-        <el-tag type="warning">推送内容</el-tag>
-        <el-tag type="warning">推送通道</el-tag>
+        <router-link :to="{path:'/data-tag'}"> <el-tag effect="dark" type="info">标签分类</el-tag></router-link>
+        <router-link :to="{path:'/push-content'}"> <el-tag effect="dark" type="danger">推送内容</el-tag></router-link>
+        <router-link :to="{path:'/push-channel'}"> <el-tag effect="dark" type="warning">推送通道</el-tag></router-link>
         <p>step2: 设置内容推送规则</p>
         <el-tag type="warning">内容推送</el-tag>
         <p>step3: 完成推送</p>
-        <el-tag type="warning">推送统计</el-tag>
+        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>推送统计</el-tag></router-link>
 
       </el-col>
       <el-col :span="8">
         <h4>渠道推送</h4>
         <p>step1: 初始化设置</p>
-        <el-tag type="warning">推送通道</el-tag>
+        <router-link :to="{path:'/push-channel'}"> <el-tag effect="dark" type="warning">推送通道</el-tag></router-link>
         <p>step2: 设置渠道推送规则</p>
-        <el-tag type="warning">渠道推送</el-tag>
+        <router-link :to="{path:'/message-push/pipe-push'}"> <el-tag effect="dark">渠道推送</el-tag></router-link>
         <p>step3: 完成推送</p>
-        <el-tag type="warning">推送统计</el-tag>
+        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag effect="dark" type="danger">推送统计</el-tag></router-link>
 
       </el-col>
     </el-row>

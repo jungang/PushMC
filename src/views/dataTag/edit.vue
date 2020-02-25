@@ -77,10 +77,10 @@ import { mapGetters } from 'vuex'
 import waves from '@/directive/waves' // waves directive
 import { deepClone } from '@/utils/index.js'
 import XcomTagTransfer from '@/components/tagTransfer/index'
-import { saveTag } from '@/api/datatag' // waves directive
+import { saveTag } from '@/api/dataTag' // waves directive
 
 export default {
-  name: 'DataTag',
+  name: 'Edit',
   components: { XcomTagTransfer },
   directives: { waves },
   data() {

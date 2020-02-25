@@ -29,7 +29,7 @@
       <el-table-column label="状态" class-name="status-col" min-width="50">
         <template slot-scope="{row}">
 
-          <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
+          <el-tag v-if="row.status !== 'deleted'" :type="row.status">
             {{ row.status === 'enabled' ? '启用': '未启用' }}
           </el-tag>
           <el-tag
@@ -246,7 +246,7 @@ export default {
     getList() {
       this.listLoading = true
       fetchSourceList(this.listArr.listQuery).then(response => {
-        // console.log(response)
+        console.log(response)
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
