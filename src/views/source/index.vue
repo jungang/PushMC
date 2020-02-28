@@ -103,7 +103,7 @@
         <el-form-item label="定时更新" prop="updatePlanHours">
 
           <div v-if="temp.type==='API'">
-            <el-input v-model="temp.updatePlanMinute" placeholder="请输入内容" style="width: 200px">
+            <el-input v-model="temp.interval" placeholder="请输入内容" style="width: 200px">
               <template slot="append">分钟</template>
             </el-input>
           </div>
@@ -148,7 +148,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchSourceList, dele, createSource, updateSource, changeStatus, detail } from '@/api/source'
+import { fetchSourceList, dele, createSource, updateSource, changeStatus, sourceDetail } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -364,7 +364,7 @@ export default {
       })
     },
     handleUpdate(row) {
-      detail({ id: row.id }).then(response => {
+      sourceDetail({ id: row.id }).then(response => {
         this.temp = response.data
         this.dialogStatus = 'update'
         this.dialogFormVisible = true

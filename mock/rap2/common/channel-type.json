@@ -7,8 +7,8 @@
         "id": 1
       },
       {
-        "type": "app",
-        "label": "app",
+        "type": "goCom",
+        "label": "goCom",
         "id": 2
       },
       {

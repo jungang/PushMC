@@ -25,6 +25,18 @@
               <el-button v-if="data.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
             </el-input>
           </el-col>
+
+          <el-col :span="3">
+            path
+          </el-col>
+          <el-col :span="21">
+            <el-input
+              v-model="path.path"
+              placeholder=""
+              class="dy_path"
+            />
+          </el-col>
+
           <el-col :span="3">
             schema
           </el-col>

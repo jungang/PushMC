@@ -28,6 +28,7 @@
         highlight-current-row
         style="width: 100%;"
       >
+
         <el-table-column label="ID" prop="id" align="center" min-width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
@@ -48,7 +49,7 @@
         </el-table-column>
         <el-table-column label="标签" align="center" min-width="100">
           <template slot-scope="{row}">
-            <el-tag >{{ row.tag }}</el-tag>
+            <el-tag>{{ row.tag }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="来源" align="center" min-width="100">
@@ -114,17 +115,13 @@
         </el-form-item>
 
         <el-form-item label="选择频道" prop="category">
-          <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.label" :value="item.key" />
+          <el-select v-model="temp.channelId" class="filter-item" placeholder="请选择" @change="handleChannelFilter">
+            <el-option v-for="item in channelListArr.items" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
 
         <el-form-item label="数据表" prop="title">
-          100
-        </el-form-item>
-
-        <el-form-item label="频道类型" prop="type">
-          默认
+          {{ temp.channel.paths.length || 0 }}
         </el-form-item>
 
         <el-form-item label="频道标签" prop="tag">
@@ -344,8 +341,103 @@
 
         </el-form-item>
 
-        <el-form-item label="推送模板" prop="templateKey">
-          <el-radio v-for=" (item, key) in pushTemplateList" :key="key" v-model="temp.templateKey" :label="item.key"> {{ item.label }} </el-radio>
+        <el-form-item label="消息模版" prop="templateKey">
+          <el-radio v-model="temp.templateType" label="template"> 图文消息 </el-radio>
+          <el-radio v-model="temp.templateType" label="text"> 文本消息 </el-radio>
+        </el-form-item>
+
+        <el-form-item label="模板名称" prop="title">
+          <el-input v-model="temp.templateTitle" style="width:400px" />
+        </el-form-item>
+
+        <el-form-item v-if="temp.templateType==='text'" label="URL" prop="title">
+          <el-checkbox v-model="temp.isURL" />
+          <el-input v-model="temp.templateURL" style="width:400px" />
+        </el-form-item>
+
+        <el-row>
+          <el-col align="right">
+            <el-button size="mini" @click="previewVisible = true">查看预览</el-button>
+          </el-col>
+        </el-row>
+
+        <el-form-item v-if="temp.templateType==='template'" label="">
+          <el-row>
+            <el-col>
+
+              <div class="preview">
+                <div class="top">
+                  <el-select v-model="temp.templateContent.arg1" placeholder="+选择推送字段">
+                    <el-option
+                      v-for="item in temp.argTags"
+                      :key="item.path"
+                      :label="item.pathTitle"
+                      :value="item.path"
+                    />
+                  </el-select>
+                </div>
+
+                <div class="img">
+                  <el-upload
+                    class="uploader"
+                    action="http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload"
+                    :show-file-list="false"
+                    :on-success="handleSuccess"
+                  >
+                    <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
+                  </el-upload>
+                  <img :src="temp.templateContent.img" alt="">
+                </div>
+
+                <el-row>
+                  <el-col :span="12">
+                    <el-select v-model="temp.templateContent.arg2" placeholder="+选择推送字段">
+                      <el-option
+                        v-for="item in temp.argTags"
+                        :key="item.path"
+                        :label="item.pathTitle"
+                        :value="item.path"
+                      />
+                    </el-select>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-select v-model="temp.templateContent.arg3" placeholder="+选择推送字段">
+                      <el-option
+                        v-for="item in temp.argTags"
+                        :key="item.path"
+                        :label="item.pathTitle"
+                        :value="item.path"
+                      />
+                    </el-select>
+                  </el-col>
+                </el-row>
+
+                <div class="url">
+                  <el-input v-model="temp.templateContent.url" placeholder="+推送URL" />
+                </div>
+              </div>
+
+            </el-col>
+          </el-row>
+        </el-form-item>
+
+        <el-form-item v-if="temp.templateType==='text'" label="内容标签" prop="content">
+          <el-row class="btn">
+            <el-button v-for="tag in temp.argTags" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
+          </el-row>
+          <quill-editor
+            ref="myQuillEditor"
+            v-model="temp.content"
+            :options="editorOption"
+            @blur="onEditorBlur($event)"
+            @focus="onEditorFocus($event)"
+            @change="onEditorChange($event)"
+          />
+          <el-row>
+            <el-col align="right">
+              图文消息模版，不支持自定义内容输入
+            </el-col>
+          </el-row>
         </el-form-item>
 
         <el-form-item label="推送时间" prop="templateKey">
@@ -443,10 +535,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, createSource, dele, fetchList, detail, groups, push, unPush, searchList, updateChannel } from '@/api/channelPush'
+import { copyChannel, createSource, dele, fetchList, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
+import { sourceDetail } from '@/api/source'
 // import quillConfig from './quill-config.js'
 
 export default {
@@ -470,6 +563,7 @@ export default {
       channelSubscribeList: [],
       pushTemplateList: [],
       additionalOptionShow: false,
+      channelListArr: [],
       groupsArr: [],
       ruleOptions: [
         {
@@ -529,6 +623,18 @@ export default {
       listLoading: true,
       temp: {
         id: undefined,
+        templateType: 'template',
+        templateContent: {
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+          url: ''
+        },
+        argTags: [],
+        channel: {
+          paths: []
+        },
         tag: '',
         category: '',
         title: '',
@@ -565,12 +671,39 @@ export default {
   },
   created() {
     this.getList()
+    this.getChannelList()
     this.getChannelTypeList()
     this.getChannelSubscribe()
     this.getPushTemplateList()
     this.getGroups()
   },
   methods: {
+    handleSuccess(res, file) {
+      this.temp.templateContent.img = res.url
+    },
+    insertText(mark) {
+      console.log(this.editor)
+      const index = this.editor.selection.savedRange.index
+      console.log('index:', index)
+      this.editor.insertText(index, ' {' + mark + '} ')
+    },
+    handleChannelFilter() {
+      console.log(this.temp.channelId)
+      this.temp.argTags = []
+      sourceDetail({ id: this.temp.channelId }).then(response => {
+        this.temp.channel = response.data
+        this.temp.channel.paths.forEach(item => {
+          this.temp.argTags = this.temp.argTags.concat(...item.checkColumns)
+        })
+        console.log(this.temp.argTags)
+      })
+      // this.getList()
+    },
+    getChannelList() {
+      channelList().then(response => {
+        this.channelListArr = response.data
+      })
+    },
     getGroups() {
       groups().then(response => {
         this.groupsArr = response.data
@@ -649,15 +782,23 @@ export default {
         this.listLoading = false
       })
     },
-    handleFilter() {
-      this.listArr.listQuery.page = 1
-      this.getList()
-    },
     resetTemp() {
       this.isSubhead = false
       this.isUrl = false
       this.temp = {
         id: undefined,
+        templateType: 'template',
+        templateContent: {
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+          url: ''
+        },
+        argTags: [],
+        channel: {
+          paths: []
+        },
         tag: [],
         category: '',
         title: '',
@@ -850,10 +991,28 @@ export default {
 </script>
 
 <style lang="scss">
+
 .ql-editor{
   height: 200px;
 }
   #channelPush{
+    .preview{
+      border: 1px solid #C1C1C1;
+      padding: 10px;
+      width: 450px;
+      /*height: 500px;*/
+      img{
+        margin-top: 10px;
+        width: 100%;
+      }
+      .uploader{
+        position: absolute;
+        padding-top: 6px;
+      }
+      .url{
+        margin-top: 10px;
+      }
+    }
     tr{
       button{
         padding: 7px;

@@ -134,21 +134,37 @@
               <el-table-column
                 type="index"
                 width="50"
+                label="序号"
               />
               <el-table-column
-                property="date"
-                label="日期"
+                property="isMain"
+                label="主表"
+              >
+                <template slot-scope="scope">
+                  <el-radio v-model="temp.mainTable" :label="scope.row"><i /></el-radio>
+                </template>
+              </el-table-column>
+
+              <el-table-column
+                property="sourceId"
+                label="数据源"
                 width="120"
               />
               <el-table-column
-                property="name"
-                label="姓名"
+                property="title"
+                label="数据表名"
                 width="120"
               />
               <el-table-column
-                property="address"
-                label="地址"
-              />
+                label="操作"
+              >
+                <template slot-scope="{row}">
+                  <el-button size="mini" type="danger" @click="handleTableDelete(row,'deleted')">
+                    删除
+                  </el-button>
+                </template>
+              </el-table-column>
+
             </el-table>
 
           </el-form-item>
@@ -184,7 +200,7 @@
               <template slot-scope="{row}">
                 <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
                   <el-option
-                    v-for="item in options"
+                    v-for="item in mainOptions"
                     :key="item.id"
                     :label="item.title"
                     :value="item.id"
@@ -287,6 +303,7 @@ export default {
           value: '<',
           label: '<'
         }],
+      mainOptions: [],
       options: [],
       value: '',
       keyword: '',
@@ -354,27 +371,31 @@ export default {
       this.currentRow = val
     },
     handleAdd() {
-      console.log('handleAdd...')
+      // console.log('handleAdd...')
       // this.dynamicTags = this.dynamicTags.concat(this.plaza)
       // this.dynamicTags = this.dynamicTags.concat(this.multipleSelection)
       // this.dynamicTags = Array.from(new Set(this.dynamicTags)) // 去重
-      console.log(this.$refs.transfer.targetData)
       this.temp.alternative = this.temp.alternative.concat(this.$refs.transfer.targetData)
-      this.dynamicTags = Array.from(new Set(this.temp.alternative)) // 去重
+      this.temp.alternative = Array.from(new Set(this.temp.alternative)) // 去重
+      // console.log(this.temp.alternative)
     },
     nextStep() {
+      // console.log(this.temp)
       this.options = []
-      this.$refs.transfer.value.forEach((item) => {
-        const arr = this.temp.tables.find(obj => obj.id === item)
-        console.log(arr)
-        this.options = this.options.concat(arr.smColumns)
+      this.temp.alternative.forEach((item) => {
+        this.options = this.options.concat(item.smColumns)
       })
-      console.log(this.options)
-
+      this.temp.mainResourceId = this.temp.mainTable.sourceId
+      this.mainOptions = this.temp.mainTable.smColumns
       this.step = 'step2'
     },
     filter() {
       this.getTables()
+    },
+    handleTableDelete(row) {
+      console.log(row)
+      const index = this.temp.alternative.indexOf(row)
+      this.temp.alternative.splice(index, 1)
     },
     handleRuleDelete(row) {
       const index = this.temp.rules.indexOf(row)
@@ -438,7 +459,7 @@ export default {
     getTables() {
       fetchSource(this.temp.resourceId).then(response => {
         this.temp.tables = response.data.paths
-        console.log(this.temp.tables)
+        // console.log(this.temp.tables)
       })
     },
     getList() {

@@ -78,7 +78,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchSourceList, detail } from '@/api/source'
+import { fetchSourceList, sourceDetail } from '@/api/source'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -198,7 +198,7 @@ export default {
       this.getList()
     },
     handleUpdate(row) {
-      detail({ id: row.id }).then(response => {
+      sourceDetail({ id: row.id }).then(response => {
         this.$router.push({ name: 'Edit', params: response.data })
       })
     }

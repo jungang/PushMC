@@ -180,8 +180,8 @@ export function sourceOption(query) {
             'label': '短信'
           },
           {
-            'key': 'app',
-            'label': 'app'
+            'key': 'goCom',
+            'label': 'goCom'
           },
           {
             'key': 'business',
@@ -217,10 +217,25 @@ export function sourceOption(query) {
 }
 
 export function channelType(query) {
-  return request({
+/*  return request({
     url: '/common/channel-type',
     method: 'get',
     params: query
+  })*/
+  return new Promise((resolve, reject) => {
+    const res = {
+      'data': {
+        'items': [
+          {
+            'type': 'gocom',
+            'label': 'goCom',
+            'id': 2
+          }
+        ]
+      },
+      'code': 20000
+    }
+    resolve(res)
   })
 }
 
@@ -250,18 +265,95 @@ export function searchPersons(query) {
 
 // 频道订阅列表
 export function channelSubscribe(query) {
-  return request({
+/*  return request({
     url: '/common/channel-Subscribe',
     method: 'get',
     params: query
+  })*/
+
+  return new Promise((resolve, reject) => {
+    const res = {
+      'code': 20000,
+      'data': {
+        'items': [
+          {
+            'id': 61619,
+            'status': false,
+            'title': '次千正'
+          },
+          {
+            'id': 91454,
+            'status': false,
+            'title': '则达易位族层马'
+          },
+          {
+            'id': 66442,
+            'status': false,
+            'title': '技过示观'
+          },
+          {
+            'id': 36373,
+            'status': false,
+            'title': '高快过利目全很'
+          },
+          {
+            'id': 94720,
+            'status': true,
+            'title': '专位算看记别'
+          }
+        ]
+      }
+    }
+    resolve(res)
   })
 }
 
 // 推送模板列表
 export function pushTemplate(query) {
-  return request({
+/*  return request({
     url: '/common/push-template',
     method: 'get',
     params: query
+  })*/
+
+  return new Promise((resolve, reject) => {
+    const res = {
+      'data': {
+        'items': [
+          {
+            'key': 'tmp1',
+            'label': '模板-效件如属统',
+            'id': 1
+          },
+          {
+            'key': 'tmp2',
+            'label': '模板-学角效个',
+            'id': 2
+          },
+          {
+            'key': 'tmp3',
+            'label': '模板-事问即影参选',
+            'id': 3
+          },
+          {
+            'key': 'tmp4',
+            'label': '模板-片说矿料铁是',
+            'id': 4
+          },
+          {
+            'key': 'tmp5',
+            'label': '模板-按各知外',
+            'id': 5
+          },
+          {
+            'key': 'tmp6',
+            'label': '模板-较指需人',
+            'id': 6
+          }
+        ]
+      },
+      'code': 20000
+    }
+    resolve(res)
   })
 }

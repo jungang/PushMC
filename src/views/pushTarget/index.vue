@@ -206,7 +206,7 @@ export default {
   },
 
   async created() {
-    await this.getDepartmentData()
+    // await this.getDepartmentData()
     this.getList()
   },
   methods: {
@@ -348,7 +348,6 @@ export default {
             item.itemId = item.itemId || item.userid
             item.itemName = item.itemName || item.truename
           })
-
 
           create(this.temp).then(() => {
             this.getList()

@@ -94,7 +94,7 @@ export const asyncRoutes = [
         path: 'list',
         name: 'List',
         component: () => import('@/views/dataTag/index'),
-        meta: { title: '标注', icon: 'form' }
+        meta: { title: '数据标注', icon: 'form' }
       },
       {
         path: 'edit',

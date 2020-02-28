@@ -57,9 +57,9 @@
             "label": "短信"
           },
           {
-            "type": "app",
+            "type": "goCom",
             "id": 2,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -213,9 +213,9 @@
         "targetType": 2,
         "pushChannels": [
           {
-            "type": "app",
+            "type": "goCom",
             "id": 8,
-            "label": "app"
+            "label": "goCom"
           }
         ],
         "templateKey": "tmp5",
@@ -435,9 +435,9 @@
         "targetType": 2,
         "pushChannels": [
           {
-            "type": "app",
+            "type": "goCom",
             "id": 14,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -523,9 +523,9 @@
             "label": "短信"
           },
           {
-            "type": "app",
+            "type": "goCom",
             "id": 20,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -615,9 +615,9 @@
             "label": "短信"
           },
           {
-            "type": "app",
+            "type": "goCom",
             "id": 26,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -802,9 +802,9 @@
             "label": "短信"
           },
           {
-            "type": "app",
+            "type": "goCom",
             "id": 32,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -884,9 +884,9 @@
             "label": "短信"
           },
           {
-            "type": "app",
+            "type": "goCom",
             "id": 38,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -1016,9 +1016,9 @@
         "targetType": 2,
         "pushChannels": [
           {
-            "type": "app",
+            "type": "goCom",
             "id": 44,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -1106,9 +1106,9 @@
             "label": "短信"
           },
           {
-            "type": "app",
+            "type": "goCom",
             "id": 50,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",
@@ -1308,9 +1308,9 @@
         "targetType": 1,
         "pushChannels": [
           {
-            "type": "app",
+            "type": "goCom",
             "id": 56,
-            "label": "app"
+            "label": "goCom"
           },
           {
             "type": "business",

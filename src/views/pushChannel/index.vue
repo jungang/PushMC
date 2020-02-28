@@ -33,7 +33,7 @@
         </el-table-column>
         <el-table-column label="通道类型" prop="type" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.type | channelType }}</span>
+            <span>{{ row.type }}</span>
           </template>
         </el-table-column>
         <el-table-column label="状态" align="center" min-width="50">
@@ -74,7 +74,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
         <el-form-item label="通道类型" prop="type">
-          <el-radio v-for=" (item, key) in MODEL.channelType" :key="key" v-model="temp.type" :label="item.key"> {{ item.label }} </el-radio>
+          <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.type" :label="item.type"> {{ item.label }} </el-radio>
         </el-form-item>
         <el-form-item label="通道名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
@@ -82,8 +82,22 @@
         <el-form-item label="通道状态" prop="status">
           <el-radio v-model="temp.status" label="enabled">启用</el-radio>
           <el-radio v-model="temp.status" label="disabled ">未启用</el-radio>
-
         </el-form-item>
+
+        <div v-if="temp.type==='gocom'">
+          <el-form-item label="API 地址">
+            <el-input v-model="temp.apiUrl" style="width:400px" />
+          </el-form-item>
+          <el-form-item label="数据库链接">
+            <el-input v-model="temp.dbUrl" style="width:400px" />
+          </el-form-item>
+          <el-form-item label="数据库用户名">
+            <el-input v-model="temp.dbUser" style="width:400px" />
+          </el-form-item>
+          <el-form-item label="数据库密码">
+            <el-input v-model="temp.dbPassword" style="width:400px" />
+          </el-form-item>
+        </div>
 
         <el-form-item label="描述" prop="describe">
           <el-input
@@ -185,13 +199,13 @@ export default {
   },
   async created() {
     await this.getChannelType()
-    console.log(this.channelTypeList)
     this.getList()
   },
   methods: {
     async getChannelType() {
       await channelType().then(response => {
-        this.channelTypeList = response.data
+        this.channelTypeList = response.data.items
+        console.log(this.channelTypeList)
       })
     },
     getList() {

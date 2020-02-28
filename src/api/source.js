@@ -56,7 +56,7 @@ export function updateSource(data) {
   })
 }
 
-export function detail(data) {
+export function sourceDetail(data) {
   return request({
     url: '/source/detail',
     method: 'get',

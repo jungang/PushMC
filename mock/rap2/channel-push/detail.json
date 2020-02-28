@@ -12,9 +12,9 @@
           "label": "短信"
         },
         {
-          "type": "app",
+          "type": "goCom",
           "id": 2,
-          "label": "app"
+          "label": "goCom"
         },
         {
           "type": "business",
