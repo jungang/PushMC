@@ -95,7 +95,6 @@
           </el-form-item>
 
           <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
-            {{ temp.tablesList }}
             <XcomTagTransfer
               ref="transfer"
               v-model="tempValue"
@@ -281,7 +280,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { deepClone } from '@/utils/index.js'
 import { fetchList, channelDetail, searchList, createSource, update, dele } from '@/api/businessChannel'
 import { fetchLabel } from '@/api/category'
 import { fetchSourceList, fetchSource } from '@/api/source'
@@ -338,7 +336,7 @@ export default {
         tag: '',
         title: '',
         tables: [],
-        tablesList: this.tablesList
+        tablesList: []
       },
       dialogFormVisible: false,
       step: 'step1',
@@ -442,7 +440,7 @@ export default {
       // console.log('handleDialogClose...')
       this.step = 'step1'
       this.tempValue = []
-      console.log(this.tempValue)
+      // console.log(this.tempValue)
     },
     handleCheckLeft(value, direction) {
     },
@@ -455,10 +453,7 @@ export default {
     },
     getTables() {
       fetchSource(this.temp.resourceId).then(response => {
-        console.log('getTables...')
         this.temp.tablesList = response.data.paths
-        // console.log(this.temp.tables)
-        console.log(this.temp.tablesList)
       })
     },
     getList() {
@@ -485,7 +480,7 @@ export default {
         pushType: 'business',
         category: 'API',
         title: '',
-        tablesList: deepClone(this.tablesList),
+        tablesList: [],
         tables: [],
         transferStatus: [],
         rules: []
@@ -508,6 +503,30 @@ export default {
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
+      })
+    },
+    handleUpdate(row) {
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+
+      channelDetail({ id: row.id }).then((res) => {
+        Object.keys(res.data).forEach(item => {
+          this.temp[item] = res.data[item]
+        })
+
+        this.temp.id = res.data.id
+        this.temp.resourceId = this.temp.resourceId || 1
+        this.temp.rules = this.temp.rules || []
+        this.temp.tables.forEach(item => {
+          if (item.id === this.temp.mainResourceId) {
+            this.temp.mainTable = item
+          }
+        })
+
+        this.getTables()
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
     handleAddRule() {
@@ -549,26 +568,7 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
-      // console.log(row)
-      channelDetail({ id: row.id }).then((res) => {
-        console.log(this.temp.mainTable)
-        console.log(res.data.mainResourceId)
 
-        this.temp = { ...res.data }
-        console.log(this.temp)
-        this.temp.tablesList = []
-        this.temp.resourceId = this.temp.resourceId || 1
-        this.temp.rules = this.temp.rules || []
-
-        this.getTables()
-        this.dialogStatus = 'update'
-        this.dialogFormVisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].clearValidate()
-        })
-      })
-    },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {

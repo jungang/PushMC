@@ -1434,6 +1434,13 @@ export function detail(query) {
     params: query
   })
 }
+export function copy(query) {
+  return request({
+    url: '/business-channel/detail',
+    method: 'get',
+    params: query
+  })
+}
 
 export function channelList(query) {
   return request({
@@ -1484,7 +1491,7 @@ export function searchList(keyWord) {
 
 export function dele(id, status) {
   return request({
-    url: '/channel-push/delete',
+    url: '/business-channel/delete',
     method: 'delete',
     params: { id, status }
   })

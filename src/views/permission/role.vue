@@ -72,6 +72,7 @@
             :key="item.id"
             :label="item.id"
             border
+            :disabled="dialogStatus==='view'"
             class="permission"
           >{{ item.title }}</el-checkbox>
         </el-checkbox-group>
