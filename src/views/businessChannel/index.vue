@@ -95,6 +95,7 @@
           </el-form-item>
 
           <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
+            {{ temp.tablesList }}
             <XcomTagTransfer
               ref="transfer"
               v-model="tempValue"
@@ -102,7 +103,7 @@
                 key: 'id',
                 label: 'title'
               }"
-              :data="temp.tables"
+              :data="temp.tablesList"
               :left-default-checked="temp.transferStatus"
               :right-default-checked="temp.transferStatus"
               type="businessChannel"
@@ -126,7 +127,7 @@
 
             <el-table
               ref="singleTable"
-              :data="temp.alternative || []"
+              :data="temp.tables || []"
               highlight-current-row
               style="width: 100%"
               @current-change="handleCurrentChange"
@@ -216,7 +217,7 @@
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.operation1" placeholder="请选择" style="width: 100px">
+                <el-select v-model="row.operation1" :disabled="options.length===0" placeholder="请选择" style="width: 100px">
                   <el-option
                     v-for="item in ruleOptions"
                     :key="item.value"
@@ -225,15 +226,18 @@
                   />
                 </el-select>
               </template>
-            </el-table-column>
-            <el-table-column
+            </el-table-column>            <el-table-column
               prop="name"
               label="选择数据项"
               width="300"
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.item2.tableName" placeholder="请选择" style="width:50%">
+                <el-select v-model="row.item2.tableName" :disabled="options.length===0" placeholder="请选择" style="width:50%">
+                  <el-option
+                    label="常量"
+                    value="-2"
+                  />
                   <el-option
                     v-for="item in options"
                     :key="item.id"
@@ -241,7 +245,7 @@
                     :value="item.id"
                   />
                 </el-select>
-                <el-input v-model="row.item2.value" placeholder="请输入内容" style="width:45%" />
+                <el-input v-model="row.valueColumnPath" placeholder="请输入内容" style="width:45%" />
               </template>
             </el-table-column>
 
@@ -278,7 +282,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { deepClone } from '@/utils/index.js'
-import { fetchList, detail, searchList, createSource, update, dele } from '@/api/businessChannel'
+import { fetchList, channelDetail, searchList, createSource, update, dele } from '@/api/businessChannel'
 import { fetchLabel } from '@/api/category'
 import { fetchSourceList, fetchSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
@@ -305,9 +309,10 @@ export default {
         }],
       mainOptions: [],
       options: [],
+      options2: [],
       value: '',
       keyword: '',
-      tables: [],
+      tablesList: [],
       tableKey: 0,
       listLabel: [],
       listSource: [],
@@ -328,11 +333,12 @@ export default {
       tempValueMax: 3,
       temp: {
         id: undefined,
+        pushType: 'business',
         tagId: '',
         tag: '',
         title: '',
-        alternative: [],
-        tables: []
+        tables: [],
+        tablesList: this.tablesList
       },
       dialogFormVisible: false,
       step: 'step1',
@@ -371,31 +377,62 @@ export default {
       this.currentRow = val
     },
     handleAdd() {
-      // console.log('handleAdd...')
-      // this.dynamicTags = this.dynamicTags.concat(this.plaza)
-      // this.dynamicTags = this.dynamicTags.concat(this.multipleSelection)
-      // this.dynamicTags = Array.from(new Set(this.dynamicTags)) // 去重
-      this.temp.alternative = this.temp.alternative.concat(this.$refs.transfer.targetData)
-      this.temp.alternative = Array.from(new Set(this.temp.alternative)) // 去重
-      // console.log(this.temp.alternative)
+      console.log(this.temp.tables)
+      this.$refs.transfer.targetData.forEach(item => {
+        const v = this.temp.tables.find(item2 => item2.id === item.id)
+        if (!v) {
+          this.temp.tables.push(item)
+        }
+      })
     },
     nextStep() {
-      // console.log(this.temp)
-      this.options = []
-      this.temp.alternative.forEach((item) => {
-        this.options = this.options.concat(item.smColumns)
+      let v = false
+      this.$refs['dataForm'].validate((valid) => {
+        v = valid
       })
-      this.temp.mainResourceId = this.temp.mainTable.sourceId
-      this.mainOptions = this.temp.mainTable.smColumns
-      this.step = 'step2'
+
+      if (!v) return
+
+      // console.log(v)
+      this.options = []
+      if (!this.temp.tagId) {
+        this.$notify({
+          title: '错误',
+          message: '请选择标签',
+          type: 'error',
+          duration: 2000
+        })
+        return
+      }
+
+      // console.log(this.temp.mainTable)
+      if (this.temp.mainTable) {
+        this.temp.mainResourceId = this.temp.mainTable.sourceId
+        this.mainOptions = this.temp.mainTable.smColumns
+        this.temp.tables.forEach((item) => {
+          if (this.temp.mainTable.sourceId !== item.sourceId) {
+            this.options = this.options.concat(item.smColumns)
+          }
+        })
+
+        this.temp.tag = this.listLabel.find(o => o.id === this.temp.tagId).title
+        this.step = 'step2'
+      } else {
+        this.$notify({
+          title: '错误',
+          message: '请选择主表',
+          type: 'error',
+          duration: 2000
+        })
+      }
     },
     filter() {
       this.getTables()
     },
     handleTableDelete(row) {
       console.log(row)
-      const index = this.temp.alternative.indexOf(row)
-      this.temp.alternative.splice(index, 1)
+      const index = this.temp.tables.indexOf(row)
+      this.temp.tables.splice(index, 1)
     },
     handleRuleDelete(row) {
       const index = this.temp.rules.indexOf(row)
@@ -408,49 +445,9 @@ export default {
       console.log(this.tempValue)
     },
     handleCheckLeft(value, direction) {
-      /*      console.log(this.$refs.transfer)
-      const n = this.tempValue.length + value.length // 当前数量
-      if (n === 3) {
-        console.log('===3')
-        this.temp.tables.map(item => {
-          const status1 = !this.tempValue.find(key => key === item.key)
-          const status2 = !value.find(key => key === item.key)
-          item.disabled = status1 && status2
-        })
-      } else if (n >= 3) {
-        this.$refs.transfer.leftChecked = this.$refs.transfer.leftChecked.filter((item, index) => index < 3 - this.tempValue.length)
-        console.log(this.$refs.transfer.leftChecked)
-      } else {
-        this.temp.tables.map(item => {
-          item.disabled = false
-        })
-      }*/
     },
     handleCheckRight() {},
-    handleChange(value, direction, movedKeys) {
-      if (direction === 'right') {
-        // console.log(this.$refs.transfer.leftChecked)
-        // console.log(this.$refs.transfer)
-        // console.log(this.$refs.transfer.value)
-
-        /*        document.querySelectorAll('span.is-checked').forEach(function(item,index) {
-          console.log(index)
-          document.querySelectorAll('span.is-checked')[index].click()
-        })*/
-      }
-      /*      if (value.length < 3) {
-        this.temp.tables.map(item => {
-          item.disabled = false
-        })
-      }*/
-      /*      if (value.length === 3) {
-        this.temp.tables.map(item => {
-          const status1 = !this.tempValue.find(key => key === item.key)
-          const status2 = !value.find(key => key === item.key)
-          item.disabled = status1 && status2
-        })
-      }*/
-    },
+    handleChange(value, direction, movedKeys) {},
     getLabel() {
       fetchLabel(this.temp.resourceId).then(response => {
         this.listLabel = response.data.items
@@ -458,8 +455,10 @@ export default {
     },
     getTables() {
       fetchSource(this.temp.resourceId).then(response => {
-        this.temp.tables = response.data.paths
+        console.log('getTables...')
+        this.temp.tablesList = response.data.paths
         // console.log(this.temp.tables)
+        console.log(this.temp.tablesList)
       })
     },
     getList() {
@@ -483,10 +482,11 @@ export default {
       this.tempValue = []
       this.temp = {
         id: undefined,
+        pushType: 'business',
         category: 'API',
-        alternative: [],
-        title: '****',
-        tables: deepClone(this.tables),
+        title: '',
+        tablesList: deepClone(this.tablesList),
+        tables: [],
         transferStatus: [],
         rules: []
 
@@ -523,13 +523,17 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.tag = this.listLabel.find(o => o.id === this.temp.tagId).title
           this.temp.resourceTitle = this.listSource.find(o => o.id === this.temp.resourceId).title
           this.temp.status = 'enabled'
 
-          this.temp.tables.forEach(item => {
+          this.temp.tablesList.forEach(item => {
             item.resourceId = item.id
             item.resourceTitle = item.title
+          })
+
+          this.temp.bookTables = this.temp.tables
+          this.temp.bookTables.forEach(item => {
+
           })
 
           createSource(this.temp).then(() => {
@@ -547,9 +551,13 @@ export default {
     },
     handleUpdate(row) {
       // console.log(row)
-      detail({ id: row.id }).then((res) => {
-        this.temp = res.data
-        this.temp.tables = []
+      channelDetail({ id: row.id }).then((res) => {
+        console.log(this.temp.mainTable)
+        console.log(res.data.mainResourceId)
+
+        this.temp = { ...res.data }
+        console.log(this.temp)
+        this.temp.tablesList = []
         this.temp.resourceId = this.temp.resourceId || 1
         this.temp.rules = this.temp.rules || []
 
@@ -566,7 +574,7 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
 
-          tempData.tables.forEach(item => {
+          tempData.tablesList.forEach(item => {
             item.resourceId = item.id
             item.resourceTitle = item.title
           })

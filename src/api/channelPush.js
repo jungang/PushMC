@@ -1,13 +1,13 @@
 import request from '@/utils/request'
 
 export function fetchList(query) {
-/*  return request({
-    url: '/channel-push/list',
+  return request({
+    url: '/business-channel/book/list',
     method: 'get',
     params: query
-  })*/
+  })
 
-  return new Promise((resolve, reject) => {
+/*  return new Promise((resolve, reject) => {
     const res = {
       'code': 20000,
       'msg': '',
@@ -1425,11 +1425,11 @@ export function fetchList(query) {
       }
     }
     resolve(res)
-  })
+  })*/
 }
 export function detail(query) {
   return request({
-    url: '/channel-push/detail',
+    url: '/business-channel/detail',
     method: 'get',
     params: query
   })

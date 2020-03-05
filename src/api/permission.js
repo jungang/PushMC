@@ -1,14 +1,12 @@
 import request from '@/utils/request'
 
 export function fetchList(query) {
-/*
   return request({
-    url: '/permission/list',
+    url: '/role/list',
     method: 'get',
     params: query
   })
-*/
-
+/*
   return new Promise((resolve, reject) => {
     const res = {
       'code': 20000,
@@ -510,7 +508,7 @@ export function fetchList(query) {
       }
     }
     resolve(res)
-  })
+  })*/
 }
 
 export function dele(id, status) {
@@ -531,7 +529,7 @@ export function create(data) {
 
 export function update(data) {
   return request({
-    url: '/permission/update',
+    url: '/role/update',
     method: 'put',
     data: data
   })
@@ -539,7 +537,7 @@ export function update(data) {
 
 export function allPermission(data) {
   return request({
-    url: '/permission/all',
+    url: '/permission/list',
     method: 'get',
     data: data
   })

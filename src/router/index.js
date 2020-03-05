@@ -68,6 +68,7 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
+    id: '1',
     path: '/source',
     component: Layout,
     children: [
@@ -195,19 +196,19 @@ export const asyncRoutes = [
     meta: { title: '消息推送', icon: 'example' },
     children: [
       {
-        path: 'channel-push',
+        path: '/channel-push',
         name: 'ChannelPush',
         component: () => import('@/views/channelPush/index'),
         meta: { title: '频道推送', icon: 'table' }
       },
       {
-        path: 'pipe-push',
+        path: '/pipe-push',
         name: 'PipePush',
         component: () => import('@/views/pipePush/index'),
         meta: { title: '渠道推送', icon: 'table' }
       },
       {
-        path: 'content-push',
+        path: '/content-push',
         name: 'ContentPush',
         component: () => import('@/views/contentPush/index'),
         meta: { title: '内容推送', icon: 'tree' }
@@ -240,6 +241,7 @@ export const asyncRoutes = [
   {
     path: '/statistics',
     component: Layout,
+    redirect: '/statistics/index',
     children: [
       {
         path: 'index',

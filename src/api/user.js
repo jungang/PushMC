@@ -1,3 +1,11 @@
+import request from '@/utils/request'
+export function xxx(data) {
+  return request({
+    url: '/user/login',
+    method: 'post',
+    data
+  })
+}
 export function login(data) {
 /*  return request({
     url: '/user/login',
@@ -18,33 +26,20 @@ export function login(data) {
 }
 
 export function getInfo(token) {
-/*  return request({
-    url: '/user/info',
+  return request({
+    url: '/user/login',
     method: 'get',
-    params: { token }
-  })*/
-
-  return new Promise((resolve, reject) => {
-    const res = {
-      'code': 20000,
-      'data': {
-        'roles': [
-          'admin'
-        ],
-        'introduction': 'I am a super administrator',
-        'avatar': 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-        'name': '钱超'
-      }
-    }
-    resolve(res)
+    params: { app_token: token }
   })
 }
 export function getPermission(roles) {
-/*  return request({
+/*
+  return request({
     url: '/user/permission',
     method: 'get',
     params: { roles }
-  })*/
+  })
+*/
 
   return new Promise((resolve, reject) => {
     const res = {

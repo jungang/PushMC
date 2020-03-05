@@ -248,7 +248,7 @@ export default {
       this.temp = {
         id: undefined,
         category: 'API',
-        title: '****'
+        title: ''
       }
     },
     handleCreate() {

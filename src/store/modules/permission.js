@@ -70,16 +70,18 @@ const actions = {
       } else {
         roleTypes.forEach(item => {
           asyncRoutes.forEach(item2 => {
-            if (item.path === item2.path) {
-              accessedRoutes.push(item2)
+            if (item.path === item2.path) accessedRoutes.push(item2)
+            if (item2.children.length > 1) {
+              item2.children.forEach(item3 => (item.path === item3.path) || accessedRoutes.push(item2))
             }
           })
         })
 
+        accessedRoutes = Array.from(new Set(accessedRoutes)) // 去重
         // accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
       commit('SET_ROUTES', accessedRoutes)
-      console.log(accessedRoutes)
+      // console.log(accessedRoutes)
       resolve(accessedRoutes)
     })
   }

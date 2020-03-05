@@ -2,7 +2,7 @@
   <div class="container">
     <el-row style="margin-bottom: 10px">
       <el-col :span="16" style="line-height: 40px;">
-        用户角色列表：：
+        权限管理：
       </el-col>
     </el-row>
 
@@ -65,7 +65,18 @@
     >
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
         <el-form-item label="角色名称" prop="title"> {{ temp.title }} </el-form-item>
-        <el-tree
+
+        <el-checkbox-group v-model="checkedPermissions" @change="handleCheckedCitiesChange">
+          <el-checkbox
+            v-for="item in permissionsTree.items"
+            :key="item.id"
+            :label="item.id"
+            border
+            class="permission"
+          >{{ item.title }}</el-checkbox>
+        </el-checkbox-group>
+
+        <!--        <el-tree
           ref="tree"
           :data="permissionsTree"
           show-checkbox
@@ -73,7 +84,7 @@
           node-key="id"
           highlight-current
           :props="defaultProps"
-        />
+        />-->
 
       </el-form>
 
@@ -102,6 +113,7 @@ export default {
   components: { Pagination },
   data() {
     return {
+      checkedPermissions: [],
       permissionsTree: [],
       defaultProps: {
         children: 'children',
@@ -122,6 +134,7 @@ export default {
       },
       listLoading: true,
       temp: {
+        smPermissions: [],
         id: undefined,
         title: ''
       },
@@ -148,11 +161,15 @@ export default {
     this.getAllPermissions()
   },
   methods: {
+    handleCheckedCitiesChange(value) {
+      console.log(value)
+    },
     handleDialogOpened() {
-      this.setCheckedKeys()
+      this.temp.smPermissions = this.temp.smPermissions || []
+      this.checkedPermissions = this.temp.smPermissions.map(item => item.id)
     },
     handleDialogClose() {
-      this.$refs.tree.setCheckedKeys([])
+      // this.$refs.tree.setCheckedKeys([])
     },
     setCheckedKeys() {
       if (this.$refs.tree) {
@@ -167,6 +184,7 @@ export default {
       this.listLoading = true
       allPermission().then(response => {
         this.permissionsTree = response.data
+        console.log(this.permissionsTree.items)
         this.listLoading = false
       })
     },
@@ -182,6 +200,7 @@ export default {
       this.temp = {
         id: undefined,
         title: '',
+        smPermissions: [],
         permissions: []
       }
     },
@@ -233,7 +252,17 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.permissions = this.$refs.tree.getCheckedKeys()
+          this.temp.smPermissions = []
+          console.log(this.checkedPermissions)
+          this.checkedPermissions.forEach(item => {
+            console.log(item)
+            this.permissionsTree.items.forEach(item2 => {
+              if (item2.id === item) {
+                this.temp.smPermissions.push(item2)
+              }
+            })
+          })
+
           const tempData = Object.assign({}, this.temp)
           update(tempData).then(() => {
             for (const v of this.listArr.data) {
@@ -273,4 +302,9 @@ export default {
 </script>
 
 <style lang="scss">
+.permission {
+  margin:2px !important;
+width: 250px;
+}
+
 </style>

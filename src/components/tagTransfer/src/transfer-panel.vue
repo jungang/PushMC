@@ -46,8 +46,11 @@
           :disabled="item[disabledProp]"
         >
           <option-content :option="item" />
+
           <div v-if="isShowInput" class="right-input">
-            {{ customPrefix ? customPrefix + '@' : '' }} <el-input v-if="isShowInput" v-model="item[labelProp]" placeholder="请输入内容" size="mini" />
+            {{ customPrefix ? customPrefix + '@' : '' }}
+            <el-input v-if="isShowInput" v-model="item.column" :placeholder="item[labelProp]" size="mini" style="width: 150px" />
+            {{ item.title }}
           </div>
           <div v-else>
             {{ item[labelProp] }}
@@ -216,6 +219,9 @@ export default {
         : 'search'
     },
 
+    newLabel() {
+      return ''
+    },
     labelProp() {
       return this.props.label || 'label'
     },
@@ -279,7 +285,6 @@ export default {
     }
   },
   created() {
-    // console.log(this.type)
   },
 
   methods: {

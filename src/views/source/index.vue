@@ -100,21 +100,21 @@
           <el-input v-model="temp.serverAddress" placeholder="多个IP间以逗号分隔" />
         </el-form-item>
 
-        <el-form-item label="定时更新" prop="updatePlanHours">
+        <el-form-item v-if="temp.type==='API'" label="定时更新" prop="updatePlanHours">
 
-          <div v-if="temp.type==='API'">
+          <div>
             <el-input v-model="temp.interval" placeholder="请输入内容" style="width: 200px">
               <template slot="append">分钟</template>
             </el-input>
           </div>
-          <div v-if="temp.type==='webhooks'">
+          <!--          <div v-if="temp.type==='webhooks'">
             <el-select v-model="temp.updatePlanHours" class="filter-item" placeholder="请选择" style="width:150px;">
               <el-option v-for="item in MODEL.updatePlanOptions.hour" :key="item.key" :label="item.label" :value="item.key" />
             </el-select>
             <el-select v-model="temp.updatePlanTimes" class="filter-item" placeholder="请选择" style="width:100px;">
               <el-option v-for="item in MODEL.updatePlanOptions.times" :key="item.key" :label="item.label" :value="item.key" />
             </el-select>
-          </div>
+          </div>-->
 
         </el-form-item>
 
@@ -319,9 +319,9 @@ export default {
       this.temp = {
         id: undefined,
         type: 'API',
-        title: '****',
+        title: '',
         status: 'disabled',
-        secretKey: '*****',
+        secretKey: '',
         serverAddress: 'http://00000.com',
         updatePlanHours: '4',
         updatePlanTimes: '8',
@@ -329,7 +329,7 @@ export default {
           title: '',
           value: '{}'
         }],
-        describe: '*****'
+        describe: ''
       }
     },
     handleCreate() {

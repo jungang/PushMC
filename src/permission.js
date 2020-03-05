@@ -28,6 +28,7 @@ router.beforeEach(async(to, from, next) => {
     } else {
       // 确定用户是否已通过getInfo获得其权限角色
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
+      // console.log(hasRoles)
       if (hasRoles) {
         next()
       } else {
@@ -36,14 +37,30 @@ router.beforeEach(async(to, from, next) => {
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
 
-          console.log('roles:', roles)
-          const { roleTypes } = await store.dispatch('user/getPermission', roles)
+          let roleTypes = []
+          roles.forEach(item => {
+            // console.log(item)
 
+            console.log(item.smPermissions)
+
+            if (item.smPermissions) {
+              item.smPermissions.forEach(item2 => {
+                roleTypes.push(item2)
+              })
+            }
+          })
+
+          // const { roleTypes } = await store.dispatch('user/getPermission', roles)
+
+          roleTypes = Array.from(new Set(roleTypes)) // 去重
+
+          console.log('roleTypes:', roleTypes)
           // generate accessible routes map based on roles
 
           // const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
           const accessRoutes = await store.dispatch('permission/generateAsyncRouter', { roles, roleTypes })
 
+          console.log(accessRoutes)
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
 

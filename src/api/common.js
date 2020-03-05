@@ -265,46 +265,10 @@ export function searchPersons(query) {
 
 // 频道订阅列表
 export function channelSubscribe(query) {
-/*  return request({
-    url: '/common/channel-Subscribe',
+  return request({
+    url: '/business-channel/third/list',
     method: 'get',
     params: query
-  })*/
-
-  return new Promise((resolve, reject) => {
-    const res = {
-      'code': 20000,
-      'data': {
-        'items': [
-          {
-            'id': 61619,
-            'status': false,
-            'title': '次千正'
-          },
-          {
-            'id': 91454,
-            'status': false,
-            'title': '则达易位族层马'
-          },
-          {
-            'id': 66442,
-            'status': false,
-            'title': '技过示观'
-          },
-          {
-            'id': 36373,
-            'status': false,
-            'title': '高快过利目全很'
-          },
-          {
-            'id': 94720,
-            'status': true,
-            'title': '专位算看记别'
-          }
-        ]
-      }
-    }
-    resolve(res)
   })
 }
 

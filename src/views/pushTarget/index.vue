@@ -322,7 +322,7 @@ export default {
       this.temp = {
         id: undefined,
         category: 'API',
-        title: '****',
+        title: '',
         smGroupItems: []
       }
       this.dynamicTags = []

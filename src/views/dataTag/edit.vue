@@ -23,6 +23,7 @@
             ref="transfer"
             v-model="value"
             type="dataTag"
+            :prefix="currentRow.prefix"
             class="main-transfer"
             style="text-align: left; display: inline-block"
             :titles="['属性字段', '标注结果']"
@@ -128,12 +129,10 @@ export default {
 
       console.log(this.saveQuery)
       this.saveQuery.targetData.forEach(item => {
-        console.log(item.id)
         const index = this.currentRow.smColumns.findIndex((t, i, arr) => t.id === item.id)
-        this.currentRow.smColumns[index].newTitle = item.title
+        console.log(item)
+        this.currentRow.smColumns[index].column = item.column
       })
-
-      console.log(this.currentRow.smColumns)
       saveTag([this.currentRow]).then(res => {
         this.listLoading = false
         this.$notify({
@@ -153,12 +152,20 @@ export default {
       if (val) {
         this.transfer = deepClone(val.smColumns)
         this.currentRow = val
+        console.log(this.currentRow)
       } else {
         console.log('handleCurrentChange...')
       }
+
       this.value = []
+      this.transfer.forEach(item => {
+        if (item.column !== item.title) {
+          this.value.push(item.id)
+        }
+      })
     },
     handleChange(value, direction, movedKeys) {
+      console.log(this.$refs.transfer.setQuery())
     }
   }
 

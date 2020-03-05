@@ -112,7 +112,7 @@
           />
         </el-form-item>
 
-        <el-form-item label="审批状态">
+        <el-form-item v-if="dialogStatus!=='create'" label="审批状态">
           {{ temp.status || '' }} {{ temp.examineTime || '' }}
         </el-form-item>
 

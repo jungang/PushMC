@@ -2,7 +2,7 @@
   <div class="container">
     <el-row style="margin-bottom: 10px">
       <el-col :span="16" style="line-height: 40px;">
-        用户角色列表：：
+        用户角色列表：
       </el-col>
       <el-col :span="8" align="right">
         <el-button type="primary" @click="handleCreate">+新建角色</el-button>
@@ -32,7 +32,7 @@
 
         <el-table-column label="角色分配" prop="type" width="300" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.persons.length }}</span>
+            <span>{{ row.persons }}</span>
           </template>
         </el-table-column>
 

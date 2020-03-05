@@ -246,11 +246,11 @@
 
         <el-form-item label="选择发送对象" prop="targetType">
           <el-row>
-
-            <el-radio-group v-model="temp.targetType">
+            按推送对象组
+            <!--            <el-radio-group v-model="temp.targetType">
               <el-radio :label="1">按推送对象组</el-radio>
               <el-radio :label="2">按人员</el-radio>
-            </el-radio-group>
+            </el-radio-group>-->
 
           </el-row>
           <el-row>

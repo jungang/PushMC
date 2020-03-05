@@ -1,7 +1,7 @@
 <template>
   <div id="messageTemplate" class="container">
 
-    <el-row style="margin-bottom: 10px">
+    <!--    <el-row style="margin-bottom: 10px">
       <el-col :span="16">
         &nbsp;
       </el-col>
@@ -9,7 +9,7 @@
         <el-button type="primary" @click="handleCreate('text')">+ 文字模版</el-button>
         <el-button type="primary" @click="handleCreate('template')">+ 图文模版</el-button>
       </el-col>
-    </el-row>
+    </el-row>-->
 
     <el-row>
       <el-table
@@ -55,16 +55,16 @@
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-
+            <!--
             <el-button v-if="row.status!='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
               启用
-            </el-button>
-            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+            </el-button>-->
+            <!--           <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
               停用
-            </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+            </el-button>-->
+            <!--            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
               删除
-            </el-button>
+            </el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -85,41 +85,102 @@
       @close="dialogClose"
     >
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
-
+        <el-form-item label="消息模版" prop="templateKey">
+          <el-radio v-model="temp.type" label="template"> 图文消息 </el-radio>
+          <el-radio v-model="temp.type" label="text"> 文本消息 </el-radio>
+        </el-form-item>
         <el-form-item label="模板名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
-
+        <el-form-item v-if="temp.type==='text'" label="URL" prop="title">
+          <el-checkbox v-model="temp.url" />
+          <el-input v-model="temp.url" style="width:400px" />
+        </el-form-item>
         <el-row>
           <el-col align="right">
             <el-button size="mini" @click="previewVisible = true">查看预览</el-button>
           </el-col>
         </el-row>
+        <el-form-item v-if="temp.type==='template'" label="">
+          <el-row>
+            <el-col>
 
-        <el-form-item label="内容标签" prop="content">
+              <div class="preview">
+                <div class="top">
+                  <el-select v-model="temp.templateContent.arg1" placeholder="+选择推送字段">
+                    <el-option
+                      v-for="item in temp.argTags"
+                      :key="item.path"
+                      :label="item.pathTitle"
+                      :value="item.path"
+                    />
+                  </el-select>
+                </div>
 
-          <el-row class="btn">
-            <el-button size="mini" @click="insertText('内容标题')">内容标题</el-button>
-            <el-button size="mini" @click="insertText('推送封面图')">推送封面图</el-button>
-            <el-button size="mini" @click="insertText('发送时间')">发送时间</el-button>
-            <el-button size="mini" @click="insertText('发布人ID')">发布人ID</el-button>
+                <div class="img">
+                  <el-upload
+                    class="uploader"
+                    action="http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload"
+                    :show-file-list="false"
+                    :on-success="handleSuccess"
+                  >
+                    <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
+                  </el-upload>
+                  <img :src="temp.templateContent.img" alt="">
+                </div>
+
+                <el-row>
+                  <el-col :span="12">
+                    <el-select v-model="temp.templateContent.arg2" placeholder="+选择推送字段">
+                      <el-option
+                        v-for="item in temp.argTags"
+                        :key="item.path"
+                        :label="item.pathTitle"
+                        :value="item.path"
+                      />
+                    </el-select>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-select v-model="temp.templateContent.arg3" placeholder="+选择推送字段">
+                      <el-option
+                        v-for="item in temp.argTags"
+                        :key="item.path"
+                        :label="item.pathTitle"
+                        :value="item.path"
+                      />
+                    </el-select>
+                  </el-col>
+                </el-row>
+
+                <div class="url">
+                  <el-input v-model="temp.templateContent.url" placeholder="+推送URL" />
+                </div>
+              </div>
+
+            </el-col>
           </el-row>
-          <quill-editor
+        </el-form-item>
+        <el-form-item v-if="temp.type==='text'" label="内容标签" prop="content">
+          <el-row class="btn">
+            <el-button v-for="tag in temp.argTags" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
+          </el-row>
+
+          <textarea
+            id="textarea"
             ref="myQuillEditor"
             v-model="temp.content"
-            :options="editorOption"
-            @click="onEditorClick($event)"
-            @blur="onEditorBlur($event)"
-            @focus="onEditorFocus($event)"
-            @change="onEditorChange($event)"
+            autocomplete="off"
+            type="textarea"
+            :rows="5"
+            placeholder="请输入内容"
+            style="width: 100%"
           />
+          <el-row>
+            <el-col align="right">
+              图文消息模版，不支持自定义内容输入
+            </el-col>
+          </el-row>
         </el-form-item>
-
-        <el-row v-if="temp.type!=='text'">
-          <el-col align="right">
-            图文消息模版，不支持自定义内容输入
-          </el-col>
-        </el-row>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -160,6 +221,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { fetchList, searchList, detail, changeStatus, create, updateSource, dele } from '@/api/messageTemplate'
+import { channelDetail } from '@/api/businessChannel'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -201,6 +263,13 @@ export default {
       temp: {
         id: undefined,
         category: '',
+        templateContent: {
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+          url: ''
+        },
         origin: 'CUSTOM',
         status: 'enabled',
         title: '',
@@ -223,24 +292,34 @@ export default {
     ]),
     MODEL: function() {
       return this.$store.state.publicData.model
-    },
-    editor() {
-      return this.$refs.myQuillEditor.quill
     }
   },
   created() {
     this.getList()
   },
   methods: {
-    dialogClose() {
-      console.log(this.editor)
-      this.editor.setContents([{ insert: 'Hello ' }])
+    handleSuccess(res, file) {
+      this.temp.templateContent.img = res.url
     },
-    insertText(mark) {
-      console.log(this.editor)
-      const index = this.editor.selection.savedRange.index
-      console.log('index:', index)
-      this.editor.insertText(index, ' {' + mark + '} ')
+    dialogClose() {
+      // console.log(this.editor)
+      // this.editor.setContents([{ insert: 'Hello ' }])
+    },
+    async insertText(mark) {
+      mark = '{' + mark + '}'
+      // const myField = document.querySelector('#textarea');
+      const myField = this.$refs.myQuillEditor
+      if (myField.selectionStart || myField.selectionStart === 0) {
+        var startPos = myField.selectionStart
+        var endPos = myField.selectionEnd
+        this.temp.content = myField.value.substring(0, startPos) + mark +
+          myField.value.substring(endPos, myField.value.length)
+        await this.$nextTick() // 这句是重点, 圈起来
+        myField.focus()
+        myField.setSelectionRange(endPos + mark.length, endPos + mark.length)
+      } else {
+        this.temp.content += mark
+      }
     },
     handleModifyStatus(row, status) {
       changeStatus(row.id, status).then(response => {
@@ -286,6 +365,13 @@ export default {
       this.temp = {
         id: undefined,
         status: 'enabled',
+        templateContent: {
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+          url: ''
+        },
         origin: 'CUSTOM',
         title: '',
         content: '{内容标题}'
@@ -333,7 +419,12 @@ export default {
     },
     handleUpdate(row) {
       detail({ id: row.id }).then((res) => {
-        this.temp = res.data
+        this.temp = { ...this.temp, ...res.data }
+        channelDetail({ id: row.channelId }).then((res) => {
+          this.temp.channel = res.data
+        })
+
+        console.log(this.temp)
         this.dialogStatus = 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {

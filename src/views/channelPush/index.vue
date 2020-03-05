@@ -134,9 +134,9 @@
             <el-col :span="12">
               <el-button type="primary" @click="handleAddRule">+添加规则条目</el-button>
             </el-col>
-            <el-col :span="12" align="right">
+            <!--            <el-col :span="12" align="right">
               <el-checkbox v-model="additionalOptionShow">高级选项</el-checkbox>
-            </el-col>
+            </el-col>-->
           </el-row>
           <el-table
             :data="temp.rules"
@@ -209,7 +209,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-row v-if="additionalOptionShow">
+          <!--          <el-row v-if="additionalOptionShow">
             高级选项
             <el-table
               :data="temp.additionalOption"
@@ -248,17 +248,17 @@
                 <el-button size="small">添加</el-button>
               </el-table-column>
             </el-table>
-          </el-row>
+          </el-row>-->
 
         </el-form-item>
 
         <el-form-item label="选择发送对象" prop="targetType">
           <el-row>
-
-            <el-radio-group v-model="temp.targetType">
+            按推送对象组
+            <!--            <el-radio-group v-model="temp.targetType">
               <el-radio :label="1">按推送对象组</el-radio>
               <el-radio :label="2">按人员</el-radio>
-            </el-radio-group>
+            </el-radio-group>-->
 
           </el-row>
           <el-row>
@@ -345,22 +345,18 @@
           <el-radio v-model="temp.templateType" label="template"> 图文消息 </el-radio>
           <el-radio v-model="temp.templateType" label="text"> 文本消息 </el-radio>
         </el-form-item>
-
         <el-form-item label="模板名称" prop="title">
           <el-input v-model="temp.templateTitle" style="width:400px" />
         </el-form-item>
-
         <el-form-item v-if="temp.templateType==='text'" label="URL" prop="title">
           <el-checkbox v-model="temp.isURL" />
           <el-input v-model="temp.templateURL" style="width:400px" />
         </el-form-item>
-
         <el-row>
           <el-col align="right">
             <el-button size="mini" @click="previewVisible = true">查看预览</el-button>
           </el-col>
         </el-row>
-
         <el-form-item v-if="temp.templateType==='template'" label="">
           <el-row>
             <el-col>
@@ -420,19 +416,22 @@
             </el-col>
           </el-row>
         </el-form-item>
-
         <el-form-item v-if="temp.templateType==='text'" label="内容标签" prop="content">
           <el-row class="btn">
             <el-button v-for="tag in temp.argTags" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
           </el-row>
-          <quill-editor
+
+          <textarea
+            id="textarea"
             ref="myQuillEditor"
             v-model="temp.content"
-            :options="editorOption"
-            @blur="onEditorBlur($event)"
-            @focus="onEditorFocus($event)"
-            @change="onEditorChange($event)"
+            autocomplete="off"
+            type="textarea"
+            :rows="5"
+            placeholder="请输入内容"
+            style="width: 100%"
           />
+
           <el-row>
             <el-col align="right">
               图文消息模版，不支持自定义内容输入
@@ -488,7 +487,7 @@
 
       <template>
         <el-table
-          :data="channelSubscribeList"
+          :data="channelSubscribeList.data"
           stripe
           border
           style="width: 100%"
@@ -526,7 +525,7 @@
 
       <span slot="footer" class="dialog-footer">
         <!--        <el-button @click="dialogFormSubscribe = false">取 消</el-button>-->
-        <el-button type="primary" @click="dialogFormSubscribe = false">关闭</el-button>
+        <el-button type="primary" @click="closeSubscribe">关闭</el-button>
       </span>
     </el-dialog>
 
@@ -560,7 +559,19 @@ export default {
     return {
       radio: '1',
       channelTypeList: [],
-      channelSubscribeList: [],
+      channelSubscribeList: {
+        data: [],
+        total: 0,
+        listQuery: {
+          isSubscibe: true,
+          page: 1,
+          limit: 20,
+          importance: undefined,
+          title: undefined,
+          type: undefined,
+          sort: '+id'
+        }
+      },
       pushTemplateList: [],
       additionalOptionShow: false,
       channelListArr: [],
@@ -612,6 +623,7 @@ export default {
         data: [],
         total: 0,
         listQuery: {
+          isSubscibe: true,
           page: 1,
           limit: 20,
           importance: undefined,
@@ -678,14 +690,54 @@ export default {
     this.getGroups()
   },
   methods: {
+    closeSubscribe() {
+      this.dialogFormSubscribe = false
+      this.getList()
+      this.getChannelSubscribe()
+    },
     handleSuccess(res, file) {
       this.temp.templateContent.img = res.url
     },
-    insertText(mark) {
-      console.log(this.editor)
-      const index = this.editor.selection.savedRange.index
-      console.log('index:', index)
-      this.editor.insertText(index, ' {' + mark + '} ')
+    async insertText(mark) {
+      mark = '{' + mark + '}'
+      // const myField = document.querySelector('#textarea');
+      const myField = this.$refs.myQuillEditor
+      if (myField.selectionStart || myField.selectionStart === 0) {
+        var startPos = myField.selectionStart
+        var endPos = myField.selectionEnd
+        this.temp.content = myField.value.substring(0, startPos) + mark +
+          myField.value.substring(endPos, myField.value.length)
+        await this.$nextTick() // 这句是重点, 圈起来
+        myField.focus()
+        myField.setSelectionRange(endPos + mark.length, endPos + mark.length)
+      } else {
+        this.temp.content += mark
+      }
+      /*      const areaField = this.$refs.myQuillEditor
+
+      console.log(document.selection)
+      if (document.selection) {
+        var sel = document.selection.createRange()
+      }
+
+      console.log(areaField)
+      console.log(areaField.selectionStart)
+      if (areaField.selectionStart || areaField.selectionStart === '0') {
+        const startPos = areaField.selectionStart
+        const endPos = areaField.selectionEnd
+        const restoreTop = areaField.scrollTop // 获取滚动条高度
+        //  this.waitingTextArea 是v-model的值
+        // item.text 是 选择的要插入的值
+        this.waitingTextArea = this.waitingTextArea.substring(0, startPos) + 'item.text' + this.waitingTextArea.substring(endPos, this.waitingTextArea.length)
+        console.log(this.waitingTextArea)
+      } else {
+        this.temp.content += mark
+        areaField.focus()
+      }*/
+
+      // const index = this.editor.selection.savedRange.index
+      // console.log('index:', index)
+      // this.editor.insertText(index, ' {' + mark + '} ')
     },
     handleChannelFilter() {
       console.log(this.temp.channelId)
@@ -756,6 +808,7 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listArr.listQuery).then(response => {
+        console.log(response)
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -770,8 +823,8 @@ export default {
     },
     getChannelSubscribe() {
       this.listLoading = true
-      channelSubscribe().then(response => {
-        this.channelSubscribeList = response.data.items
+      channelSubscribe(this.channelSubscribeList.listQuery).then(response => {
+        this.channelSubscribeList.data = response.data.items
         this.listLoading = false
       })
     },
@@ -828,12 +881,18 @@ export default {
       this.dialogFormSubscribe = true
     },
     handleSubscribe(row, opt) {
-      subscribe(row.id, opt).then(response => {
+      console.log(opt)
+      const data = [{
+        channelId: row.id,
+        bookStatus: opt ? 1 : 0
+      }]
+      subscribe(data).then(response => {
         this.listLoading = false
         row.status = opt
         console.log(response)
       })
     },
+
     handleUnPush(row, opt) {
       unPush(row.id, opt).then(response => {
         this.listLoading = false

@@ -38,7 +38,7 @@ export function dele(data) {
   })
 }
 
-export function detail(data) {
+export function channelDetail(data) {
   return request({
     url: '/business-channel/detail',
     method: 'get',
@@ -70,10 +70,10 @@ export function update(data) {
   })
 }
 
-export function subscribe(data, opt) {
+export function subscribe(data) {
   return request({
-    url: '/business-channel/subscribe',
-    method: 'post',
-    data: { data: data, opt: opt }
+    url: '/business-channel/book',
+    method: 'put',
+    data: data
   })
 }
