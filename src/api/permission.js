@@ -18,8 +18,8 @@ export function dele(id, status) {
 
 export function create(data) {
   return request({
-    url: '/user/permission/create',
-    method: 'post',
+    url: '/user/users',
+    method: 'put',
     data: data
   })
 }

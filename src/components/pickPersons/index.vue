@@ -1,5 +1,16 @@
 <template>
   <div>
+
+    <el-row>
+      tunnelId
+      <el-select v-model="personsArr.tunnelId" placeholder="请选择" @change="handleFilter">
+        <el-option label="0" value="0" />
+        <el-option label="1" value="1" />
+        <el-option label="2" value="2" />
+        <el-option label="3" value="3" />
+      </el-select>
+    </el-row>
+
     <el-tabs v-model="tabTo" type="card">
       <el-tab-pane label="按组织结构" name="department">
 
@@ -163,6 +174,7 @@ export default {
       listLoading: false,
       dynamicTags: [],
       personsArr: {
+        tunnelId: 2,
         items: [],
         total: 0,
         listQuery: {
@@ -182,12 +194,16 @@ export default {
     }
   },
   async created() {
-    await this.getDepartmentData()
+    // await this.getDepartmentData()
+    console.log('created...')
   },
   mounted() {
     this.dynamicTags = this.data
   },
   methods: {
+    async handleFilter() {
+      await this.getDepartmentData()
+    },
     init(val) {
       this.dynamicTags = val
       this.plaza = []
@@ -204,7 +220,7 @@ export default {
       })
     },
     async getDepartmentData() {
-      await department({ domain: 'xykj' }).then(response => {
+      await department({ domain: 'xykj', tunnelId: this.personsArr.tunnelId }).then(response => {
         // console.log('format..')
         this.departmentData = this.format(response.data)
       })

@@ -1515,7 +1515,7 @@ export function fetchPv(pv) {
 
 export function createSource(data) {
   return request({
-    url: '/channel-push/create',
+    url: '/business-channel/create',
     method: 'post',
     data: data
   })

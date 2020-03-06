@@ -79,7 +79,7 @@
           <el-input v-model="temp.title" :readonly="dialogStatus==='view'" :placeholder="'输入角色名称'" />
         </el-form-item>
 
-        <PickPersons ref="pickPersons" :data.sync="temp.persons" />
+        <PickPersons ref="pickPersons" :data.sync="temp.persons" :tunnel="temp.tunnelId" />
 
       </el-form>
 
@@ -125,7 +125,8 @@ export default {
       listLoading: true,
       temp: {
         id: undefined,
-        title: ''
+        title: '',
+        tunnelId: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -161,6 +162,7 @@ export default {
       this.temp = {
         id: undefined,
         title: '',
+        tunnelId: '',
         persons: []
       }
     },
@@ -202,6 +204,7 @@ export default {
     },
 
     handleUpdate(row, opt) {
+
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = opt || 'update'
       this.dialogFormVisible = true

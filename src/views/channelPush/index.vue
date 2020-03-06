@@ -121,11 +121,11 @@
         </el-form-item>
 
         <el-form-item label="数据表" prop="title">
-          {{ temp.channel.paths.length || 0 }}
+          {{ temp.channel.tables.length }}
         </el-form-item>
 
         <el-form-item label="频道标签" prop="tag">
-          <el-tag v-for="tag in temp.tag" :key="tag">{{ tag }}</el-tag>
+          <el-tag>{{ temp.channel.tag }}</el-tag>
         </el-form-item>
 
         <el-form-item label="频道规则" prop="tag">
@@ -156,10 +156,10 @@
               <template slot-scope="{row}">
                 <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
                   <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in mainOptions"
+                    :key="item.id"
+                    :label="item.pathTitle"
+                    :value="item.id"
                   />
                 </el-select>
                 <el-input v-model="row.item1.value" placeholder="请输入内容" style="width:45%" />
@@ -172,7 +172,7 @@
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.operation1" placeholder="请选择" style="width: 60px">
+                <el-select v-model="row.operation1" :disabled="!options" placeholder="请选择" style="width: 60px">
                   <el-option
                     v-for="item in ruleOptions"
                     :key="item.value"
@@ -189,15 +189,15 @@
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.item2.tableName" placeholder="请选择" style="width:50%">
+                <el-select v-model="row.item2.tableName" :disabled="!options" placeholder="请选择" style="width:50%">
                   <el-option
                     v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    :key="item.id"
+                    :label="item.pathTitle"
+                    :value="item.id"
                   />
                 </el-select>
-                <el-input v-model="row.item2.value" placeholder="请输入内容" style="width:45%" />
+                <el-input v-model="row.item2.value" :disabled="!options" placeholder="请输入内容" style="width:45%" />
               </template>
             </el-table-column>
 
@@ -301,7 +301,7 @@
                 label="创建时间"
               >
                 <template slot-scope="{row}">
-                  {{ row.createDate }}
+                  {{ row.updateTime }}
                 </template>
               </el-table-column>
             </el-table>
@@ -365,10 +365,10 @@
                 <div class="top">
                   <el-select v-model="temp.templateContent.arg1" placeholder="+选择推送字段">
                     <el-option
-                      v-for="item in temp.argTags"
-                      :key="item.path"
+                      v-for="item in mainOptions"
+                      :key="item.id"
                       :label="item.pathTitle"
-                      :value="item.path"
+                      :value="item.id"
                     />
                   </el-select>
                 </div>
@@ -389,20 +389,20 @@
                   <el-col :span="12">
                     <el-select v-model="temp.templateContent.arg2" placeholder="+选择推送字段">
                       <el-option
-                        v-for="item in temp.argTags"
-                        :key="item.path"
+                        v-for="item in mainOptions"
+                        :key="item.id"
                         :label="item.pathTitle"
-                        :value="item.path"
+                        :value="item.id"
                       />
                     </el-select>
                   </el-col>
                   <el-col :span="12">
                     <el-select v-model="temp.templateContent.arg3" placeholder="+选择推送字段">
                       <el-option
-                        v-for="item in temp.argTags"
-                        :key="item.path"
+                        v-for="item in mainOptions"
+                        :key="item.id"
                         :label="item.pathTitle"
-                        :value="item.path"
+                        :value="item.id"
                       />
                     </el-select>
                   </el-col>
@@ -497,7 +497,7 @@
             label="订阅状态"
           >
             <template slot-scope="{row}">
-              <span>{{ row.status? '已订阅':'未订阅' }}</span>
+              <span>{{ row.bookStatus? '已订阅':'未订阅' }}</span>
             </template>
 
           </el-table-column>
@@ -511,7 +511,7 @@
             label="操作"
           >
             <template slot-scope="{row}">
-              <el-button v-if="row.status" type="danger" size="mini" @click="handleSubscribe(row,false)">
+              <el-button v-if="row.bookStatus" type="danger" size="mini" @click="handleSubscribe(row,false)">
                 取消订阅
               </el-button>
               <el-button v-else type="primary" size="mini" @click="handleSubscribe(row,true)">
@@ -538,7 +538,6 @@ import { copyChannel, createSource, dele, fetchList, channelList, detail, groups
 import { subscribe } from '@/api/businessChannel'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
-import { sourceDetail } from '@/api/source'
 // import quillConfig from './quill-config.js'
 
 export default {
@@ -590,6 +589,7 @@ export default {
           value: '<',
           label: '<'
         }],
+      mainOptions: [],
       options: [],
       content: `<p>内容部分</p>`,
       // editorOption: quillConfig,  //图片上传
@@ -629,7 +629,7 @@ export default {
         },
         argTags: [],
         channel: {
-          paths: []
+          tables: []
         },
         tag: '',
         category: '',
@@ -724,16 +724,17 @@ export default {
       // this.editor.insertText(index, ' {' + mark + '} ')
     },
     handleChannelFilter() {
-      console.log(this.temp.channelId)
-      this.temp.argTags = []
-      sourceDetail({ id: this.temp.channelId }).then(response => {
-        this.temp.channel = response.data
-        this.temp.channel.paths.forEach(item => {
-          this.temp.argTags = this.temp.argTags.concat(...item.checkColumns)
-        })
-        console.log(this.temp.argTags)
-      })
-      // this.getList()
+      this.getChannel()
+    },
+    getChannel() {
+      this.temp.channel = this.channelListArr.items.find(item => item.id === this.temp.channelId)
+      this.mainOptions = this.temp.channel.tables.find(item => item.id === this.temp.channel.mainResourceId).smColumns
+      this.options = this.temp.channel.tables.filter(item => item.id !== this.temp.channel.mainResourceId).smColumns
+      this.temp.tables = this.temp.channel.tables
+      this.temp.tag = this.temp.channel.tag
+      this.temp.tagId = this.temp.channel.tagId
+      this.temp.mainResourceId = this.temp.channel.mainResourceId
+      this.temp.pushType = 'business'
     },
     getChannelList() {
       channelList().then(response => {
@@ -743,6 +744,7 @@ export default {
     getGroups() {
       groups().then(response => {
         this.groupsArr = response.data
+        console.log(this.groupsArr)
       })
     },
     handleDialogOpened() {
@@ -834,7 +836,7 @@ export default {
         },
         argTags: [],
         channel: {
-          paths: []
+          tables: []
         },
         tag: [],
         category: '',
@@ -928,9 +930,9 @@ export default {
 
     handleUpdate(row, opt) {
       detail({ id: row.id }).then((res) => {
-
         this.temp = res.data
 
+        this.getChannel()
         this.dialogStatus = opt || 'update'
         this.dialogFormVisible = true
         this.$nextTick(() => {

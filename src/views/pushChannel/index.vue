@@ -81,7 +81,7 @@
         </el-form-item>
         <el-form-item label="通道状态" prop="status">
           <el-radio v-model="temp.status" label="enabled">启用</el-radio>
-          <el-radio v-model="temp.status" label="disabled ">未启用</el-radio>
+          <el-radio v-model="temp.status" label="disabled">未启用</el-radio>
         </el-form-item>
 
         <div v-if="temp.type==='gocom'">
