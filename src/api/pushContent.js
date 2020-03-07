@@ -27,7 +27,7 @@ export function searchList(keyWord) {
   return request({
     url: '/push-content/list',
     method: 'get',
-    params: { word: keyWord }
+    params: { searchKey: keyWord }
   })
 }
 

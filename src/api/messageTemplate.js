@@ -35,7 +35,7 @@ export function searchList(keyWord) {
   return request({
     url: '/message-template/list',
     method: 'get',
-    params: { word: keyWord }
+    params: { searchKey: keyWord }
   })
 }
 

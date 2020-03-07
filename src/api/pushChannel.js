@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function fetchList(query) {
+export function pushChannelList(query) {
   return request({
     url: '/push-channel/list',
     method: 'get',

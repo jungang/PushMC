@@ -32,7 +32,7 @@
 
         <el-table-column label="角色分配" prop="type" width="300" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.persons }}</span>
+            <span>{{ row.persons && row.persons.length || 0 }}</span>
           </template>
         </el-table-column>
 
@@ -126,7 +126,7 @@ export default {
       temp: {
         id: undefined,
         title: '',
-        tunnelId: ''
+        tunnelId: 1
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -155,6 +155,10 @@ export default {
       fetchList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
+        this.listArr.data.forEach(item => {
+          item.persons = item.persons || []
+          item.tunnelId = item.tunnelId || 1
+        })
         this.listLoading = false
       })
     },
@@ -162,7 +166,7 @@ export default {
       this.temp = {
         id: undefined,
         title: '',
-        tunnelId: '',
+        tunnelId: 1,
         persons: []
       }
     },
@@ -180,7 +184,17 @@ export default {
           this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
           this.temp.author = 'jun'
           this.temp.persons = this.$refs.pickPersons.dynamicTags
-          create(this.temp).then(() => {
+          this.temp.tunnelId = this.$refs.pickPersons.personsArr.tunnelId
+          this.temp.smPermissions = []
+
+          // todo
+
+          /*       const data = [{
+            roles: [this.temp],
+            userId: -1
+          }]*/
+
+          create([this.temp]).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
@@ -204,7 +218,6 @@ export default {
     },
 
     handleUpdate(row, opt) {
-
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = opt || 'update'
       this.dialogFormVisible = true
@@ -239,7 +252,7 @@ export default {
     },
 
     handleDelete(row) {
-      dele(row.id, status).then(response => {
+      dele({ roleId: row.id }).then(response => {
         this.$notify({
           title: '完成',
           message: '删除',

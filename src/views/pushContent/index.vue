@@ -7,7 +7,7 @@
         <el-select v-model="listArr.listQuery.type" style="width: 140px" class="filter-item" @change="handleFilter">
           <el-option v-for="item in MODEL.tagCategory" :key="item.key" :label="item.label" :value="item.key" />
         </el-select>
-        <el-input v-model="keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-input v-model="searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </el-col>
       <el-col :span="4" align="right"><el-button type="primary" @click="handleCreate">+ 新建内容</el-button></el-col>
@@ -146,7 +146,7 @@ export default {
       editorOption: {}, // base64
       isSubhead: false,
       isUrl: false,
-      keyword: '',
+      searchKey: '',
       tables: [],
       tableKey: 0,
       listType: [
@@ -247,7 +247,7 @@ export default {
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.keyword).then(response => {
+      searchList(this.searchKey).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -265,7 +265,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.category = this.listCategory.find(item => item.id === this.temp.categoryId).title
-          this.temp.status = 'draft'
+          this.temp.status = 'pro_examine'
           this.temp.contentType = 'content'
           create(this.temp).then(() => {
             this.getList()

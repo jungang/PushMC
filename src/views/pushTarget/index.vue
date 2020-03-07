@@ -92,7 +92,7 @@
           <el-radio-button label="department">按组织结构</el-radio-button>
           <el-radio-button label="personnel">按人员</el-radio-button>
         </el-radio-group>-->
-        <PickPersons ref="pickPersons" :data.sync="temp.smGroupItems" />
+        <PickPersons ref="pickPersons" :data.sync="temp.smGroupItems" :tunnel="temp.tunnelId" />
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -133,7 +133,7 @@ export default {
   },
   data() {
     return {
-      keyword: '',
+      searchKey: '',
       personWord: '',
       dynamicTags: [],
       checkAll: false,
@@ -170,6 +170,7 @@ export default {
         id: undefined,
         type: '',
         describe: '',
+        tunnelId: 1,
         title: '',
         smGroupItems: []
       },
@@ -213,7 +214,7 @@ export default {
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.keyword).then(response => {
+      searchList(this.searchKey).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -321,6 +322,7 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
+        tunnelId: 1,
         category: 'API',
         title: '',
         smGroupItems: []

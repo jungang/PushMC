@@ -347,7 +347,9 @@ export default {
           importance: undefined,
           title: undefined,
           type: undefined,
-          sort: '+id'
+          sort: '+id',
+          pushType: 1,
+          group: 'default'
         }
       },
       list_c: {
@@ -359,7 +361,9 @@ export default {
           importance: undefined,
           title: undefined,
           type: undefined,
-          sort: '+id'
+          sort: '+id',
+          pushType: 1,
+          group: 'default'
         }
       },
       list_p: {
@@ -371,7 +375,9 @@ export default {
           importance: undefined,
           title: undefined,
           type: undefined,
-          sort: '+id'
+          sort: '+id',
+          pushType: 3,
+          group: 'default'
         }
       },
       detailList: { data: [] },

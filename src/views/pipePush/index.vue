@@ -3,7 +3,7 @@
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="20">
-        <el-input v-model="keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-input v-model="searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </el-col>
     </el-row>
@@ -541,7 +541,7 @@ export default {
       editorOption: {}, // base64
       isSubhead: false,
       isUrl: false,
-      keyword: '',
+      searchKey: '',
       tables: [],
       tableKey: 0,
       listType: [
@@ -758,7 +758,7 @@ export default {
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.keyword).then(response => {
+      searchList(this.searchKey).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false

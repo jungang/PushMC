@@ -125,7 +125,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, detail, create, update, dele } from '@/api/pushChannel'
+import { pushChannelList, detail, create, update, dele } from '@/api/pushChannel'
 import { channelType } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -210,7 +210,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      fetchList(this.listArr.listQuery).then(response => {
+      pushChannelList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false

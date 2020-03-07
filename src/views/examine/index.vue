@@ -68,13 +68,26 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="750px">
 
       <el-row class="details">
-        <el-col :span="4">内容标题：</el-col><el-col :span="20">   {{ examineDetails.title }}</el-col>
-        <el-col :span="4">内容分类：</el-col><el-col :span="20">   {{ examineDetails.category }}</el-col>
-        <el-col :span="4">内容标签：</el-col><el-col :span="20">   {{ examineDetails.tag }}</el-col>
-        <el-col :span="4">内容正文：</el-col><el-col :span="18">   {{ examineDetails.content }}</el-col>
-        <el-col :span="4">创建时间：</el-col><el-col :span="20">   {{ examineDetails.updateTime }}</el-col>
-        <el-col :span="4">提交人：</el-col><el-col :span="20">     {{ examineDetails.authorName }}</el-col>
-        <el-col :span="4">审批历史：</el-col><el-col :span="20">   {{ examineDetails.history }}</el-col>
+        <el-col :span="4">内容标题：</el-col><el-col :span="19">   {{ examineDetails.title }}</el-col>
+      </el-row>
+      <el-row class="details">
+        <el-col :span="4">内容分类：</el-col><el-col :span="19">   {{ examineDetails.category }}</el-col>
+      </el-row>
+      <el-row class="details">
+        <el-col :span="4">内容标签：</el-col><el-col :span="19">   {{ examineDetails.tag }}</el-col>
+      </el-row>
+      <el-row class="details">
+        <el-col :span="4">内容正文：</el-col><el-col :span="18" v-html="examineDetails.content">  </el-col>
+      </el-row>
+      <el-row class="details">
+        <el-col :span="4">创建时间：</el-col><el-col :span="19">   {{ examineDetails.updateTime }}</el-col>
+      </el-row>
+      <el-row class="details">
+        <el-col :span="4">提交人：</el-col><el-col :span="19">     {{ examineDetails.authorName }}</el-col>
+      </el-row>
+      <el-row class="details">
+        <el-col :span="4">审批历史：</el-col><el-col :span="19">   {{ examineDetails.history }}</el-col>
+
       </el-row>
 
       <div slot="footer" class="dialog-footer">
@@ -210,6 +223,7 @@ export default {
   .details{
     .el-col{
       line-height: 30px;
+      display: block;
     }
     .el-col-4{
       text-align: right;

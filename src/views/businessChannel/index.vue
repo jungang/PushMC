@@ -6,7 +6,7 @@
 
     <el-row>
       <div style="margin-top: 15px;">
-        <el-input v-model="keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-input v-model="searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </div>
     </el-row>
@@ -309,7 +309,7 @@ export default {
       options: [],
       options2: [],
       value: '',
-      keyword: '',
+      searchKey: '',
       tablesList: [],
       tableKey: 0,
       listLabel: [],
@@ -490,7 +490,7 @@ export default {
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.keyword).then(response => {
+      searchList(this.searchKey).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false

@@ -8,17 +8,17 @@ export function fetchList(query) {
   })
 }
 
-export function dele(id, status) {
+export function dele(data) {
   return request({
-    url: '/user/permission/delete',
+    url: '/user/role/delete',
     method: 'delete',
-    params: { id, status }
+    params: data
   })
 }
 
 export function create(data) {
   return request({
-    url: '/user/users',
+    url: '/user/role',
     method: 'put',
     data: data
   })

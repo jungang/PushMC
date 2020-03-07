@@ -1,13 +1,24 @@
 <template>
   <div>
 
-    <el-row>
-      tunnelId
+    <el-row style="margin-bottom: 10px">
+      通道（tunnelId）
       <el-select v-model="personsArr.tunnelId" placeholder="请选择" @change="handleFilter">
-        <el-option label="0" value="0" />
-        <el-option label="1" value="1" />
-        <el-option label="2" value="2" />
-        <el-option label="3" value="3" />
+        <el-option
+          v-for="item in tunnelArr"
+          :key="item.id"
+          :label="item.title"
+          :value="item.id"
+        />
+      </el-select>
+      域（domain）
+      <el-select v-model="personsArr.domain" placeholder="请选择" @change="handleFilter">
+        <el-option
+          v-for="item in domainArr"
+          :key="item.name"
+          :label="item.name"
+          :value="item.name"
+        />
       </el-select>
     </el-row>
 
@@ -17,10 +28,10 @@
         <el-row>
           <el-col :span="12">
 
-            <el-input
+            <!--            <el-input
               v-model="filterText"
               placeholder="输入关键字进行过滤"
-            />
+            />-->
 
             <el-tree
               ref="tree"
@@ -49,7 +60,7 @@
       <el-tab-pane label="按人员" name="personnel">
         <el-row style="margin-bottom: 10px">
           <el-col>
-            按人员姓名查找：<el-input v-model="personsArr.listQuery.keyword" placeholder="输入人员姓名，多个人员以 ，逗号间隔，录入王磊 , 李刚" clearable style="width: 400px" />
+            按人员姓名查找：<el-input v-model="personsArr.listQuery.searchKey" placeholder="输入人员姓名，多个人员以 ，逗号间隔，录入王磊 , 李刚" clearable style="width: 400px" />
             <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearchPersons">查询</el-button>
           </el-col>
         </el-row>
@@ -116,7 +127,7 @@
       </el-tab-pane>
     </el-tabs>
 
-    <el-row type="flex" justify="end">
+    <el-row type="flex" justify="end" style="margin-top: 10px; margin-bottom: 10px">
       <el-col :span="6">
         <el-button @click="addPersons">
           加入已选择
@@ -145,7 +156,8 @@
 <script>
 
 import Pagination from '@/components/Pagination'
-import { department, searchPersons } from '@/api/common'
+import { department, searchPersons, domain } from '@/api/common'
+import { pushChannelList } from '@/api/pushChannel'
 
 export default {
   name: 'PickPersons',
@@ -154,6 +166,10 @@ export default {
     data: {
       required: true,
       type: Array
+    },
+    tunnel: {
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -173,12 +189,15 @@ export default {
       plaza: [],
       listLoading: false,
       dynamicTags: [],
+      tunnelArr: [],
+      domainArr: [],
       personsArr: {
-        tunnelId: 2,
+        tunnelId: 1,
+        domain: '',
         items: [],
         total: 0,
         listQuery: {
-          keyword: '',
+          searchKey: '',
           page: 1,
           limit: 10
         }
@@ -194,34 +213,58 @@ export default {
     }
   },
   async created() {
-    // await this.getDepartmentData()
-    console.log('created...')
+    await this.getPushChannelList()
+    await this.getDomainList()
+    this.$nextTick(() => {
+      this.handleFilter()
+    })
   },
   mounted() {
     this.dynamicTags = this.data
   },
   methods: {
+    async getDomainList() {
+      domain({ tunnelId: this.personsArr.tunnelId }).then(res => {
+        this.domainArr = res.data.items
+        this.personsArr.domain = this.domainArr[0].name
+      })
+    },
+
+    async getPushChannelList() {
+      pushChannelList().then(res => {
+        this.tunnelArr = res.data.items
+        // console.log(this.tunnelArr)
+      })
+    },
     async handleFilter() {
       await this.getDepartmentData()
     },
     init(val) {
+      console.log('init......')
       this.dynamicTags = val
       this.plaza = []
       this.personsArr.items = []
+      this.personsArr.tunnelId = this.tunnel
       this.personsArr.total = 0
       this.tabTo = 'department'
       this.$refs.tree.setCheckedKeys([])
+      this.handleFilter()
     },
 
     getPersonsList() {
+      this.personsArr.listQuery.tunnelId = this.personsArr.tunnelId
       searchPersons(this.personsArr.listQuery).then(res => {
         this.personsArr.items = res.data.items
         this.personsArr.total = res.data.total
       })
     },
     async getDepartmentData() {
-      await department({ domain: 'xykj', tunnelId: this.personsArr.tunnelId }).then(response => {
-        // console.log('format..')
+      const data = {
+        domain: this.personsArr.domain || '',
+        tunnelId: this.personsArr.tunnelId
+      }
+      await department(data).then(response => {
+        console.log(response.data)
         this.departmentData = this.format(response.data)
       })
     },
@@ -231,12 +274,14 @@ export default {
       return resData
     },
     recursive(arr) {
+      if (!arr) return
       arr.forEach(item => {
         item.label = item.deptname || item.departname
-        item.id = item.pathid
+        item.id = item.deptid
 
         if (item.hasOwnProperty('personnel')) {
           item.persons = item.personnel.items
+          if (!item.persons) return
           item.persons.forEach(item => {
             item.name = item.truename
             // console.log(item)
@@ -263,6 +308,7 @@ export default {
     handleCheck(status, nodes) {
       nodes.checkedNodes.forEach((item) => {
         if (item.hasOwnProperty('persons')) {
+          if (!item.persons) return
           item.persons.forEach((person) => {
             this.treePersons.push(person)
           })
@@ -288,16 +334,28 @@ export default {
       this.getPersonsList()
     },
     handleSelectionChange(val) {
+      console.log(val)
       this.multipleSelection = val
     },
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
     },
     addPersons() {
-      this.dynamicTags = this.dynamicTags.concat(this.plaza)
-      this.dynamicTags = this.dynamicTags.concat(this.multipleSelection)
-
-      this.dynamicTags = Array.from(new Set(this.dynamicTags)) // 去重
+      const _arr = [...this.multipleSelection, ...this.plaza]
+      console.log(_arr)
+      _arr.forEach(item => {
+        item.userId = item.userId || item.userid
+        const v = this.dynamicTags.find(item2 => {
+          item2.userId = item2.userId || item2.userid
+          return item.userId === item2.userId
+        })
+        if (!v) this.dynamicTags.push(item)
+      })
+      // this.dynamicTags = this.dynamicTags.concat(this.plaza)
+      // this.dynamicTags = this.dynamicTags.concat(this.multipleSelection)
+      // this.dynamicTags = Array.from(new Set(this.dynamicTags)) // 去重*/
+      // console.log(this.plaza)
+      // console.log(this.dynamicTags)
     }
   }
 }

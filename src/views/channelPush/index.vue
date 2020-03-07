@@ -3,7 +3,7 @@
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="20">
-        <el-input v-model="listArr.listQuery.keyword" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-input v-model="listArr.listQuery.searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </el-col>
     </el-row>
@@ -596,7 +596,7 @@ export default {
       editorOption: {}, // base64
       isSubhead: false,
       isUrl: false,
-      keyword: '',
+      searchKey: '',
       tables: [],
       tableKey: 0,
       listType: [
@@ -727,9 +727,18 @@ export default {
       this.getChannel()
     },
     getChannel() {
-      this.temp.channel = this.channelListArr.items.find(item => item.id === this.temp.channelId)
+      console.log('getChannel...')
+
+      if (this.temp.tables) {
+        this.temp.channel = { ...this.temp }
+      } else {
+        this.temp.channel = this.channelListArr.items.find(item => item.id === this.temp.channelId)
+      }
+
       this.mainOptions = this.temp.channel.tables.find(item => item.id === this.temp.channel.mainResourceId).smColumns
+
       this.options = this.temp.channel.tables.filter(item => item.id !== this.temp.channel.mainResourceId).smColumns
+
       this.temp.tables = this.temp.channel.tables
       this.temp.tag = this.temp.channel.tag
       this.temp.tagId = this.temp.channel.tagId
@@ -748,9 +757,12 @@ export default {
       })
     },
     handleDialogOpened() {
-      const rows = this.channelTypeList.items.filter((item, index) => {
-        return this.temp.pushChannels.find((item2, index2) => item2.label === item.label)
+      // 通道信息
+      if (!this.temp.pushChannels) return
+      const rows = this.channelTypeList.items.filter((item) => {
+        return this.temp.pushChannels.find((item2) => item2.label === item.label)
       })
+
       this.pushChannelSelection(rows)
     },
     pushChannelSelection(rows) {
@@ -770,7 +782,10 @@ export default {
     },
     handleAddRule() {
       console.log(this.temp.rules)
-      console.log(this.temp)
+      // todo 缺少频道包含的规则信息
+
+      this.temp.rules = this.temp.rules || []
+
       this.temp.rules.push({
         item1: { value: '', tableKey: '', tableName: '' },
         item2: { value: '', tableKey: '', tableName: '' },
@@ -914,24 +929,22 @@ export default {
     },
 
     handleView(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      // console.log(row.subhead)
-      this.isSubhead = !!row.subhead
-      this.isUrl = !this.url
-
-      this.dialogStatus = 'view'
-
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      detail({ id: row.id }).then((res) => {
+        this.temp = res.data
+        this.temp.channel = res.data
+        this.getChannel()
+        this.dialogStatus = 'view'
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
       })
     },
 
     handleUpdate(row, opt) {
       detail({ id: row.id }).then((res) => {
         this.temp = res.data
-
+        this.temp.channel = res.data
         this.getChannel()
         this.dialogStatus = opt || 'update'
         this.dialogFormVisible = true

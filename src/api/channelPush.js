@@ -1485,7 +1485,7 @@ export function searchList(keyWord) {
   return request({
     url: '/channel-push/list',
     method: 'get',
-    params: { word: keyWord }
+    params: { searchKey: keyWord }
   })
 }
 
