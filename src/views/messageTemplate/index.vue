@@ -84,105 +84,11 @@
       width="800"
       @close="dialogClose"
     >
+
       <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
-        <el-form-item label="消息模版" prop="templateKey">
-          <el-radio v-model="temp.type" label="template"> 图文消息 </el-radio>
-          <el-radio v-model="temp.type" label="text"> 文本消息 </el-radio>
-        </el-form-item>
-        <el-form-item label="模板名称" prop="title">
-          <el-input v-model="temp.title" style="width:400px" />
-        </el-form-item>
-        <el-form-item v-if="temp.type==='text'" label="URL" prop="title">
-          <el-checkbox v-model="temp.url" />
-          <el-input v-model="temp.url" style="width:400px" />
-        </el-form-item>
-        <el-row>
-          <el-col align="right">
-            <el-button size="mini" @click="previewVisible = true">查看预览</el-button>
-          </el-col>
-        </el-row>
-        <el-form-item v-if="temp.type==='template'" label="">
-          <el-row>
-            <el-col>
-
-              <div class="preview">
-                <div class="top">
-                  <el-select v-model="temp.templateContent.arg1" placeholder="+选择推送字段">
-                    <el-option
-                      v-for="item in temp.argTags"
-                      :key="item.path"
-                      :label="item.pathTitle"
-                      :value="item.path"
-                    />
-                  </el-select>
-                </div>
-
-                <div class="img">
-                  <el-upload
-                    class="uploader"
-                    action="http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload"
-                    :show-file-list="false"
-                    :on-success="handleSuccess"
-                  >
-                    <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
-                  </el-upload>
-                  <img :src="temp.templateContent.img" alt="">
-                </div>
-
-                <el-row>
-                  <el-col :span="12">
-                    <el-select v-model="temp.templateContent.arg2" placeholder="+选择推送字段">
-                      <el-option
-                        v-for="item in temp.argTags"
-                        :key="item.path"
-                        :label="item.pathTitle"
-                        :value="item.path"
-                      />
-                    </el-select>
-                  </el-col>
-                  <el-col :span="12">
-                    <el-select v-model="temp.templateContent.arg3" placeholder="+选择推送字段">
-                      <el-option
-                        v-for="item in temp.argTags"
-                        :key="item.path"
-                        :label="item.pathTitle"
-                        :value="item.path"
-                      />
-                    </el-select>
-                  </el-col>
-                </el-row>
-
-                <div class="url">
-                  <el-input v-model="temp.templateContent.url" placeholder="+推送URL" />
-                </div>
-              </div>
-
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item v-if="temp.type==='text'" label="内容标签" prop="content">
-          <el-row class="btn">
-            <el-button v-for="tag in temp.argTags" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
-          </el-row>
-
-          <textarea
-            id="textarea"
-            ref="myQuillEditor"
-            v-model="temp.content"
-            autocomplete="off"
-            type="textarea"
-            :rows="5"
-            placeholder="请输入内容"
-            style="width: 100%"
-          />
-          <el-row>
-            <el-col align="right">
-              图文消息模版，不支持自定义内容输入
-            </el-col>
-          </el-row>
-        </el-form-item>
-
+        <Templates :tmp="temp.tmp" :tables="temp.tables" />
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
@@ -191,7 +97,8 @@
           完成
         </el-button>
       </div>
-      <el-dialog
+
+      <!--      <el-dialog
         :id="`messageTemplatePreview`"
         width="30%"
         title="预览"
@@ -212,7 +119,7 @@
           王经理，您好！感谢您的来电咨询！品牌销售顾问—成功为您服务，欢迎您的来店亲临体验！祝您及家人身体健康，事事如意！
         </div>
 
-      </el-dialog>
+      </el-dialog>-->
 
     </el-dialog>
   </div>
@@ -220,13 +127,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, searchList, detail, changeStatus, create, updateSource, dele } from '@/api/messageTemplate'
+import { fetchList, searchList, detail, changeStatus, updateSource, dele } from '@/api/messageTemplate'
 import { channelDetail } from '@/api/businessChannel'
+import Templates from '@/components/Templates'
 import Pagination from '@/components/Pagination'
 
 export default {
   name: 'PushContent',
-  components: { Pagination },
+  components: { Pagination, Templates },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -263,13 +171,6 @@ export default {
       temp: {
         id: undefined,
         category: '',
-        templateContent: {
-          arg1: '',
-          arg2: '',
-          arg3: '',
-          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          url: ''
-        },
         origin: 'CUSTOM',
         status: 'enabled',
         title: '',
@@ -364,14 +265,21 @@ export default {
       this.isUrl = false
       this.temp = {
         id: undefined,
-        status: 'enabled',
-        templateContent: {
-          arg1: '',
-          arg2: '',
-          arg3: '',
-          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          url: ''
+        tmp: {
+          title: '',
+          templateType: 'template',
+          content: '',
+          templateContent: {
+            arg1: '',
+            arg2: '',
+            arg3: '',
+            img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+            url: ''
+          },
+          isURL: false,
+          templateURL: ''
         },
+        status: 'enabled',
         origin: 'CUSTOM',
         title: '',
         content: '{内容标题}'
@@ -386,49 +294,18 @@ export default {
         this.listLoading = false
       })
     },
-    handleCreate(type) {
-      this.resetTemp()
 
-      if (type === 'text') {
-        this.temp.type = 'text'
-        this.temp.content = '{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }'
-      } else {
-        this.temp.type = 'template'
-      }
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          create(this.temp).then(() => {
-            this.getList()
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '完成',
-              message: '新建',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
-    },
     handleUpdate(row) {
       detail({ id: row.id }).then((res) => {
-        this.temp = { ...this.temp, ...res.data }
         channelDetail({ id: row.channelId }).then((res) => {
-          this.temp.channel = res.data
-        })
-
-        console.log(this.temp)
-        this.dialogStatus = 'update'
-        this.dialogFormVisible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].clearValidate()
+          this.resetTemp()
+          this.temp = { ...this.temp, ...res.data }
+          console.log(this.temp)
+          this.dialogStatus = 'update'
+          this.dialogFormVisible = true
+          this.$nextTick(() => {
+            this.$refs['dataForm'].clearValidate()
+          })
         })
       })
     },

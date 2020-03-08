@@ -36,10 +36,9 @@
         </el-table-column>
         <el-table-column label="频道推送状态" align="center" min-width="50">
           <template slot-scope="{row}">
-
-            <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
-              {{ row.status === 'pushed' ? '已推送': '未推送' }}
-            </el-tag>
+            <span :style="{color:row.pushStatus === 'pushed'?'green':'red'}">
+              {{ row.pushStatus === 'pushed' ? '已推送': '未推送' }}
+            </span>
           </template>
         </el-table-column>
         <el-table-column label="业务频道名称" prop="type" width="300" align="center" min-width="50">
@@ -49,7 +48,7 @@
         </el-table-column>
         <el-table-column label="标签" align="center" min-width="100">
           <template slot-scope="{row}">
-            <el-tag>{{ row.tag }}</el-tag>
+            {{ row.tag }}
           </template>
         </el-table-column>
         <el-table-column label="来源" align="center" min-width="100">
@@ -60,7 +59,7 @@
 
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button :disabled="row.status==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button :disabled="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
 
@@ -72,19 +71,19 @@
               :title="'删除 '+row.title + '?'"
               @onConfirm="handleDelete(row,'deleted')"
             >
-              <el-button slot="reference" :disabled="row.status==='pushed'" type="danger" size="mini">删除</el-button>
+              <el-button slot="reference" :disabled="row.pushStatus==='pushed'" type="danger" size="mini">删除</el-button>
             </el-popconfirm>
 
             <el-button type="primary" size="mini" @click="handleUpdate(row, 'copy')">
               复制
             </el-button>
-            <el-button type="primary" size="mini" @click="handleView(row)">
+            <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
               查看
             </el-button>
-            <el-button v-if="row.status==='notPush'" type="primary" size="mini" @click="handleUpdate(row,'push')">
+            <el-button v-if="row.pushStatus==='notuse'" type="primary" size="mini" @click="handleUpdate(row,'push')">
               推送
             </el-button>
-            <el-button v-if="row.status==='pushed'" type="primary" size="mini" @click="handleUnPush(row, false)">
+            <el-button v-if="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUnPush(row, false)">
               取消推送
             </el-button>
           </template>
@@ -341,103 +340,9 @@
 
         </el-form-item>
 
-        <el-form-item label="消息模版" prop="templateKey">
-          <el-radio v-model="temp.templateType" label="template"> 图文消息 </el-radio>
-          <el-radio v-model="temp.templateType" label="text"> 文本消息 </el-radio>
-        </el-form-item>
-        <el-form-item label="模板名称" prop="title">
-          <el-input v-model="temp.templateTitle" style="width:400px" />
-        </el-form-item>
-        <el-form-item v-if="temp.templateType==='text'" label="URL" prop="title">
-          <el-checkbox v-model="temp.isURL" />
-          <el-input v-model="temp.templateURL" style="width:400px" />
-        </el-form-item>
-        <el-row>
-          <el-col align="right">
-            <el-button size="mini" @click="previewVisible = true">查看预览</el-button>
-          </el-col>
-        </el-row>
-        <el-form-item v-if="temp.templateType==='template'" label="">
-          <el-row>
-            <el-col>
-
-              <div class="preview">
-                <div class="top">
-                  <el-select v-model="temp.templateContent.arg1" placeholder="+选择推送字段">
-                    <el-option
-                      v-for="item in mainOptions"
-                      :key="item.id"
-                      :label="item.pathTitle"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </div>
-
-                <div class="img">
-                  <el-upload
-                    class="uploader"
-                    action="http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload"
-                    :show-file-list="false"
-                    :on-success="handleSuccess"
-                  >
-                    <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
-                  </el-upload>
-                  <img :src="temp.templateContent.img" alt="">
-                </div>
-
-                <el-row>
-                  <el-col :span="12">
-                    <el-select v-model="temp.templateContent.arg2" placeholder="+选择推送字段">
-                      <el-option
-                        v-for="item in mainOptions"
-                        :key="item.id"
-                        :label="item.pathTitle"
-                        :value="item.id"
-                      />
-                    </el-select>
-                  </el-col>
-                  <el-col :span="12">
-                    <el-select v-model="temp.templateContent.arg3" placeholder="+选择推送字段">
-                      <el-option
-                        v-for="item in mainOptions"
-                        :key="item.id"
-                        :label="item.pathTitle"
-                        :value="item.id"
-                      />
-                    </el-select>
-                  </el-col>
-                </el-row>
-
-                <div class="url">
-                  <el-input v-model="temp.templateContent.url" placeholder="+推送URL" />
-                </div>
-              </div>
-
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item v-if="temp.templateType==='text'" label="内容标签" prop="content">
-          <el-row class="btn">
-            <el-button v-for="tag in temp.argTags" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
-          </el-row>
-
-          <textarea
-            id="textarea"
-            ref="myQuillEditor"
-            v-model="temp.content"
-            autocomplete="off"
-            type="textarea"
-            :rows="5"
-            placeholder="请输入内容"
-            style="width: 100%"
-          />
-
-          <el-row>
-            <el-col align="right">
-              图文消息模版，不支持自定义内容输入
-            </el-col>
-          </el-row>
-        </el-form-item>
+        <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
+          <Templates :tmp="temp.tmp" :tables="temp.tables" />
+        </el-form>
 
         <el-form-item label="推送时间" prop="templateKey">
           <el-radio v-model="temp.pushPlan" label="instant">实时</el-radio>
@@ -536,18 +441,19 @@
 import { mapGetters } from 'vuex'
 import { copyChannel, createSource, dele, fetchList, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
+import Templates from '@/components/Templates'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
 
 export default {
   name: 'ChannelPush',
-  components: { Pagination },
+  components: { Pagination, Templates },
   filters: {
     statusFilter(status) {
       const statusMap = {
         pushed: 'success',
-        notPush: 'danger',
+        notuse: 'danger',
         enabled: 'success',
         disabled: 'danger'
       }
@@ -619,15 +525,22 @@ export default {
       listLoading: true,
       temp: {
         id: undefined,
-        templateType: 'template',
-        templateContent: {
-          arg1: '',
-          arg2: '',
-          arg3: '',
-          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          url: ''
+        tmp: {
+          title: '',
+          templateType: 'template',
+          content: '',
+          templateContent: {
+            arg1: '',
+            arg2: '',
+            arg3: '',
+            img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+            url: ''
+          },
+          isURL: false,
+          templateURL: ''
         },
         argTags: [],
+        tables: [],
         channel: {
           tables: []
         },
@@ -727,17 +640,15 @@ export default {
       this.getChannel()
     },
     getChannel() {
-      console.log('getChannel...')
+      this.temp.channel = this.channelListArr.items.find(item => item.id === this.temp.channelId)
 
-      if (this.temp.tables) {
-        this.temp.channel = { ...this.temp }
+      if (this.temp.channel.tables.length > 0) {
+        this.mainOptions = this.temp.channel.tables.find(item => item.id === this.temp.channel.mainResourceId).smColumns
+        this.options = this.temp.channel.tables.filter(item => item.id !== this.temp.channel.mainResourceId).smColumns
       } else {
-        this.temp.channel = this.channelListArr.items.find(item => item.id === this.temp.channelId)
+        this.mainOptions = []
+        this.options = []
       }
-
-      this.mainOptions = this.temp.channel.tables.find(item => item.id === this.temp.channel.mainResourceId).smColumns
-
-      this.options = this.temp.channel.tables.filter(item => item.id !== this.temp.channel.mainResourceId).smColumns
 
       this.temp.tables = this.temp.channel.tables
       this.temp.tag = this.temp.channel.tag
@@ -748,12 +659,19 @@ export default {
     getChannelList() {
       channelList().then(response => {
         this.channelListArr = response.data
+        if (!this.channelListArr) {
+          this.$notify({
+            title: '错误',
+            message: '未读取频道列表',
+            type: 'error',
+            duration: 2000
+          })
+        }
       })
     },
     getGroups() {
       groups().then(response => {
         this.groupsArr = response.data
-        console.log(this.groupsArr)
       })
     },
     handleDialogOpened() {
@@ -809,7 +727,6 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listArr.listQuery).then(response => {
-        console.log(response)
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -841,14 +758,21 @@ export default {
       this.isUrl = false
       this.temp = {
         id: undefined,
-        templateType: 'template',
-        templateContent: {
-          arg1: '',
-          arg2: '',
-          arg3: '',
-          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          url: ''
+        tmp: {
+          title: '',
+          templateType: 'template',
+          content: '',
+          templateContent: {
+            arg1: '',
+            arg2: '',
+            arg3: '',
+            img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+            url: ''
+          },
+          isURL: false,
+          templateURL: ''
         },
+        tables: [],
         argTags: [],
         channel: {
           tables: []
@@ -897,12 +821,14 @@ export default {
     handleUnPush(row, opt) {
       unPush(row.id, opt).then(response => {
         this.listLoading = false
-        row.status = opt ? 'pushed' : 'notPush'
+        row.status = opt ? 'pushed' : 'notuse'
         console.log(response)
       })
     },
     handleCreate() {
       this.resetTemp()
+      console.log('resetTemp...')
+      console.log(this.temp)
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -943,8 +869,23 @@ export default {
 
     handleUpdate(row, opt) {
       detail({ id: row.id }).then((res) => {
-        this.temp = res.data
+        this.resetTemp()
+        this.temp = { ...this.temp, ...res.data }
         this.temp.channel = res.data
+
+        this.temp.templateType = this.temp.templateType || 'template'
+        this.temp.templateContent = this.temp.templateContent || {
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+          url: ''
+        }
+
+        this.temp.channelId = this.temp.channelId || this.temp.mainResourceId
+        console.log(this.temp)
+        console.log(this.temp.channelId)
+
         this.getChannel()
         this.dialogStatus = opt || 'update'
         this.dialogFormVisible = true

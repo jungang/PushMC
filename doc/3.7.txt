@@ -1,7 +1,14 @@
 
+数据标注：
+
 
 待解决问题---
 新建角色
 http://172.20.96.205/jira/browse/ZNP-16?filter=-1
 
 推送对象-启用\禁用状态更改未成功
+
+
+业务频道
+    列表接口抛错（无规律）
+    http://localhost:8080/dev-api/business-channel/list?page=1&limit=20&sort=%2Bid

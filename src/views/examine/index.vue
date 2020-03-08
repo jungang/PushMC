@@ -77,7 +77,7 @@
         <el-col :span="4">内容标签：</el-col><el-col :span="19">   {{ examineDetails.tag }}</el-col>
       </el-row>
       <el-row class="details">
-        <el-col :span="4">内容正文：</el-col><el-col :span="18" v-html="examineDetails.content">  </el-col>
+        <el-col :span="4">内容正文：</el-col><el-col :span="18" v-html="examineDetails.content" />
       </el-row>
       <el-row class="details">
         <el-col :span="4">创建时间：</el-col><el-col :span="19">   {{ examineDetails.updateTime }}</el-col>

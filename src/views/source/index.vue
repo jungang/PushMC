@@ -3,7 +3,7 @@
     <el-row>
       数据源列表
     </el-row>
-    <el-row type="flex" justify="end">
+    <el-row type="flex" justify="end" style="margin-bottom: 10px">
       <el-button type="primary" @click="handleCreate">新建数据源</el-button>
     </el-row>
     <el-table

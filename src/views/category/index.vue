@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <el-row type="flex" justify="end">
+    <el-row type="flex" justify="end" style="margin-bottom: 10px">
       <el-button type="primary" @click="handleCreateCategory">添加分类</el-button>
       <el-button type="primary" @click="handleCreateTag">添加标签</el-button>
     </el-row>
@@ -26,7 +26,7 @@
         </el-table-column>
         <el-table-column label="分类" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.categoryId }}</span>
+            <span>{{ row.category }}</span>
           </template>
         </el-table-column>
         <el-table-column label="标签来源" align="center" min-width="50">
@@ -68,13 +68,13 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item v-if="dialogStatus==='create'" label="输入标签名" prop="title">
+        <el-form-item label="输入标签名" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
         <el-form-item label="选择分类" prop="categoryId">
           <el-select v-model="temp.categoryId" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in listArr.data" :key="item.id" :label="item.title" :value="item.id" />
+            <el-option v-for="item in categoryArr" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
 
@@ -109,7 +109,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, createTag, saveCategory, updateTag, dele } from '@/api/category'
+import { fetchList, createTag, saveCategory, fetchCategory, updateTag, dele } from '@/api/category'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 
@@ -129,6 +129,7 @@ export default {
   data() {
     return {
       tableKey: 0,
+      categoryArr: [],
       listArr: {
         data: [],
         total: 0,
@@ -189,6 +190,11 @@ export default {
         this.listLoading = false
       })
     },
+    getCategory() {
+      fetchCategory().then(response => {
+        this.categoryArr = response.data.items
+      })
+    },
     handleFilter() {
       this.listArr.listQuery.page = 1
       this.getList()
@@ -205,10 +211,14 @@ export default {
       }
     },
     handleCreateCategory() {
+      this.temp.title = ''
       this.dialogStatus = 'create'
       this.dialogCategoryVisible = true
     },
+
     handleCreateTag() {
+      this.getCategory()
+
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -219,7 +229,9 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.category = this.listArr.data.find(item => {
+          console.log(this.temp)
+          console.log(this.categoryArr)
+          this.temp.category = this.categoryArr.find(item => {
             if (item.id === this.temp.categoryId) {
               return item
             }
@@ -252,6 +264,7 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.getCategory()
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -275,13 +288,7 @@ export default {
           ).title
 
           updateTag(tempData).then(() => {
-            for (const v of this.listArr.data) {
-              if (v.id === this.temp.id) {
-                const index = this.listArr.data.indexOf(v)
-                this.listArr.data.splice(index, 1, this.temp)
-                break
-              }
-            }
+            this.getList()
             this.dialogFormVisible = false
             this.$notify({
               title: '完成',

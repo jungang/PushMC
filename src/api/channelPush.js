@@ -1523,14 +1523,14 @@ export function createSource(data) {
 
 export function updateChannel(data) {
   return request({
-    url: '/channel-push/update',
-    method: 'put',
+    url: '/business-channel/update',
+    method: 'post',
     data: data
   })
 }
 export function copyChannel(data) {
   return request({
-    url: '/channel-push/copy',
+    url: '/business-channel/copy',
     method: 'post',
     data: data
   })
@@ -1538,7 +1538,7 @@ export function copyChannel(data) {
 
 export function push(data) {
   return request({
-    url: '/channel-push/push',
+    url: '/business-channel/push',
     method: 'post',
     data: data
   })
