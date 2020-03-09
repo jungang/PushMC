@@ -47,7 +47,8 @@
           </XcomTagTransfer>
 
           <el-row style="margin-top: 20px">
-            <el-button>取消</el-button>
+            <router-link to="/data-tag/list"><el-button>取消</el-button></router-link>
+
             <el-button type="primary" @click="openDailog">保存并应用</el-button>
           </el-row>
         </div>

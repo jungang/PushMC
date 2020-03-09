@@ -188,37 +188,37 @@
           </el-table-column>
           <el-table-column label="渠道推送名称" prop="title" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.title }}</span>
+              <span>{{ row.channelTitle }}</span>
             </template>
           </el-table-column>
           <el-table-column label="渠道类型" prop="title" align="center">
             <template slot-scope="{row}">
-              <span>{{ row.pipeType }}</span>
+              <span>{{ row.pushType }}</span>
             </template>
           </el-table-column>
           <el-table-column label="渠道标签" prop="channelTag" align="center" min-width="100">
             <template slot-scope="{row}">
-              <span>{{ row.pipeTag }}</span>
+              <span>{{ row.channelLabel }}</span>
             </template>
           </el-table-column>
           <el-table-column label="推送匹配" align="center" min-width="50">
             <template slot-scope="{row}">
-              <span>{{ row.pushMatched }}</span>
+              <span>{{ row.channelMappingNum }}</span>
             </template>
           </el-table-column>
           <el-table-column label="推送状态" align="center" min-width="50">
             <template slot-scope="{row}">
-              <span>{{ row.pushStatus }}</span>
+              <span>{{ row.channelPushStatus }}</span>
             </template>
           </el-table-column>
           <el-table-column label="推送成功" align="center" min-width="50">
             <template slot-scope="{row}">
-              <span>{{ row.pushSucceed }}</span>
+              <span>{{ row.channelSuccessNum }}</span>
             </template>
           </el-table-column>
           <el-table-column label="推送失败" align="center" min-width="50">
             <template slot-scope="{row}">
-              <span>{{ row.pushFailed }}</span>
+              <span>{{ row.channelFailNum }}</span>
             </template>
           </el-table-column>
           <el-table-column label="推送确认" align="center" min-width="50">
@@ -228,7 +228,7 @@
           </el-table-column>
           <el-table-column label="最近推送" align="center" min-width="100">
             <template slot-scope="{row}">
-              <span>{{ row.lastPushTime }}</span>
+              <span>{{ row.channelListTime }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" min-width="50" class-name="small-padding fixed-width">
@@ -348,7 +348,7 @@ export default {
           title: undefined,
           type: undefined,
           sort: '+id',
-          pushType: 1,
+          pushType: 'business',
           group: 'default'
         }
       },
@@ -362,7 +362,7 @@ export default {
           title: undefined,
           type: undefined,
           sort: '+id',
-          pushType: 1,
+          pushType: 'content',
           group: 'default'
         }
       },
@@ -376,7 +376,7 @@ export default {
           title: undefined,
           type: undefined,
           sort: '+id',
-          pushType: 3,
+          pushType: 'channel',
           group: 'default'
         }
       },

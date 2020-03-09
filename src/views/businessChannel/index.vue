@@ -6,7 +6,7 @@
 
     <el-row>
       <div style="margin-top: 15px;">
-        <el-input v-model="searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+        <el-input v-model="listArr.listQuery.searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </div>
     </el-row>
@@ -83,7 +83,7 @@
             <el-input v-model="temp.title" style="width:400px" />
           </el-form-item>
 
-          <el-form-item label="选择数据源" prop="businessSource">
+          <el-form-item label="选择数据源" prop="resourceId">
             <el-select
               v-model="temp.resourceId"
               class="filter-item"
@@ -122,7 +122,7 @@
             <el-button type="primary" @click="handleAdd">加入已选</el-button>
           </el-row>
 
-          <el-form-item label="*已选全部数据表：">
+          <el-form-item label="已选全部数据表:" prop="mainTable">
 
             <el-table
               ref="singleTable"
@@ -169,7 +169,7 @@
 
           </el-form-item>
 
-          <el-form-item label="选择标签" prop="tag">
+          <el-form-item label="选择标签" prop="tagId">
             <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
               <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
             </el-select>
@@ -198,15 +198,15 @@
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
+                <el-select v-model="row.mainColumnPath" placeholder="请选择" style="width:50%">
                   <el-option
                     v-for="item in mainOptions"
                     :key="item.id"
-                    :label="item.title"
-                    :value="item.id"
+                    :label="item.pathTitle"
+                    :value="item.path"
                   />
                 </el-select>
-                <el-input v-model="row.item1.value" placeholder="请输入内容" style="width:45%" />
+                <el-input v-if="!options.length" v-model="row.valueResourceId" placeholder="请输入内容" style="width:45%" />
               </template>
             </el-table-column>
             <el-table-column
@@ -216,7 +216,7 @@
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.operation1" :disabled="options.length===0" placeholder="请选择" style="width: 100px">
+                <el-select v-model="row.expression" :disabled="options.length===0" placeholder="请选择" style="width: 100px">
                   <el-option
                     v-for="item in ruleOptions"
                     :key="item.value"
@@ -225,14 +225,21 @@
                   />
                 </el-select>
               </template>
-            </el-table-column>            <el-table-column
+            </el-table-column>
+            <el-table-column
               prop="name"
               label="选择数据项"
               width="300"
               align="center"
             >
               <template slot-scope="{row}">
-                <el-select v-model="row.item2.tableName" :disabled="options.length===0" placeholder="请选择" style="width:50%">
+                <el-select
+                  v-model="row.pathTitle"
+                  :disabled="options.length===0"
+                  placeholder="请选择"
+                  style="width:50%"
+                  @change="handleSel(row)"
+                >
                   <el-option
                     label="常量"
                     value="-2"
@@ -240,11 +247,10 @@
                   <el-option
                     v-for="item in options"
                     :key="item.id"
-                    :label="item.title"
-                    :value="item.id"
+                    :label="item.pathTitle"
+                    :value="`${item.pathTitle}--${item.path}--${item.resourceId}`"
                   />
                 </el-select>
-                <el-input v-model="row.valueColumnPath" placeholder="请输入内容" style="width:45%" />
               </template>
             </el-table-column>
 
@@ -280,7 +286,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, channelDetail, searchList, createSource, update, dele } from '@/api/businessChannel'
+import { fetchList, channelDetail, createSource, update, dele } from '@/api/businessChannel'
 import { fetchLabel } from '@/api/category'
 import { fetchSourceList, fetchSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
@@ -322,7 +328,7 @@ export default {
           limit: 20,
           importance: undefined,
           title: undefined,
-          type: undefined,
+          searchKey: '',
           sort: '+id'
         }
       },
@@ -346,12 +352,18 @@ export default {
         create: '新建'
       },
       rules: {
-        category: [
+        resourceId: [
           { required: true, message: '请选择分类', trigger: 'change' }
         ],
         title: [
           { required: true, message: '标签名称不能为空', trigger: 'blur' },
           { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        mainTable: [
+          { required: true, message: '请选择数据表和主表', trigger: 'blur' }
+        ],
+        tagId: [
+          { required: true, message: '请选择标签', trigger: 'blur' }
         ]
       }
     }
@@ -427,6 +439,13 @@ export default {
     filter() {
       this.getTables()
     },
+    handleSel(val) {
+      console.log(val)
+
+      val.valueResourceId = val.pathTitle.split('--')[2]
+      val.valueColumnPath = val.pathTitle.split('--')[1]
+      val.pathTitle = val.pathTitle.split('--')[0]
+    },
     handleTableDelete(row) {
       console.log(row)
       const index = this.temp.tables.indexOf(row)
@@ -490,11 +509,8 @@ export default {
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.searchKey).then(response => {
-        this.listArr.data = response.data.items
-        this.listArr.total = response.data.total
-        this.listLoading = false
-      })
+
+      this.getList()
     },
     handleCreate() {
       this.resetTemp()
@@ -531,13 +547,13 @@ export default {
     },
     handleAddRule() {
       this.temp.rules.push({
-        item1: { value: '', tableKey: '', tableName: '' },
-        item2: { value: '', tableKey: '', tableName: '' },
-        item3: { value: '', tableKey: '', tableName: '' },
-        operation1: '==',
-        operation2: '=='
+        expression: 'equal',
+        mainColumnPath: '',
+        mainResourceId: this.temp.mainResourceId,
+        valueColumnPath: '',
+        valueResourceId: -2
       })
-      // console.log(this.temp.rules)
+      console.log(this.temp.rules)
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {

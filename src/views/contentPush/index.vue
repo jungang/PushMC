@@ -13,8 +13,7 @@
         业务频道列表：
       </el-col>
       <el-col :span="8" align="right">
-        <el-button type="primary" @click="showSubscribePanel">频道订阅</el-button>
-        <el-button type="primary" @click="handleCreate">+自定义业务频道</el-button>
+        <el-button type="primary" @click="handleCreate">+新建内容推送</el-button>
       </el-col>
     </el-row>
 
@@ -34,7 +33,7 @@
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="频道推送状态" align="center" min-width="50">
+        <el-table-column label="频道推送状态" align="center" min-width="100">
           <template slot-scope="{row}">
             <span :style="{color:row.pushStatus === 'pushed'?'green':'red'}">
               {{ row.pushStatus === 'pushed' ? '已推送': '未推送' }}
@@ -385,55 +384,6 @@
       </div>
     </el-dialog>
 
-    <el-dialog
-      title="频道订阅"
-      :visible.sync="dialogFormSubscribe"
-    >
-
-      <template>
-        <el-table
-          :data="channelSubscribeList.data"
-          stripe
-          border
-          style="width: 100%"
-        >
-          <el-table-column
-            prop="status"
-            label="订阅状态"
-          >
-            <template slot-scope="{row}">
-              <span>{{ row.bookStatus? '已订阅':'未订阅' }}</span>
-            </template>
-
-          </el-table-column>
-
-          <el-table-column
-            prop="title"
-            label="频道名称"
-          />
-          <el-table-column
-            align="center"
-            label="操作"
-          >
-            <template slot-scope="{row}">
-              <el-button v-if="row.bookStatus" type="danger" size="mini" @click="handleSubscribe(row,false)">
-                取消订阅
-              </el-button>
-              <el-button v-else type="primary" size="mini" @click="handleSubscribe(row,true)">
-                订阅
-              </el-button>
-            </template>
-
-          </el-table-column>
-        </el-table>
-      </template>
-
-      <span slot="footer" class="dialog-footer">
-        <!--        <el-button @click="dialogFormSubscribe = false">取 消</el-button>-->
-        <el-button type="primary" @click="closeSubscribe">关闭</el-button>
-      </span>
-    </el-dialog>
-
   </div>
 </template>
 
@@ -442,7 +392,7 @@ import { mapGetters } from 'vuex'
 import { copyChannel, createSource, dele, fetchList, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import Templates from '@/components/Templates'
-import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
+import { channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
 
@@ -473,7 +423,7 @@ export default {
           limit: 20,
           importance: undefined,
           title: undefined,
-          type: undefined,
+          type: 'content',
           sort: '+id'
         }
       },
@@ -518,7 +468,7 @@ export default {
           limit: 20,
           importance: undefined,
           title: undefined,
-          type: undefined,
+          type: 'content',
           sort: '+id'
         }
       },
@@ -582,16 +532,10 @@ export default {
     this.getList()
     this.getChannelList()
     this.getChannelTypeList()
-    this.getChannelSubscribe()
     this.getPushTemplateList()
     this.getGroups()
   },
   methods: {
-    closeSubscribe() {
-      this.dialogFormSubscribe = false
-      this.getList()
-      this.getChannelSubscribe()
-    },
     handleSuccess(res, file) {
       this.temp.templateContent.img = res.url
     },
@@ -654,7 +598,7 @@ export default {
       this.temp.tag = this.temp.channel.tag
       this.temp.tagId = this.temp.channel.tagId
       this.temp.mainResourceId = this.temp.channel.mainResourceId
-      this.temp.pushType = 'business'
+      this.temp.pushType = 'content'
     },
     getChannelList() {
       channelList().then(response => {
@@ -736,13 +680,6 @@ export default {
       this.listLoading = true
       channelType().then(response => {
         this.channelTypeList = response.data
-        this.listLoading = false
-      })
-    },
-    getChannelSubscribe() {
-      this.listLoading = true
-      channelSubscribe(this.channelSubscribeList.listQuery).then(response => {
-        this.channelSubscribeList.data = response.data.items
         this.listLoading = false
       })
     },

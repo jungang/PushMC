@@ -3,7 +3,7 @@
 
     <el-row style="margin-bottom: 10px">
       通道（tunnelId）
-      <el-select v-model="personsArr.tunnelId" placeholder="请选择" @change="handleFilter">
+      <el-select v-model="personsArr.tunnelId" placeholder="请选择" style="width:150px" @change="handleFilter">
         <el-option
           v-for="item in tunnelArr"
           :key="item.id"
@@ -12,7 +12,7 @@
         />
       </el-select>
       域（domain）
-      <el-select v-model="personsArr.domain" placeholder="请选择" @change="handleFilter">
+      <el-select v-model="personsArr.domain" placeholder="请选择" style="width:150px" @change="handleFilter">
         <el-option
           v-for="item in domainArr"
           :key="item.name"
@@ -233,11 +233,13 @@ export default {
     async getPushChannelList() {
       pushChannelList().then(res => {
         this.tunnelArr = res.data.items
-        // console.log(this.tunnelArr)
+        console.log(this.tunnelArr)
       })
     },
-    async handleFilter() {
-      await this.getDepartmentData()
+    handleFilter() {
+      this.departmentData = []
+      // this.dynamicTags = []
+      this.getDepartmentData()
     },
     init(val) {
       console.log('init......')
@@ -248,11 +250,13 @@ export default {
       this.personsArr.total = 0
       this.tabTo = 'department'
       this.$refs.tree.setCheckedKeys([])
-      this.handleFilter()
+      // this.handleFilter()
     },
 
     getPersonsList() {
       this.personsArr.listQuery.tunnelId = this.personsArr.tunnelId
+      this.personsArr.listQuery.domain = this.personsArr.domain
+
       searchPersons(this.personsArr.listQuery).then(res => {
         this.personsArr.items = res.data.items
         this.personsArr.total = res.data.total
@@ -264,8 +268,9 @@ export default {
         tunnelId: this.personsArr.tunnelId
       }
       await department(data).then(response => {
-        console.log(response.data)
         this.departmentData = this.format(response.data)
+        console.log('department...')
+        console.log(this.departmentData)
       })
     },
     format(data) {
@@ -274,7 +279,7 @@ export default {
       return resData
     },
     recursive(arr) {
-      if (!arr) return
+      if (!arr) return []
       arr.forEach(item => {
         item.label = item.deptname || item.departname
         item.id = item.deptid
@@ -293,7 +298,6 @@ export default {
           this.recursive(item.children)
         }
       })
-
       return arr
     },
     filterNode(value, data) {

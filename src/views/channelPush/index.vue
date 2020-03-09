@@ -107,19 +107,19 @@
       :class="'form'"
       @opened="handleDialogOpened"
     >
-      <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" class="main-form">
 
         <el-form-item label="频道名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="选择频道" prop="category">
+        <el-form-item label="选择频道" prop="channelId">
           <el-select v-model="temp.channelId" class="filter-item" placeholder="请选择" @change="handleChannelFilter">
             <el-option v-for="item in channelListArr.items" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="数据表" prop="title">
+        <el-form-item label="数据表">
           {{ temp.channel.tables.length }}
         </el-form-item>
 
@@ -152,6 +152,7 @@
               width="340"
               align="center"
             >
+
               <template slot-scope="{row}">
                 <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
                   <el-option
@@ -251,7 +252,7 @@
 
         </el-form-item>
 
-        <el-form-item label="选择发送对象" prop="targetType">
+        <el-form-item label="选择发送对象" prop="groups">
           <el-row>
             按推送对象组
             <!--            <el-radio-group v-model="temp.targetType">
@@ -518,7 +519,8 @@ export default {
           limit: 20,
           importance: undefined,
           title: undefined,
-          type: undefined,
+          type: 'business',
+          searchKey: '',
           sort: '+id'
         }
       },
@@ -536,6 +538,8 @@ export default {
             img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
             url: ''
           },
+          groups: [],
+          pushChannel: [],
           isURL: false,
           templateURL: ''
         },
@@ -551,6 +555,8 @@ export default {
         url: '',
         content: '',
         targetType: 1,
+        pushPlan: 'instant',
+        pushPlanOption: 1,
         pushChannels: []
       },
       dialogFormVisible: false,
@@ -563,6 +569,27 @@ export default {
         copy: '复制',
         push: '推送',
         create: '新建'
+      },
+      rules: {
+        channelId: [
+          { required: true, message: '请选择分类', trigger: 'change' }
+        ],
+        groups: [
+          { required: true, message: '请选择推送对象组', trigger: 'blur' }
+        ],
+        pushChannel: [
+          { required: true, message: '请选择推送通道', trigger: 'blur' }
+        ],
+        title: [
+          { required: true, message: '名称不能为空', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        mainTable: [
+          { required: true, message: '请选择数据表和主表', trigger: 'blur' }
+        ],
+        tagId: [
+          { required: true, message: '请选择标签', trigger: 'blur' }
+        ]
       }
     }
   },
@@ -693,10 +720,12 @@ export default {
       }
     },
     handleSelectionChange(val) {
-      this.multipleSelection = val
+      this.temp.groups = val
+      console.log(this.temp.groups)
+      console.log(this.temp)
     },
     handleSelectionChangePushChannel(val) {
-      this.multipleSelection = val
+      this.temp.pushChannel = val
     },
     handleAddRule() {
       console.log(this.temp.rules)
@@ -783,21 +812,23 @@ export default {
         subhead: '',
         url: '',
         content: '',
+        pushPlan: 'instant',
+        pushPlanOption: 1,
         additionalOption: [],
         targetes: [],
         pushChannels: [],
         pushTemplateList: [],
+        groups: [],
+        pushChannel: [],
         rules: []
       }
     },
     handleSearch() {
+      console.log('handleSearch...')
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      this.getList().then(response => {
-        this.listArr.data = response.data.items
-        this.listArr.total = response.data.total
-        this.listLoading = false
-      })
+      console.log(this.listArr.listQuery)
+      this.getList()
     },
     handleClose() {
 
@@ -838,8 +869,9 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
+          this.temp.id = -1
+          console.log(this.temp)
+
           createSource(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
@@ -859,6 +891,8 @@ export default {
         this.temp = res.data
         this.temp.channel = res.data
         this.getChannel()
+
+        console.log(this.temp.rules)
         this.dialogStatus = 'view'
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -883,8 +917,6 @@ export default {
         }
 
         this.temp.channelId = this.temp.channelId || this.temp.mainResourceId
-        console.log(this.temp)
-        console.log(this.temp.channelId)
 
         this.getChannel()
         this.dialogStatus = opt || 'update'

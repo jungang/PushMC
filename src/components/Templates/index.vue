@@ -96,11 +96,11 @@
       </el-row>
     </el-form-item>
 
-    <el-row>
+    <!--    <el-row>
       <el-col align="right">
         <el-button size="mini" @click="previewVisible = true">查看预览</el-button>
       </el-col>
-    </el-row>
+    </el-row>-->
 
     <el-dialog
       :id="`messageTemplatePreview`"
