@@ -10,14 +10,11 @@
     </el-form-item>
 
     <el-row v-if="tmp.templateType==='text'">
-      <el-form-item label="URL" prop="isURL">
-        <el-checkbox v-model="tmp.isURL" />
-        <el-input v-model="tmp.templateURL" style="width:400px" />
-      </el-form-item>
-
       <el-form-item label="可选字段" prop="可选字段">
-        <el-row class="btn">
+        <el-row class="btnArea" :class="showAll?'show-all':'show-part'">
           <el-button v-for="tag in options" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
+
+          <el-button round size="small" class="toggle" :icon="showAll?'el-icon-arrow-up':'el-icon-arrow-down'" circle @click="showAll = !showAll" />
         </el-row>
       </el-form-item>
 
@@ -42,12 +39,12 @@
 
           <div class="preview">
             <div class="top">
-              <el-select v-model="tmp.templateContent.arg1" placeholder="+选择推送字段">
+              <el-select v-model="tmp.msgTitle" placeholder="+选择推送字段">
                 <el-option
                   v-for="item in options"
                   :key="item.id"
                   :label="item.pathTitle"
-                  :value="item.id"
+                  :value="item.path"
                 />
               </el-select>
             </div>
@@ -61,34 +58,34 @@
               >
                 <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
               </el-upload>
-              <img :src="tmp.templateContent.img" alt="">
+              <img :src="tmp.cover" alt="">
             </div>
 
             <el-row>
               <el-col :span="12">
-                <el-select v-model="tmp.templateContent.arg2" placeholder="+选择推送字段">
+                <el-select v-model="tmp.digest" placeholder="+选择推送字段">
                   <el-option
                     v-for="item in options"
                     :key="item.id"
                     :label="item.pathTitle"
-                    :value="item.id"
+                    :value="item.path"
                   />
                 </el-select>
               </el-col>
               <el-col :span="12">
-                <el-select v-model="tmp.templateContent.arg3" placeholder="+选择推送字段">
+                <el-select v-model="tmp.digest2" placeholder="+选择推送字段">
                   <el-option
                     v-for="item in options"
                     :key="item.id"
                     :label="item.pathTitle"
-                    :value="item.id"
+                    :value="item.path"
                   />
                 </el-select>
               </el-col>
             </el-row>
 
             <div class="url">
-              <el-input v-model="tmp.templateContent.url" placeholder="+推送URL" />
+              <el-input v-model="tmp.templateURL" placeholder="+推送URL" />
             </div>
           </div>
 
@@ -144,7 +141,8 @@ export default {
   },
   data() {
     return {
-      previewVisible: false
+      previewVisible: false,
+      showAll: false
     }
   },
   computed: {
@@ -171,6 +169,9 @@ export default {
     console.log(this.tables)
   },
   methods: {
+    toggle() {
+      console.log('toggle...')
+    },
     async insertText(mark) {
       mark = '{' + mark + '}'
       const myField = this.$refs.editor
@@ -187,7 +188,7 @@ export default {
       }
     },
     handleSuccess(res, file) {
-      this.tmp.templateContent.img = res.url
+      this.tmp.cover = res.url
     }
   }
 }
@@ -210,5 +211,15 @@ export default {
     .url{
       margin-top: 10px;
     }
+  }
+
+  .show-part{
+    height: 120px;
+    overflow: hidden;
+  }
+  .toggle{
+    bottom: 5px;
+    right: 0;
+    position: absolute;
   }
 </style>

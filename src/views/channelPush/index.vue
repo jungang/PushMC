@@ -14,7 +14,7 @@
       </el-col>
       <el-col :span="8" align="right">
         <el-button type="primary" @click="showSubscribePanel">频道订阅</el-button>
-        <el-button type="primary" @click="handleCreate">+自定义业务频道</el-button>
+        <el-button type="primary" @click="handleCreate">+新建频道推送</el-button>
       </el-col>
     </el-row>
 
@@ -128,142 +128,17 @@
         </el-form-item>
 
         <el-form-item label="频道规则" prop="tag">
-
-          <el-row>
-            <el-col :span="12">
-              <el-button type="primary" @click="handleAddRule">+添加规则条目</el-button>
-            </el-col>
-            <!--            <el-col :span="12" align="right">
-              <el-checkbox v-model="additionalOptionShow">高级选项</el-checkbox>
-            </el-col>-->
-          </el-row>
-          <el-table
-            :data="temp.rules"
-            width="90%"
-          >
-            <el-table-column
-              type="index"
-              label="序号"
-              align="center"
-            />
-            <el-table-column
-              prop="item1.tableKey"
-              label="选择数据项"
-              width="340"
-              align="center"
-            >
-
-              <template slot-scope="{row}">
-                <el-select v-model="row.item1.tableName" placeholder="请选择" style="width:50%">
-                  <el-option
-                    v-for="item in mainOptions"
-                    :key="item.id"
-                    :label="item.pathTitle"
-                    :value="item.id"
-                  />
-                </el-select>
-                <el-input v-model="row.item1.value" placeholder="请输入内容" style="width:45%" />
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="条件"
-              width="100"
-              align="center"
-            >
-              <template slot-scope="{row}">
-                <el-select v-model="row.operation1" :disabled="!options" placeholder="请选择" style="width: 60px">
-                  <el-option
-                    v-for="item in ruleOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="选择数据项"
-              width="340"
-              align="center"
-            >
-              <template slot-scope="{row}">
-                <el-select v-model="row.item2.tableName" :disabled="!options" placeholder="请选择" style="width:50%">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.id"
-                    :label="item.pathTitle"
-                    :value="item.id"
-                  />
-                </el-select>
-                <el-input v-model="row.item2.value" :disabled="!options" placeholder="请输入内容" style="width:45%" />
-              </template>
-            </el-table-column>
-
-            <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
-              <template slot-scope="{row}">
-                <el-button size="mini" type="danger" @click="handleRuleDelete(row,'deleted')">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <!--          <el-row v-if="additionalOptionShow">
-            高级选项
-            <el-table
-              :data="temp.additionalOption"
-            >
-              <el-table-column
-                prop="priority"
-                label="优先级"
-                width="100"
-                size="small"
-              >
-                <template slot-scope="{row}">
-                  <el-input v-model="row.priority" size="small" placeholder="请输入内容" />
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="rule"
-                label="规则"
-                width="300"
-              >
-                <template slot-scope="{row}">
-                  <el-select v-model="row.rule" size="small" placeholder="请选择" style="width:50%">
-                    <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                </template>
-              </el-table-column>
-              <el-table-column
-                label="操作"
-                width="150"
-              >
-                <el-button size="small">删除</el-button>
-                <el-button size="small">添加</el-button>
-              </el-table-column>
-            </el-table>
-          </el-row>-->
-
+          <RulesSel :rules="temp.rules" :main-options="mainOptions" :options="options" />
         </el-form-item>
 
         <el-form-item label="选择发送对象" prop="groups">
+
           <el-row>
             按推送对象组
-            <!--            <el-radio-group v-model="temp.targetType">
-              <el-radio :label="1">按推送对象组</el-radio>
-              <el-radio :label="2">按人员</el-radio>
-            </el-radio-group>-->
-
           </el-row>
           <el-row>
             <el-table
-              ref="multipleTable"
+              ref="groupsTable"
               :data="groupsArr"
               @selection-change="handleSelectionChange"
             >
@@ -350,6 +225,7 @@
 
           <el-row>
             推送确认:
+            {{ temp.pushPlanOption }}
             <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
               <el-option label="按钮确认" value="1" />
               <el-option label="阅读读秒计时" value="2" />
@@ -360,8 +236,8 @@
           </el-row>
           <el-row>
             推送确认:
-            <el-radio v-model="temp.receipt" label="true">需回传</el-radio>
-            <el-radio v-model="temp.receipt" label="false">不需回传</el-radio>
+            <el-radio v-model="temp.receipt" label="true" value="true">需回传</el-radio>
+            <el-radio v-model="temp.receipt" label="false" value="false">不需回传</el-radio>
             <span>（短信不支持确认）</span>
           </el-row>
         </el-form-item>
@@ -443,13 +319,14 @@ import { mapGetters } from 'vuex'
 import { copyChannel, createSource, dele, fetchList, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import Templates from '@/components/Templates'
+import RulesSel from '@/components/RulesSel'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
 // import quillConfig from './quill-config.js'
 
 export default {
   name: 'ChannelPush',
-  components: { Pagination, Templates },
+  components: { Pagination, Templates, RulesSel },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -528,19 +405,12 @@ export default {
       temp: {
         id: undefined,
         tmp: {
-          title: '',
           templateType: 'template',
           content: '',
-          templateContent: {
-            arg1: '',
-            arg2: '',
-            arg3: '',
-            img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-            url: ''
-          },
-          groups: [],
-          pushChannel: [],
-          isURL: false,
+          digest: '',
+          digest2: '',
+          msgTitle: '',
+          cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
           templateURL: ''
         },
         argTags: [],
@@ -556,8 +426,9 @@ export default {
         content: '',
         targetType: 1,
         pushPlan: 'instant',
-        pushPlanOption: 1,
-        pushChannels: []
+        pushPlanOption: '1',
+        receipt: 'true',
+        pushChannel: []
       },
       dialogFormVisible: false,
       dialogFormSubscribe: false,
@@ -664,18 +535,32 @@ export default {
       // this.editor.insertText(index, ' {' + mark + '} ')
     },
     handleChannelFilter() {
+      this.temp.rules = []
       this.getChannel()
     },
     getChannel() {
       this.temp.channel = this.channelListArr.items.find(item => item.id === this.temp.channelId)
 
+      // console.log('getChannel...')
+
       if (this.temp.channel.tables.length > 0) {
+        this.mainOptions = []
+        this.options = []
         this.mainOptions = this.temp.channel.tables.find(item => item.id === this.temp.channel.mainResourceId).smColumns
-        this.options = this.temp.channel.tables.filter(item => item.id !== this.temp.channel.mainResourceId).smColumns
+        // this.options = this.temp.channel.tables.filter(item => {}item.id !== this.temp.channel.mainResourceId).smColumns
+        this.temp.channel.tables.forEach((item) => {
+          if (this.temp.channel.mainResourceId !== item.id) {
+            this.options = this.options.concat(item.smColumns)
+          }
+        })
       } else {
         this.mainOptions = []
         this.options = []
       }
+
+      // console.log(this.temp.channel.tables)
+      // console.log(this.mainOptions)
+      // console.log(this.options)
 
       this.temp.tables = this.temp.channel.tables
       this.temp.tag = this.temp.channel.tag
@@ -702,15 +587,37 @@ export default {
       })
     },
     handleDialogOpened() {
-      // 通道信息
-      if (!this.temp.pushChannels) return
-      const rows = this.channelTypeList.items.filter((item) => {
-        return this.temp.pushChannels.find((item2) => item2.label === item.label)
-      })
+      if (this.temp.pushChannel) {
+        const rows = this.channelTypeList.items.filter((item) => {
+          return this.temp.pushChannel.find((item2) => item2.id === item.id)
+        })
+        this.pushChannelSelection(rows)
+      }
 
-      this.pushChannelSelection(rows)
+      if (this.temp.groups) {
+        // console.log(this.temp.groups)
+        // console.log(this.groupsArr)
+        const rows = this.groupsArr.filter((item) => {
+          return this.temp.groups.find((item2) => item2.id === item.id)
+        })
+        this.groupsTableSelection(rows)
+      }
     },
+
+    groupsTableSelection(rows) {
+      // console.log(rows)
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.groupsTable.toggleRowSelection(row)
+        })
+      } else {
+        this.$refs.groupsTable.clearSelection()
+      }
+    },
+
     pushChannelSelection(rows) {
+      // console.log('pushChannelSelection...')
+      // console.log(rows)
       if (rows) {
         rows.forEach(row => {
           this.$refs.pushChannelTable.toggleRowSelection(row)
@@ -721,14 +628,14 @@ export default {
     },
     handleSelectionChange(val) {
       this.temp.groups = val
-      console.log(this.temp.groups)
-      console.log(this.temp)
+      // console.log(this.temp.groups)
+      // console.log(this.temp)
     },
     handleSelectionChangePushChannel(val) {
       this.temp.pushChannel = val
     },
     handleAddRule() {
-      console.log(this.temp.rules)
+      // console.log(this.temp.rules)
       // todo 缺少频道包含的规则信息
 
       this.temp.rules = this.temp.rules || []
@@ -788,17 +695,12 @@ export default {
       this.temp = {
         id: undefined,
         tmp: {
-          title: '',
           templateType: 'template',
           content: '',
-          templateContent: {
-            arg1: '',
-            arg2: '',
-            arg3: '',
-            img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-            url: ''
-          },
-          isURL: false,
+          digest: '',
+          digest2: '',
+          msgTitle: '',
+          cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
           templateURL: ''
         },
         tables: [],
@@ -813,10 +715,10 @@ export default {
         url: '',
         content: '',
         pushPlan: 'instant',
-        pushPlanOption: 1,
+        pushPlanOption: '1',
+        receipt: 'true',
         additionalOption: [],
         targetes: [],
-        pushChannels: [],
         pushTemplateList: [],
         groups: [],
         pushChannel: [],
@@ -824,10 +726,10 @@ export default {
       }
     },
     handleSearch() {
-      console.log('handleSearch...')
+      // console.log('handleSearch...')
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      console.log(this.listArr.listQuery)
+      // console.log(this.listArr.listQuery)
       this.getList()
     },
     handleClose() {
@@ -837,7 +739,7 @@ export default {
       this.dialogFormSubscribe = true
     },
     handleSubscribe(row, opt) {
-      console.log(opt)
+      // console.log(opt)
       const data = [{
         channelId: row.id,
         bookStatus: opt ? 1 : 0
@@ -845,7 +747,7 @@ export default {
       subscribe(data).then(response => {
         this.listLoading = false
         row.status = opt
-        console.log(response)
+        // console.log(response)
       })
     },
 
@@ -853,13 +755,13 @@ export default {
       unPush(row.id, opt).then(response => {
         this.listLoading = false
         row.status = opt ? 'pushed' : 'notuse'
-        console.log(response)
+        // console.log(response)
       })
     },
     handleCreate() {
       this.resetTemp()
-      console.log('resetTemp...')
-      console.log(this.temp)
+      // console.log('resetTemp...')
+      // console.log(this.temp)
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -870,7 +772,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.id = -1
-          console.log(this.temp)
+          // console.log(this.temp)
 
           createSource(this.temp).then(() => {
             this.getList()
@@ -901,20 +803,29 @@ export default {
       })
     },
 
+    setGroups() {
+      // console.log('setGroups...')
+      // console.log(this.temp.groups)
+    },
     handleUpdate(row, opt) {
       detail({ id: row.id }).then((res) => {
         this.resetTemp()
         this.temp = { ...this.temp, ...res.data }
         this.temp.channel = res.data
 
+        console.log('detail...')
+        console.log('res.data', res.data)
+        console.log('this.temp', this.temp)
+        this.setGroups()
+
         this.temp.templateType = this.temp.templateType || 'template'
-        this.temp.templateContent = this.temp.templateContent || {
+        /*        this.temp.templateContent = this.temp.templateContent || {
           arg1: '',
           arg2: '',
           arg3: '',
           img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
           url: ''
-        }
+        }*/
 
         this.temp.channelId = this.temp.channelId || this.temp.mainResourceId
 

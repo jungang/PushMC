@@ -177,91 +177,11 @@
         </div>
 
         <div v-if="step==='step2'" class="zone-step-2">
-
           <p>名称： <span>{{ temp.title }}</span></p>
-          <p>数据表： <span>{{ tempValue.length }}</span></p>
+          <p>数据表： <span>{{ temp.tables.length }}</span></p>
           <p>标签： <span>{{ temp.tag }}</span></p>
-          <p>频道规则：   <el-button type="primary" @click="handleAddRule">+添加规则条目</el-button></p>
-
-          <el-table
-            :data="temp.rules"
-          >
-            <el-table-column
-              type="index"
-              label="序号"
-              align="center"
-            />
-            <el-table-column
-              prop="item1.tableKey"
-              label="选择数据项"
-              width="300"
-              align="center"
-            >
-              <template slot-scope="{row}">
-                <el-select v-model="row.mainColumnPath" placeholder="请选择" style="width:50%">
-                  <el-option
-                    v-for="item in mainOptions"
-                    :key="item.id"
-                    :label="item.pathTitle"
-                    :value="item.path"
-                  />
-                </el-select>
-                <el-input v-if="!options.length" v-model="row.valueResourceId" placeholder="请输入内容" style="width:45%" />
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="条件"
-              width="200"
-              align="center"
-            >
-              <template slot-scope="{row}">
-                <el-select v-model="row.expression" :disabled="options.length===0" placeholder="请选择" style="width: 100px">
-                  <el-option
-                    v-for="item in ruleOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="选择数据项"
-              width="300"
-              align="center"
-            >
-              <template slot-scope="{row}">
-                <el-select
-                  v-model="row.pathTitle"
-                  :disabled="options.length===0"
-                  placeholder="请选择"
-                  style="width:50%"
-                  @change="handleSel(row)"
-                >
-                  <el-option
-                    label="常量"
-                    value="-2"
-                  />
-                  <el-option
-                    v-for="item in options"
-                    :key="item.id"
-                    :label="item.pathTitle"
-                    :value="`${item.pathTitle}--${item.path}--${item.resourceId}`"
-                  />
-                </el-select>
-              </template>
-            </el-table-column>
-
-            <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
-              <template slot-scope="{row}">
-                <el-button size="mini" type="danger" @click="handleRuleDelete(row,'deleted')">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+          <p>频道规则：</p>
+          <RulesSel :rules="temp.rules" :main-options="mainOptions" :options="options" />
 
         </div>
 
@@ -290,11 +210,12 @@ import { fetchList, channelDetail, createSource, update, dele } from '@/api/busi
 import { fetchLabel } from '@/api/category'
 import { fetchSourceList, fetchSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
+import RulesSel from '@/components/RulesSel'
 import XcomTagTransfer from '@/components/tagTransfer/index'
 
 export default {
   name: 'BusinessChannel',
-  components: { Pagination, XcomTagTransfer },
+  components: { Pagination, XcomTagTransfer, RulesSel },
   data() {
     return {
       ruleOptions: [
@@ -341,6 +262,7 @@ export default {
         tagId: '',
         tag: '',
         title: '',
+        mainTable: {},
         tables: [],
         tablesList: []
       },
@@ -352,9 +274,6 @@ export default {
         create: '新建'
       },
       rules: {
-        resourceId: [
-          { required: true, message: '请选择分类', trigger: 'change' }
-        ],
         title: [
           { required: true, message: '标签名称不能为空', trigger: 'blur' },
           { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
@@ -396,6 +315,9 @@ export default {
       })
     },
     nextStep() {
+      console.log('nextStep...')
+      console.log(this.temp.mainTable)
+
       let v = false
       this.$refs['dataForm'].validate((valid) => {
         v = valid
@@ -427,24 +349,10 @@ export default {
 
         this.temp.tag = this.listLabel.find(o => o.id === this.temp.tagId).title
         this.step = 'step2'
-      } else {
-        this.$notify({
-          title: '错误',
-          message: '请选择主表',
-          type: 'error',
-          duration: 2000
-        })
       }
     },
     filter() {
       this.getTables()
-    },
-    handleSel(val) {
-      console.log(val)
-
-      val.valueResourceId = val.pathTitle.split('--')[2]
-      val.valueColumnPath = val.pathTitle.split('--')[1]
-      val.pathTitle = val.pathTitle.split('--')[0]
     },
     handleTableDelete(row) {
       console.log(row)
@@ -500,6 +408,7 @@ export default {
         category: 'API',
         title: '',
         tablesList: [],
+        mainTable: {},
         tables: [],
         transferStatus: [],
         rules: []
@@ -530,9 +439,11 @@ export default {
           this.temp[item] = res.data[item]
         })
 
+        console.log(this.temp)
+        console.log(this.temp.mainTable)
+
         this.temp.id = res.data.id
         this.temp.resourceId = this.temp.resourceId || 1
-        this.temp.rules = this.temp.rules || []
         this.temp.tables.forEach(item => {
           if (item.id === this.temp.mainResourceId) {
             this.temp.mainTable = item
