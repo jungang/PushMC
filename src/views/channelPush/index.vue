@@ -405,6 +405,7 @@ export default {
       temp: {
         id: undefined,
         tmp: {
+          id: -1,
           templateType: 'template',
           content: '',
           digest: '',
@@ -695,6 +696,7 @@ export default {
       this.temp = {
         id: undefined,
         tmp: {
+          id: -1,
           templateType: 'template',
           content: '',
           digest: '',
