@@ -2,7 +2,7 @@
   <div>
 
     <el-row style="margin-bottom: 10px">
-      通道（tunnelId）
+      选择推送通道：
       <el-select v-model="personsArr.tunnelId" placeholder="请选择" style="width:150px" @change="handleFilter">
         <el-option
           v-for="item in tunnelArr"
@@ -11,7 +11,7 @@
           :value="item.id"
         />
       </el-select>
-      域（domain）
+      选择域：
       <el-select v-model="personsArr.domain" placeholder="请选择" style="width:150px" @change="handleFilter">
         <el-option
           v-for="item in domainArr"
@@ -238,7 +238,6 @@ export default {
     },
     handleFilter() {
       this.departmentData = []
-      // this.dynamicTags = []
       this.getDepartmentData()
     },
     init(val) {
@@ -271,6 +270,8 @@ export default {
         this.departmentData = this.format(response.data)
         console.log('department...')
         console.log(this.departmentData)
+        this.dynamicTags = []
+        this.plaza = []
       })
     },
     format(data) {
@@ -346,7 +347,6 @@ export default {
     },
     addPersons() {
       const _arr = [...this.multipleSelection, ...this.plaza]
-      console.log(_arr)
       _arr.forEach(item => {
         item.userId = item.userId || item.userid
         const v = this.dynamicTags.find(item2 => {

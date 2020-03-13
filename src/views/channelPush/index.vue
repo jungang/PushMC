@@ -80,12 +80,21 @@
             <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
               查看
             </el-button>
-            <el-button v-if="row.pushStatus==='notuse'" type="primary" size="mini" @click="handleUpdate(row,'push')">
+
+            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+              推送
+            </el-button>
+            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+              取消推送
+            </el-button>
+
+            <!--            <el-button v-if="row.pushStatus==='notuse'" type="primary" size="mini" @click="handleUpdate(row,'push')">
               推送
             </el-button>
             <el-button v-if="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUnPush(row, false)">
               取消推送
-            </el-button>
+            </el-button>-->
+
           </template>
         </el-table-column>
       </el-table>
@@ -123,18 +132,54 @@
           {{ temp.channel.tables.length }}
         </el-form-item>
 
-        <el-form-item label="频道标签" prop="tag">
+        <!--        <el-form-item label="频道标签" prop="tag">
           <el-tag>{{ temp.channel.tag }}</el-tag>
-        </el-form-item>
+        </el-form-item>-->
 
         <el-form-item label="频道规则" prop="tag">
-          <RulesSel :rules="temp.rules" :main-options="mainOptions" :options="options" />
+          <el-button :disabled="!temp.channelId" size="small" plain @click="editChannel">编辑频道规则</el-button>
+
         </el-form-item>
 
+        <el-form-item label="推送通道" prop="pushChannel">
+          <el-row>
+            <el-table
+              ref="pushChannelTable"
+              :data="channelTypeList.items"
+              style="width:400px"
+              @selection-change="handleSelectionChangePushChannel"
+            >
+              <el-table-column
+                type="selection"
+              />
+              <el-table-column
+                label="通道类型"
+              >
+                <template slot-scope="{row}">
+                  {{ row.type }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="通道名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.label }}
+                </template>
+              </el-table-column>
+
+            </el-table>
+          </el-row>
+
+        </el-form-item>
         <el-form-item label="选择发送对象" prop="groups">
 
           <el-row>
-            按推送对象组
+            <el-col :span="12">按推送对象组</el-col>
+            <el-col :span="12" align="right">
+              <el-button @click="handleCreateGroup">新建推送对象组</el-button>
+            </el-col>
+
           </el-row>
           <el-row>
             <el-table
@@ -184,38 +229,6 @@
 
         </el-form-item>
 
-        <el-form-item label="推送通道" prop="pushChannel">
-          <el-row>
-            <el-table
-              ref="pushChannelTable"
-              :data="channelTypeList.items"
-              style="width:400px"
-              @selection-change="handleSelectionChangePushChannel"
-            >
-              <el-table-column
-                type="selection"
-              />
-              <el-table-column
-                label="通道类型"
-              >
-                <template slot-scope="{row}">
-                  {{ row.type }}
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="name"
-                label="通道名称"
-              >
-                <template slot-scope="{row}">
-                  {{ row.label }}
-                </template>
-              </el-table-column>
-
-            </el-table>
-          </el-row>
-
-        </el-form-item>
-
         <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
           <Templates :tmp="temp.tmp" :tables="temp.tables" />
         </el-form>
@@ -225,7 +238,6 @@
 
           <el-row>
             推送确认:
-            {{ temp.pushPlanOption }}
             <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
               <el-option label="按钮确认" value="1" />
               <el-option label="阅读读秒计时" value="2" />
@@ -253,7 +265,7 @@
         <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">
           完成
         </el-button>
-        <el-button v-if="dialogStatus==='copy'" type="primary" @click="copyData()">
+        <el-button v-if="dialogStatus==='copy'" type="primary" @click="createData()">
           完成
         </el-button>
         <el-button v-if="dialogStatus==='push'" type="primary" @click="pushData()">
@@ -311,22 +323,53 @@
       </span>
     </el-dialog>
 
+    <el-dialog
+      title="新建推送对象组"
+      width="700px"
+      top="100px"
+      :visible.sync="groupVisible"
+      :before-close="handleClose"
+      @close="dialogClose"
+    >
+
+      <el-form ref="groupForm" :rules="rules" :model="groupTemp" label-position="right" label-width="150px" class="main-form">
+
+        <el-form-item label="推送对象组名称：" prop="title">
+          <el-input v-model="groupTemp.title" placeholder="输入对象组名称" style="width:400px" />
+        </el-form-item>
+
+        <!--       <el-radio-group v-model="tabTo" style="margin-bottom: 30px;">
+          <el-radio-button label="department">按组织结构</el-radio-button>
+          <el-radio-button label="personnel">按人员</el-radio-button>
+        </el-radio-group>-->
+        <PickPersons ref="pickPersons" :data.sync="groupTemp.smGroupItems" :tunnel="groupTemp.tunnelId" />
+
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="groupVisible = false">取 消</el-button>
+        <el-button type="primary" @click="createGroup">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, createSource, dele, fetchList, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
+import { copyChannel, createSource, dele, fetchList, changeStatus, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import Templates from '@/components/Templates'
-import RulesSel from '@/components/RulesSel'
+import PickPersons from '@/components/pickPersons'
+// import RulesSel from '@/components/RulesSel'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
+import { createGroup } from '@/api/pushTarget'
 // import quillConfig from './quill-config.js'
 
 export default {
   name: 'ChannelPush',
-  components: { Pagination, Templates, RulesSel },
+  components: { Pagination, Templates, PickPersons },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -340,6 +383,7 @@ export default {
   },
   data() {
     return {
+      groupVisible: false,
       radio: '1',
       channelTypeList: [],
       channelSubscribeList: {
@@ -396,14 +440,17 @@ export default {
           limit: 20,
           importance: undefined,
           title: undefined,
-          type: 'business',
+          pushType: 'business',
           searchKey: '',
           sort: '+id'
         }
       },
       listLoading: true,
+      groupTemp: {},
       temp: {
         id: undefined,
+        tunnel: [],
+        status: 'enabled',
         tmp: {
           id: -1,
           templateType: 'template',
@@ -483,9 +530,76 @@ export default {
     this.getChannelTypeList()
     this.getChannelSubscribe()
     this.getPushTemplateList()
-    this.getGroups()
+    // this.getGroups()
   },
   methods: {
+    handleCreateGroup() {
+      this.groupTemp = {
+        id: undefined,
+        tunnelId: 1,
+        category: 'API',
+        title: '',
+        smGroupItems: []
+      }
+
+      this.dynamicTags = []
+      this.groupVisible = true
+      this.$nextTick(() => {
+        this.$refs['groupForm'].clearValidate()
+      })
+    },
+    dialogClose() {
+      this.plaza = []
+      this.tabTo = 'department'
+      // this.$refs.tree.setCheckedKeys([])
+    },
+    createGroup() {
+      this.$refs['groupForm'].validate((valid) => {
+        if (valid) {
+          console.log(this.$refs.pickPersons.dynamicTags)
+          console.log(this.$refs.pickPersons.personsArr.tunnelId)
+          // this.temp.smGroupItems = this.dynamicTags
+          this.groupTemp.smGroupItems = this.$refs.pickPersons.dynamicTags
+          this.groupTemp.status = 'enabled'
+          console.log(this.groupTemp)
+
+          this.temp.tunnelId = this.$refs.pickPersons.personsArr.tunnelId
+
+          this.groupTemp.smGroupItems.forEach(item => {
+            item.type = item.type || '1'
+            item.itemId = item.itemId || item.userid
+            item.itemName = item.itemName || item.truename
+          })
+
+          createGroup(this.groupTemp).then(() => {
+            this.groupVisible = false
+            this.getGroups()
+            this.$notify({
+              title: '完成',
+              message: '新建对象组',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    editChannel() {
+      if (this.temp.channelId) {
+        this.$router.push({ name: 'BusinessChannel', params: { edit: this.temp.channelId }})
+      }
+    },
+    handleModifyStatus(row, status) {
+      changeStatus(row.id, status).then(response => {
+        this.$message({
+          message: '操作完成',
+          type: 'success'
+        })
+        row.status = status
+        this.listLoading = false
+      })
+    },
+
     closeSubscribe() {
       this.dialogFormSubscribe = false
       this.getList()
@@ -582,12 +696,19 @@ export default {
         }
       })
     },
-    getGroups() {
-      groups().then(response => {
-        this.groupsArr = response.data
+    getGroups(data) {
+      if (this.temp.tunnel.length === 0) {
+        this.groupsArr = []
+        return
+      }
+      groups({ tunnel: this.temp.tunnel.join(',') }).then(response => {
+        console.log('groups...')
+        console.log(response)
+        this.groupsArr = response.data.items
       })
     },
     handleDialogOpened() {
+      console.log('handleDialogOpened...')
       if (this.temp.pushChannel) {
         const rows = this.channelTypeList.items.filter((item) => {
           return this.temp.pushChannel.find((item2) => item2.id === item.id)
@@ -634,6 +755,8 @@ export default {
     },
     handleSelectionChangePushChannel(val) {
       this.temp.pushChannel = val
+      this.temp.tunnel = this.temp.pushChannel.map(i => i.id)
+      this.getGroups()
     },
     handleAddRule() {
       // console.log(this.temp.rules)
@@ -695,6 +818,8 @@ export default {
       this.isUrl = false
       this.temp = {
         id: undefined,
+        tunnel: [],
+        status: 'enabled',
         tmp: {
           id: -1,
           templateType: 'template',
@@ -760,6 +885,7 @@ export default {
         // console.log(response)
       })
     },
+
     handleCreate() {
       this.resetTemp()
       // console.log('resetTemp...')
@@ -774,8 +900,6 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.id = -1
-          // console.log(this.temp)
-
           createSource(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false

@@ -41,7 +41,7 @@ router.beforeEach(async(to, from, next) => {
           roles.forEach(item => {
             // console.log(item)
 
-            console.log(item.smPermissions)
+            // console.log(item.smPermissions)
 
             if (item.smPermissions) {
               item.smPermissions.forEach(item2 => {
@@ -54,13 +54,13 @@ router.beforeEach(async(to, from, next) => {
 
           roleTypes = Array.from(new Set(roleTypes)) // 去重
 
-          console.log('roleTypes:', roleTypes)
+          // console.log('roleTypes:', roleTypes)
           // generate accessible routes map based on roles
 
           // const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
           const accessRoutes = await store.dispatch('permission/generateAsyncRouter', { roles, roleTypes })
 
-          console.log(accessRoutes)
+          // console.log(accessRoutes)
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
 

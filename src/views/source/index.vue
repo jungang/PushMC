@@ -92,34 +92,24 @@
           <el-input v-model="temp.title" />
         </el-form-item>
 
-        <el-form-item label="Secret Key" prop="secretKey">
-          <el-input v-model="temp.secretKey" />
+        <el-form-item v-if="temp.type==='API'" label="服务器地址" prop="serverAddress">
+          <el-input v-model="temp.serverAddress" />
         </el-form-item>
 
-        <el-form-item label="服务器地址" prop="serverAddress">
-          <el-input v-model="temp.serverAddress" placeholder="多个IP间以逗号分隔" />
-        </el-form-item>
-
-        <el-form-item v-if="temp.type==='API'" label="定时更新" prop="updatePlanHours">
+        <el-form-item v-if="temp.type==='API'" label="定时更新" prop="interval">
 
           <div>
             <el-input v-model="temp.interval" placeholder="请输入内容" style="width: 200px">
               <template slot="append">分钟</template>
             </el-input>
           </div>
-          <!--          <div v-if="temp.type==='webhooks'">
-            <el-select v-model="temp.updatePlanHours" class="filter-item" placeholder="请选择" style="width:150px;">
-              <el-option v-for="item in MODEL.updatePlanOptions.hour" :key="item.key" :label="item.label" :value="item.key" />
-            </el-select>
-            <el-select v-model="temp.updatePlanTimes" class="filter-item" placeholder="请选择" style="width:100px;">
-              <el-option v-for="item in MODEL.updatePlanOptions.times" :key="item.key" :label="item.label" :value="item.key" />
-            </el-select>
-          </div>-->
 
         </el-form-item>
 
-        <el-form-item label="添加路径" prop="paths">
+        <el-form-item label="数据表" prop="paths">
+
           <DynamicInput :data.sync="temp.paths" />
+
         </el-form-item>
 
         <el-form-item label="说明" prop="describe">
@@ -217,9 +207,14 @@ export default {
           { required: true, message: '数据源名称不能为空', trigger: 'blur' },
           { min: 3, max: 100, message: '长度在 3 到 100 个字符', trigger: 'blur' }
         ],
-        describe: [
-          { required: true, message: '说明不能为空', trigger: 'blur' },
-          { min: 4, max: 200, message: '长度在 3 到 200 个字符', trigger: 'blur' }
+        interval: [
+          { required: true, message: '不能为空', trigger: 'blur' }
+        ],
+        serverAddress: [
+          { required: true, message: '服务器地址不能为空', trigger: 'blur' }
+        ],
+        paths: [
+          { required: true, message: '请输入', trigger: 'blur' }
         ],
         /*        secretKey: [
           { required: true, message: 'Secret Key不能为空', trigger: 'blur' },

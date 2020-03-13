@@ -72,7 +72,7 @@
     </el-row>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
         <el-form-item label="通道类型" prop="type">
           <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.type" :label="item.type"> {{ item.label }} </el-radio>
         </el-form-item>
@@ -85,16 +85,16 @@
         </el-form-item>
 
         <div v-if="temp.type==='gocom'">
-          <el-form-item label="API 地址">
+          <el-form-item label="API 地址" prop="apiUrl">
             <el-input v-model="temp.apiUrl" style="width:400px" />
           </el-form-item>
-          <el-form-item label="数据库链接">
+          <el-form-item label="数据库链接" prop="dbUrl">
             <el-input v-model="temp.dbUrl" style="width:400px" />
           </el-form-item>
-          <el-form-item label="数据库用户名">
+          <el-form-item label="数据库用户名" prop="dbUser">
             <el-input v-model="temp.dbUser" style="width:400px" />
           </el-form-item>
-          <el-form-item label="数据库密码">
+          <el-form-item label="数据库密码" prop="dbPassword">
             <el-input v-model="temp.dbPassword" style="width:400px" />
           </el-form-item>
         </div>
@@ -125,11 +125,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { pushChannelList, detail, create, update, dele } from '@/api/pushChannel'
+import { pushChannelList, detail, create, update, dele, changeStatus } from '@/api/pushChannel'
 import { channelType } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-import { changeStatus } from '@/api/source'
 
 export default {
   name: 'PushChannel',
@@ -178,12 +177,30 @@ export default {
         create: '新建'
       },
       rules: {
+        type: [
+          { required: true, message: '请选择', trigger: 'change' }
+        ],
+        status: [
+          { required: true, message: '请选择', trigger: 'change' }
+        ],
         category: [
           { required: true, message: '请选择分类', trigger: 'change' }
         ],
         title: [
           { required: true, message: '标签名称不能为空', trigger: 'blur' },
           { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        apiUrl: [
+          { required: true, message: '不能为空', trigger: 'blur' }
+        ],
+        dbUrl: [
+          { required: true, message: '不能为空', trigger: 'blur' }
+        ],
+        dbUser: [
+          { required: true, message: '不能为空', trigger: 'blur' }
+        ],
+        dbPassword: [
+          { required: true, message: '不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -245,10 +262,15 @@ export default {
     },
 
     resetTemp() {
+      console.log(this.$store.state.publicData.model.argu)
       this.temp = {
         id: undefined,
         category: 'API',
-        title: ''
+        title: '',
+        apiUrl: this.$store.state.publicData.model.argu.apiUrl,
+        dbUrl: this.$store.state.publicData.model.argu.dbUrl,
+        dbUser: this.$store.state.publicData.model.argu.dbUser,
+        dbPassword: this.$store.state.publicData.model.argu.dbPassword
       }
     },
     handleCreate() {

@@ -2,7 +2,7 @@
   <div class="container">
     <el-row type="flex" />
     <el-row>
-      <el-col :span="12">    2020年1月20日 ｜  推送信息总视图</el-col>
+      <el-col :span="12">    2020年1月200日 ｜  推送信息总视图</el-col>
       <el-col :span="12" align="right"><el-button type="primary"> 首页数据自定义 </el-button></el-col>
     </el-row>
 
@@ -14,37 +14,39 @@
         <h4>业务频道推送</h4>
 
         <p>step1: 初始化设置</p>
+        <router-link :to="{path:'/source'}"> <el-tag>数据源</el-tag></router-link>
         <router-link :to="{path:'/data-tag'}"> <el-tag>标签分类</el-tag></router-link>
         <router-link :to="{path:'/business-channel'}"> <el-tag type="info">业务频道</el-tag></router-link>
         <router-link :to="{path:'/push-channel'}"> <el-tag>推送通道</el-tag></router-link>
 
         <p>step2: 设置业务频道推送</p>
-        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>频道推送</el-tag></router-link>
+        <router-link :to="{path:'/channel-push'}"> <el-tag>频道推送</el-tag></router-link>
         <p>step3: 完成推送</p>
-        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>推送统计</el-tag></router-link>
+        <router-link :to="{path:'/statistics/index'}"> <el-tag>推送统计</el-tag></router-link>
 
       </el-col>
       <el-col :span="8">
         <h4>内容推送</h4>
         <p>step1: 初始化设置</p>
+        <router-link :to="{path:'/source'}"> <el-tag>数据源</el-tag></router-link>
         <router-link :to="{path:'/data-tag'}"> <el-tag type="info">标签分类</el-tag></router-link>
         <router-link :to="{path:'/push-content'}"> <el-tag type="danger">推送内容</el-tag></router-link>
         <router-link :to="{path:'/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
         <p>step2: 设置内容推送规则</p>
-        <el-tag type="warning">内容推送</el-tag>
+        <router-link :to="{path:'/content-push'}"> <el-tag type="danger">内容推送</el-tag></router-link>
         <p>step3: 完成推送</p>
-        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag>推送统计</el-tag></router-link>
+        <router-link :to="{path:'/statistics/index'}"> <el-tag>推送统计</el-tag></router-link>
 
       </el-col>
       <el-col :span="8">
         <h4>渠道推送</h4>
         <p>step1: 初始化设置</p>
+        <router-link :to="{path:'/source'}"> <el-tag>数据源</el-tag></router-link>
         <router-link :to="{path:'/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
         <p>step2: 设置渠道推送规则</p>
-        <router-link :to="{path:'/message-push/pipe-push'}"> <el-tag effect="dark">渠道推送</el-tag></router-link>
+        <router-link :to="{path:'/pipe-push'}"> <el-tag effect="dark">渠道推送</el-tag></router-link>
         <p>step3: 完成推送</p>
-        <router-link :to="{path:'/message-push/channel-push'}"> <el-tag type="danger">推送统计</el-tag></router-link>
-
+        <router-link :to="{path:'/statistics/index'}"> <el-tag>推送统计</el-tag></router-link>
       </el-col>
     </el-row>
   </div>

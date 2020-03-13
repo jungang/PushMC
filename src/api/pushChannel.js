@@ -54,3 +54,11 @@ export function update(data) {
     data: data
   })
 }
+
+export function changeStatus(id, status) {
+  return request({
+    url: '/push-channel/status',
+    method: 'put',
+    params: { id, status }
+  })
+}

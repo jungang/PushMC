@@ -5,6 +5,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { options } from '@/api/common'
 export default {
   name: 'Common',
   computed: {
@@ -20,7 +21,15 @@ export default {
     this.init()
   },
   methods: {
-    init() {}
+    init() {
+      this.getUploadUrl()
+    },
+    getUploadUrl() {
+      options().then(res => {
+        this.MODEL.nginxPath = res.data.nginxPath
+        this.MODEL.argu = res.data.argu
+      })
+    }
   }
 }
 </script>

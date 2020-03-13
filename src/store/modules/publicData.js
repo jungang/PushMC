@@ -1,7 +1,16 @@
 
 const state = {
   model: {
-    dataSourceTypeOptions: [], // 数据源分类
+    dataSourceTypeOptions: [
+      {
+        'label': 'API',
+        'key': 'API'
+      },
+      {
+        'label': 'webhooks',
+        'key': 'webhooks'
+      }
+    ], // 数据源分类
     updatePlanOptions: { // 更新时间 选项
       hour: [],
       times: []

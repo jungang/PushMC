@@ -31,7 +31,7 @@
             <span>{{ row.amount }}</span>
           </template>
         </el-table-column>
-
+        <!--
         <el-table-column label="状态" align="center" min-width="50">
           <template slot-scope="{row}">
 
@@ -39,7 +39,7 @@
               {{ row.status === 'enabled' ? '启用': '未启用' }}
             </el-tag>
           </template>
-        </el-table-column>
+        </el-table-column>-->
 
         <el-table-column label="创建时间" align="center" min-width="100">
           <template slot-scope="{row}">
@@ -52,12 +52,12 @@
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button v-if="row.status!='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+            <!--            <el-button v-if="row.status!='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
               启用
             </el-button>
             <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
               停用
-            </el-button>
+            </el-button>-->
             <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
@@ -109,12 +109,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, detail, create, update, dele } from '@/api/pushTarget'
+import { fetchList, detail, createGroup, update, dele, changeStatus } from '@/api/pushTarget'
 import { department, domain, searchPersons } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import PickPersons from '@/components/pickPersons'
-import { changeStatus } from '@/api/source'
 import { searchList } from '@/api/pushContent'
 
 export default {
@@ -340,18 +339,18 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log(this.$refs.pickPersons.dynamicTags)
           // this.temp.smGroupItems = this.dynamicTags
           this.temp.smGroupItems = this.$refs.pickPersons.dynamicTags
           this.temp.status = 'enabled'
 
+          this.temp.tunnelId = this.$refs.pickPersons.personsArr.tunnelId
           this.temp.smGroupItems.forEach(item => {
             item.type = item.type || '1'
             item.itemId = item.itemId || item.userid
             item.itemName = item.itemName || item.truename
           })
 
-          create(this.temp).then(() => {
+          createGroup(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({

@@ -39,7 +39,7 @@ export function fetchPv(pv) {
   })
 }
 
-export function create(data) {
+export function createGroup(data) {
   return request({
     url: '/push-target/create',
     method: 'post',
@@ -52,5 +52,13 @@ export function update(data) {
     url: '/push-target/update',
     method: 'put',
     data: data
+  })
+}
+
+export function changeStatus(id, status) {
+  return request({
+    url: '/push-target/status',
+    method: 'put',
+    params: { id, status }
   })
 }

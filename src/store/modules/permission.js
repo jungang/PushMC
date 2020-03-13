@@ -79,6 +79,8 @@ const actions = {
 
         accessedRoutes = Array.from(new Set(accessedRoutes)) // 去重
         // accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+
+        accessedRoutes.sort((a, b) => a.index - b.index) // 排序
       }
       commit('SET_ROUTES', accessedRoutes)
       // console.log(accessedRoutes)

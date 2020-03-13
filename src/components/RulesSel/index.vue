@@ -1,6 +1,9 @@
 <template>
 
   <div>
+
+    <!--    mainOptions:{{mainOptions}}-->
+    <!--    options:{{ options }}-->
     <el-row>
       <el-col :span="12">
         <el-button type="primary" @click="handleAddRule">+添加规则条目</el-button>
@@ -29,7 +32,7 @@
               :value="item.path"
             />
           </el-select>
-          <el-input v-if="!options.length" v-model="row.valueColumnPath" placeholder="请输入内容" style="width:100px" />
+          <el-input v-model="row.mainColumnPathValue" placeholder="请输入内容" style="width:100px" />
         </template>
       </el-table-column>
       <el-table-column
@@ -52,7 +55,7 @@
       <el-table-column
         prop="name"
         label="选择数据项"
-        width="200"
+        width="400"
         align="center"
       >
         <template slot-scope="{row}">
@@ -74,10 +77,13 @@
               :value="`${item.pathTitle}--${item.path}--${item.resourceId}`"
             />
           </el-select>
+
+          <el-input v-model="row.valueColumnPathValue" placeholder="请输入" style="width:100px" />
+
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button size="mini" type="danger" @click="handleRuleDelete(row,'deleted')">
             删除
@@ -113,14 +119,14 @@ export default {
     return {
       ruleOptions: [
         {
-          value: '==',
-          label: '=='
+          value: 'equal',
+          label: 'equal'
         }, {
-          value: '!=',
-          label: '!='
+          value: 'unequal',
+          label: 'unequal'
         }, {
-          value: '>',
-          label: '>'
+          value: 'like',
+          label: 'like'
         }, {
           value: '<',
           label: '<'
@@ -148,12 +154,16 @@ export default {
       val.pathTitle = val.pathTitle.split('--')[0]
     },
     handleAddRule() {
+      console.log(this.mainOptions)
+      console.log(this.options)
       if (this.mainOptions.length > 0) {
         this.rules.push({
           expression: 'equal',
           mainColumnPath: '',
+          mainColumnPathValue: '',
           mainResourceId: this.mainOptions[0].resourceId,
           valueColumnPath: '',
+          valueColumnPathValue: '',
           valueResourceId: -2
         })
         console.log(this.rules)

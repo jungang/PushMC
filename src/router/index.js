@@ -68,7 +68,8 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    id: '1',
+    id: '10',
+    index: 1,
     path: '/source',
     component: Layout,
     children: [
@@ -85,6 +86,7 @@ export const asyncRoutes = [
   },
 
   {
+    index: 20,
     path: '/data-tag',
     component: Layout,
     redirect: '/data-tag/list',
@@ -108,6 +110,7 @@ export const asyncRoutes = [
   },
 
   {
+    index: 30,
     path: '/category',
     component: Layout,
     children: [
@@ -124,11 +127,12 @@ export const asyncRoutes = [
   },
 
   {
+    index: 40,
     path: '/business-channel',
     component: Layout,
     children: [
       {
-        path: '',
+        path: '/business-channel',
         name: 'BusinessChannel',
         component: () => import('@/views/businessChannel/index'),
         meta: { title: '业务频道', icon: 'form' }
@@ -137,6 +141,7 @@ export const asyncRoutes = [
   },
 
   {
+    index: 50,
     path: '/push-content',
     component: Layout,
     children: [
@@ -148,8 +153,30 @@ export const asyncRoutes = [
       }
     ]
   },
+  {
+    index: 60,
+    path: '/examine',
+    component: Layout,
+    meta: {
+      title: '',
+      icon: 'nested',
+      roles: ['admin']
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'Examine',
+        component: () => import('@/views/examine/index'),
+        meta: {
+          title: '内容审批',
+          icon: 'form'
+        }
+      }
+    ]
+  },
 
   {
+    index: 70,
     path: '/push-channel',
     component: Layout,
     children: [
@@ -163,6 +190,7 @@ export const asyncRoutes = [
   },
 
   {
+    index: 80,
     path: '/push-target',
     component: Layout,
     children: [
@@ -176,6 +204,7 @@ export const asyncRoutes = [
   },
 
   {
+    index: 90,
     path: '/message-template',
     component: Layout,
     children: [
@@ -189,9 +218,10 @@ export const asyncRoutes = [
   },
 
   {
+    index: 100,
     path: '/message-push',
     component: Layout,
-    redirect: '/message-push/channel-push',
+    redirect: '/channel-push',
     name: 'MessagePush',
     meta: { title: '消息推送', icon: 'example' },
     children: [
@@ -217,6 +247,7 @@ export const asyncRoutes = [
   },
 
   {
+    index: 110,
     path: '/permission',
     component: Layout,
     redirect: '/example/table',
@@ -239,6 +270,7 @@ export const asyncRoutes = [
   },
 
   {
+    index: 120,
     path: '/statistics',
     component: Layout,
     redirect: '/statistics/index',
@@ -248,26 +280,6 @@ export const asyncRoutes = [
         name: 'Statistics',
         component: () => import('@/views/statistics/index'),
         meta: { title: '推送统计', icon: 'form' }
-      }
-    ]
-  },
-  {
-    path: '/examine',
-    component: Layout,
-    meta: {
-      title: '',
-      icon: 'nested',
-      roles: ['admin']
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'Examine',
-        component: () => import('@/views/examine/index'),
-        meta: {
-          title: '内容审批',
-          icon: 'form'
-        }
       }
     ]
   }

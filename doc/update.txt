@@ -63,5 +63,5 @@ ssh 账号
 - root
 - 8ql6,yhY
 
-/usr/share/nginx/html
-http://39.98.167.246:9910/你新建的文件夹/index.html
+/usr/share/nginx/html/push/
+http://39.98.167.246:9910/push/dist/

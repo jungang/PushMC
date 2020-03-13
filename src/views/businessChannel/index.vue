@@ -107,7 +107,7 @@
               :right-default-checked="temp.transferStatus"
               type="businessChannel"
               :titles="['最多选择三张表', '已选数据表']"
-              filterable
+
               :format="{
                 noChecked: '0/'+ tempValueMax,
                 hasChecked: '${checked}/'+ tempValueMax
@@ -123,7 +123,6 @@
           </el-row>
 
           <el-form-item label="已选全部数据表:" prop="mainTable">
-
             <el-table
               ref="singleTable"
               :data="temp.tables || []"
@@ -146,7 +145,7 @@
               </el-table-column>
 
               <el-table-column
-                property="sourceId"
+                property="sourceTitle"
                 label="数据源"
                 width="120"
               />
@@ -296,10 +295,18 @@ export default {
       return this.$store.state.publicData.model
     }
   },
-  created() {
-    this.getList()
-    this.getSourceList()
+  async created() {
+    await this.getList()
+    await this.getSourceList()
     this.getLabel()
+
+    console.log('created..')
+    if (this.$route.params.edit) {
+      console.log(this.listArr.data)
+      console.log(this.$route.params.edit)
+      const row = this.listArr.data.find(item => item.id === this.$route.params.edit)
+      this.handleUpdate(row)
+    }
   },
   methods: {
     handleCurrentChange(val) {
@@ -307,8 +314,9 @@ export default {
     },
     handleAdd() {
       console.log(this.temp.tables)
+      console.log(this.$refs.transfer.targetData)
       this.$refs.transfer.targetData.forEach(item => {
-        const v = this.temp.tables.find(item2 => item2.id === item.id)
+        const v = this.temp.tables.find(item2 => item2.id === item.id) // 排重
         if (!v) {
           this.temp.tables.push(item)
         }
@@ -322,27 +330,22 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         v = valid
       })
-
       if (!v) return
 
       // console.log(v)
       this.options = []
-      if (!this.temp.tagId) {
-        this.$notify({
-          title: '错误',
-          message: '请选择标签',
-          type: 'error',
-          duration: 2000
-        })
-        return
-      }
 
       // console.log(this.temp.mainTable)
       if (this.temp.mainTable) {
         this.temp.mainResourceId = this.temp.mainTable.sourceId
         this.mainOptions = this.temp.mainTable.smColumns
+
+        console.log('this.temp.tables:', this.temp.tables)
+        console.log('this.temp.mainTable:', this.temp.mainTable)
         this.temp.tables.forEach((item) => {
-          if (this.temp.mainTable.sourceId !== item.sourceId) {
+          console.log(this.temp.mainTable.sourceId)
+          console.log(item.sourceId)
+          if (this.temp.mainTable.id !== item.id) {
             this.options = this.options.concat(item.smColumns)
           }
         })
@@ -381,18 +384,22 @@ export default {
     getTables() {
       fetchSource(this.temp.resourceId).then(response => {
         this.temp.tablesList = response.data.paths
+        this.temp.tablesList.forEach(item => {
+          item.sourceTitle = response.data.title
+        })
       })
     },
-    getList() {
+    async getList() {
       this.listLoading = true
       fetchList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
+        console.log(this.listArr.data)
       })
     },
-    getSourceList() {
-      fetchSourceList().then(response => {
+    async getSourceList() {
+      await fetchSourceList().then(response => {
         this.listSource = response.data.items
       })
     },

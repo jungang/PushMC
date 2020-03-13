@@ -194,7 +194,7 @@ export default {
             userId: -1
           }]*/
 
-          create([this.temp]).then(() => {
+          create(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({

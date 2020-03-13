@@ -79,7 +79,7 @@
       width="800"
       destroy-on-close
     >
-      <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
         <el-form-item label="内容标题" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
@@ -89,16 +89,23 @@
           <el-input v-model="temp.subhead" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="内容分类" prop="category">
+        <el-form-item label="内容分类" prop="categoryId">
           <el-select v-model="temp.categoryId" class="filter-item" placeholder="请选择">
             <el-option v-for="item in listCategory" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
-          <el-checkbox v-model="isUrl">使用新闻链接</el-checkbox>
         </el-form-item>
-        <el-form-item v-if="isUrl" label="新闻链接" prop="url">
-          <el-input v-model="temp.url" style="width:400px" />
+
+        <el-form-item label="新闻链接" prop="url">
+          <el-input v-model="temp.url" placeholder="请输入URL">
+            <template slot="prepend">
+
+              <el-checkbox v-model="temp.isUrl" />
+
+            </template>
+          </el-input>
+
         </el-form-item>
-        <el-form-item label="内容标签" prop="tag">
+        <el-form-item label="内容标签" prop="tagId">
           <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
             <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
@@ -174,8 +181,25 @@ export default {
         category: '',
         title: '',
         subhead: '',
+        isUrl: false,
         url: '',
         content: ''
+      },
+      rules: {
+        tagId: [
+          { required: true, message: '请选择标签', trigger: 'change' }
+        ],
+        categoryId: [
+          { required: true, message: '请选择分类', trigger: 'change' }
+        ],
+        title: [
+          { required: true, message: '标签名称不能为空', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        content: [
+          { required: true, message: '内容不能为空', trigger: 'blur' },
+          { min: 3, max: 2000, message: '长度在 3 到 2000个字符', trigger: 'blur' }
+        ]
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -240,6 +264,7 @@ export default {
         category: '',
         title: '',
         subhead: '',
+        isUrl: false,
         url: '',
         content: ''
       }
@@ -264,7 +289,9 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          console.log(this.temp)
           this.temp.category = this.listCategory.find(item => item.id === this.temp.categoryId).title
+          this.temp.tag = this.listLabel.find(item => item.id === this.temp.tagId).title
           this.temp.status = 'pro_examine'
           this.temp.contentType = 'content'
           create(this.temp).then(() => {
@@ -287,7 +314,7 @@ export default {
         this.temp = res.data
 
         this.isSubhead = !!row.subhead
-        this.isUrl = !this.url
+        this.isUrl = !!this.url
 
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -295,6 +322,7 @@ export default {
         })
       })
     },
+
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {

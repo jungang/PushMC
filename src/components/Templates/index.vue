@@ -49,10 +49,15 @@
               </el-select>
             </div>
 
+            <!--            $store.state.publicData.model.nginxPath -->
+            <!--            http://39.98.167.246:9910/offlinefile/-->
+            <!--            http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload-->
+            <!--            http://39.98.167.246:9910/smartpush/rest/common/upload-->
             <div class="img">
               <el-upload
                 class="uploader"
-                action="http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload"
+                action="http://localhost:8080/dev-api/common/upload"
+                name="upfile"
                 :show-file-list="false"
                 :on-success="handleSuccess"
               >
@@ -165,8 +170,8 @@ export default {
     // }
   },
   created() {
-    console.log(this.tmp)
-    console.log(this.tables)
+    console.log('created...')
+    console.log(this.$store.state.publicData.model.nginxPath)
   },
   methods: {
     toggle() {
@@ -188,7 +193,7 @@ export default {
       }
     },
     handleSuccess(res, file) {
-      this.tmp.cover = res.url
+      this.tmp.cover = res.data
     }
   }
 }

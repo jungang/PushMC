@@ -1,58 +1,53 @@
 <template>
   <div>
+
     <div
       v-for="(path, index) in data"
       :key="path.key"
     >
-      <el-form-item
-        :prop="'paths.' + index + '.value'"
-        :rules="{
-          required: true, message: '路径不能为空', trigger: 'blur'
-        }"
-      >
-        <span>路径 {{ index + 1 }} </span>
+      <el-divider>{{ index + 1 }}</el-divider>
+      <el-row>
+        <el-col :span="6" align="right">
+          表名称：
+        </el-col>
+        <el-col :span="18">
+          <el-input
+            v-model="path.title"
+            placeholder=""
+            class="dy_path"
+          >
+            <el-button v-if="data.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
+          </el-input>
+        </el-col>
+      </el-row>
 
-        <el-row>
-          <el-col :span="3">
-            title
-          </el-col>
-          <el-col :span="21">
-            <el-input
-              v-model="path.title"
-              placeholder=""
-              class="dy_path"
-            >
-              <el-button v-if="data.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
-            </el-input>
-          </el-col>
+      <el-row>
+        <el-col :span="6" align="right">
+          路径 {{ index + 1 }}：
+        </el-col>
+        <el-col :span="15">
+          <el-input
+            v-model="path.path"
+            placeholder=""
+            class="dy_path"
+          />
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6" align="right">
+          输入代码 ：<br>（ JSON schema）
+        </el-col>
+        <el-col :span="15">
+          <el-input
+            v-model="path.value"
+            type="textarea"
+            :rows="5"
+            placeholder="输入schema"
+            class="dy_path"
+          />
+        </el-col>
 
-          <el-col :span="3">
-            path
-          </el-col>
-          <el-col :span="21">
-            <el-input
-              v-model="path.path"
-              placeholder=""
-              class="dy_path"
-            />
-          </el-col>
-
-          <el-col :span="3">
-            schema
-          </el-col>
-          <el-col :span="21">
-            <el-input
-              v-model="path.value"
-              type="textarea"
-              :rows="5"
-              placeholder="输入schema"
-              class="dy_path"
-            />
-          </el-col>
-        </el-row>
-
-      </el-form-item>
-
+      </el-row>
       <!--      <el-row>
         <el-col :span="6">
           上传JSON文件：
@@ -70,7 +65,7 @@
 
     </div>
 
-    <el-button @click="addPath">+添加路径</el-button>
+    <el-button @click="addPath">+添加表</el-button>
 
   </div>
 </template>

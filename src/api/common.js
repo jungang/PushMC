@@ -38,6 +38,15 @@ export function domain(query) {
     params: query
   })
 }
+
+export function options(query) {
+  return request({
+    url: '/common/options',
+    method: 'get',
+    params: query
+  })
+}
+
 export function department(query) {
   return request({
     url: '/common/department',
