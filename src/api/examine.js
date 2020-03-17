@@ -18,7 +18,7 @@ export function detail(query) {
 
 export function action(query) {
   return request({
-    url: '/examine/action',
+    url: '/push-content/status',
     method: 'put',
     params: query
   })

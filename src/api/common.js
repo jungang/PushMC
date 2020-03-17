@@ -9,12 +9,12 @@ export function sourceOption(query) {
 }
 
 export function channelType(query) {
-/*  return request({
-    url: '/common/channel-type',
+  return request({
+    url: '/push-channel/list',
     method: 'get',
     params: query
-  })*/
-  return new Promise((resolve, reject) => {
+  })
+/*  return new Promise((resolve, reject) => {
     const res = {
       'data': {
         'items': [
@@ -28,7 +28,7 @@ export function channelType(query) {
       'code': 20000
     }
     resolve(res)
-  })
+  })*/
 }
 
 export function domain(query) {
@@ -49,7 +49,7 @@ export function options(query) {
 
 export function department(query) {
   return request({
-    url: '/common/department',
+    url: '/common/department2',
     method: 'get',
     params: query
   })

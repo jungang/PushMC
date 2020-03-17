@@ -9,6 +9,57 @@
       <el-input v-model="tmp.title" style="width:400px" />
     </el-form-item>
 
+    <el-form-item v-if="tmp.templateType==='template'" label="">
+      <el-row>
+        <el-col>
+          <div v-if="step===1" class="preview">
+            <div class="top">
+              <Args :options="options" :parent-value.sync="tmp.msgTitle" />
+            </div>
+
+            <!--            $store.state.publicData.model.nginxPath -->
+            <!--            http://39.98.167.246:9910/offlinefile/-->
+            <!--            http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload-->
+            <!--            http://39.98.167.246:9910/smartpush/rest/common/upload-->
+            <div class="img">
+              <el-upload
+                class="uploader"
+                action="http://localhost:8080/dev-api/common/upload"
+                name="upfile"
+                :show-file-list="false"
+                :on-success="handleSuccess"
+              >
+                <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
+              </el-upload>
+              <img :src="tmp.cover" alt="">
+            </div>
+
+            <el-row>
+              <Args :options="options" :parent-value.sync="tmp.digest" />
+            </el-row>
+
+            <div class="url">
+              +URL <br>
+              <el-input v-model="tmp.templateURL" placeholder="+推送URL" />
+            </div>
+          </div>
+          <div v-if="step===2" class="preview">
+
+            <Args :options="options" :parent-value.sync="tmp.arg1" />
+            <Args :options="options" :parent-value.sync="tmp.arg2" />
+            <Args :options="options" :parent-value.sync="tmp.arg3" />
+            <Args :options="options" :parent-value.sync="tmp.arg4" />
+
+          </div>
+
+        </el-col>
+      </el-row>
+      <el-row style="width: 400px; text-align: right; margin-top: 10px">
+        <el-button :disabled="step===1" @click="step=1">上一步</el-button>
+        <el-button :disabled="step===2" @click="step=2">下一步</el-button>
+      </el-row>
+    </el-form-item>
+
     <el-row v-if="tmp.templateType==='text'">
       <el-form-item label="可选字段" prop="可选字段">
         <el-row class="btnArea" :class="showAll?'show-all':'show-part'">
@@ -33,107 +84,16 @@
 
     </el-row>
 
-    <el-form-item v-if="tmp.templateType==='template'" label="">
-      <el-row>
-        <el-col>
-
-          <div class="preview">
-            <div class="top">
-              <el-select v-model="tmp.msgTitle" placeholder="+选择推送字段">
-                <el-option
-                  v-for="item in options"
-                  :key="item.id"
-                  :label="item.pathTitle"
-                  :value="item.path"
-                />
-              </el-select>
-            </div>
-
-            <!--            $store.state.publicData.model.nginxPath -->
-            <!--            http://39.98.167.246:9910/offlinefile/-->
-            <!--            http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload-->
-            <!--            http://39.98.167.246:9910/smartpush/rest/common/upload-->
-            <div class="img">
-              <el-upload
-                class="uploader"
-                action="http://localhost:8080/dev-api/common/upload"
-                name="upfile"
-                :show-file-list="false"
-                :on-success="handleSuccess"
-              >
-                <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
-              </el-upload>
-              <img :src="tmp.cover" alt="">
-            </div>
-
-            <el-row>
-              <el-col :span="12">
-                <el-select v-model="tmp.digest" placeholder="+选择推送字段">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.id"
-                    :label="item.pathTitle"
-                    :value="item.path"
-                  />
-                </el-select>
-              </el-col>
-              <el-col :span="12">
-                <el-select v-model="tmp.digest2" placeholder="+选择推送字段">
-                  <el-option
-                    v-for="item in options"
-                    :key="item.id"
-                    :label="item.pathTitle"
-                    :value="item.path"
-                  />
-                </el-select>
-              </el-col>
-            </el-row>
-
-            <div class="url">
-              <el-input v-model="tmp.templateURL" placeholder="+推送URL" />
-            </div>
-          </div>
-
-        </el-col>
-      </el-row>
-    </el-form-item>
-
-    <!--    <el-row>
-      <el-col align="right">
-        <el-button size="mini" @click="previewVisible = true">查看预览</el-button>
-      </el-col>
-    </el-row>-->
-
-    <el-dialog
-      :id="`messageTemplatePreview`"
-      width="30%"
-      title="预览"
-      :visible.sync="previewVisible"
-      append-to-body
-    >
-
-      <div v-if="tmp.templateType!=='text'">
-        <div class="title">内容标题</div>
-        <div class="content">内容标题</div>
-        <div class="warp">
-          <span class="time">时间</span>
-          <span class="id">发布ID</span>
-        </div>
-        <div class="link">阅读全文</div>
-      </div>
-      <div v-else>
-        王经理，您好！感谢您的来电咨询！品牌销售顾问—成功为您服务，欢迎您的来店亲临体验！祝您及家人身体健康，事事如意！
-      </div>
-
-    </el-dialog>
-
   </div>
 </template>
 
 <script>
 
+import Args from '@/components/args'
+
 export default {
   name: 'Templates',
+  components: { Args },
   props: {
     tmp: {
       required: true,
@@ -146,8 +106,9 @@ export default {
   },
   data() {
     return {
-      previewVisible: false,
-      showAll: false
+      argVisible: false,
+      showAll: false,
+      step: 1
     }
   },
   computed: {
@@ -161,8 +122,8 @@ export default {
     }
   },
   watch: {
-    template(val) {
-      console.log(val)
+    tmp(val) {
+      this.step = 1
       // this.thisTemplate = val
     }
     // thisTemplate(val) {
@@ -170,7 +131,6 @@ export default {
     // }
   },
   created() {
-    console.log('created...')
     console.log(this.$store.state.publicData.model.nginxPath)
   },
   methods: {

@@ -337,7 +337,7 @@ export default {
 
       // console.log(this.temp.mainTable)
       if (this.temp.mainTable) {
-        this.temp.mainResourceId = this.temp.mainTable.sourceId
+        this.temp.mainResourceId = this.temp.mainTable.id
         this.mainOptions = this.temp.mainTable.smColumns
 
         console.log('this.temp.tables:', this.temp.tables)

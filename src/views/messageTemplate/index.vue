@@ -81,7 +81,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      width="800"
+      width="800px"
       @close="dialogClose"
     >
 
@@ -199,9 +199,6 @@ export default {
     this.getList()
   },
   methods: {
-    handleSuccess(res, file) {
-      this.temp.templateContent.img = res.url
-    },
     dialogClose() {
       // console.log(this.editor)
       // this.editor.setContents([{ insert: 'Hello ' }])
@@ -269,13 +266,10 @@ export default {
           title: '',
           templateType: 'template',
           content: '',
-          templateContent: {
-            arg1: '',
-            arg2: '',
-            arg3: '',
-            img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-            url: ''
-          },
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          arg4: '',
           isURL: false,
           templateURL: ''
         },

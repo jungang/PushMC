@@ -36,6 +36,7 @@
         </el-table-column>
         <el-table-column label="频道推送状态" align="center" min-width="50">
           <template slot-scope="{row}">
+            {{ row.pushStatus }}
             <span :style="{color:row.pushStatus === 'pushed'?'green':'red'}">
               {{ row.pushStatus === 'pushed' ? '已推送': '未推送' }}
             </span>
@@ -80,11 +81,10 @@
             <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
               查看
             </el-button>
-
-            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+            <el-button v-if="row.pushStatus!=='pushed'" type="success" size="mini" @click="handleModifyStatus(row,'pushed')">
               推送
             </el-button>
-            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+            <el-button v-if="row.pushStatus==='pushed'" size="mini" @click="handleModifyStatus(row,'notuse')">
               取消推送
             </el-button>
 
@@ -109,176 +109,9 @@
     </el-row>
 
     <el-dialog
-      :title="textMap[dialogStatus]"
-      :visible.sync="dialogFormVisible"
-      width="1100px"
-      destroy-on-close
-      :class="'form'"
-      @opened="handleDialogOpened"
-    >
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" class="main-form">
-
-        <el-form-item label="频道名称" prop="title">
-          <el-input v-model="temp.title" style="width:400px" />
-        </el-form-item>
-
-        <el-form-item label="选择频道" prop="channelId">
-          <el-select v-model="temp.channelId" class="filter-item" placeholder="请选择" @change="handleChannelFilter">
-            <el-option v-for="item in channelListArr.items" :key="item.id" :label="item.title" :value="item.id" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="数据表">
-          {{ temp.channel.tables.length }}
-        </el-form-item>
-
-        <!--        <el-form-item label="频道标签" prop="tag">
-          <el-tag>{{ temp.channel.tag }}</el-tag>
-        </el-form-item>-->
-
-        <el-form-item label="频道规则" prop="tag">
-          <el-button :disabled="!temp.channelId" size="small" plain @click="editChannel">编辑频道规则</el-button>
-
-        </el-form-item>
-
-        <el-form-item label="推送通道" prop="pushChannel">
-          <el-row>
-            <el-table
-              ref="pushChannelTable"
-              :data="channelTypeList.items"
-              style="width:400px"
-              @selection-change="handleSelectionChangePushChannel"
-            >
-              <el-table-column
-                type="selection"
-              />
-              <el-table-column
-                label="通道类型"
-              >
-                <template slot-scope="{row}">
-                  {{ row.type }}
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="name"
-                label="通道名称"
-              >
-                <template slot-scope="{row}">
-                  {{ row.label }}
-                </template>
-              </el-table-column>
-
-            </el-table>
-          </el-row>
-
-        </el-form-item>
-        <el-form-item label="选择发送对象" prop="groups">
-
-          <el-row>
-            <el-col :span="12">按推送对象组</el-col>
-            <el-col :span="12" align="right">
-              <el-button @click="handleCreateGroup">新建推送对象组</el-button>
-            </el-col>
-
-          </el-row>
-          <el-row>
-            <el-table
-              ref="groupsTable"
-              :data="groupsArr"
-              @selection-change="handleSelectionChange"
-            >
-              <el-table-column
-                type="selection"
-              />
-              <el-table-column
-                label="名称"
-              >
-                <template slot-scope="{row}">
-                  {{ row.title }}
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="name"
-                label="人数"
-              >
-                <template slot-scope="{row}">
-                  {{ row.amount }}
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="address"
-                label="状态"
-                show-overflow-tooltip
-              >
-                <template slot-scope="{row}">
-                  <el-tag :type="row.status | statusFilter">
-                    {{ row.status === 'enabled' ? '已启用': '未启用' }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="name"
-                label="创建时间"
-              >
-                <template slot-scope="{row}">
-                  {{ row.updateTime }}
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-row>
-
-        </el-form-item>
-
-        <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
-          <Templates :tmp="temp.tmp" :tables="temp.tables" />
-        </el-form>
-
-        <el-form-item label="推送时间" prop="templateKey">
-          <el-radio v-model="temp.pushPlan" label="instant">实时</el-radio>
-
-          <el-row>
-            推送确认:
-            <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
-              <el-option label="按钮确认" value="1" />
-              <el-option label="阅读读秒计时" value="2" />
-              <el-option label="不需要确认" value="3" />
-            </el-select>
-            <el-input v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
-            <span>（短信不支持确认）</span>
-          </el-row>
-          <el-row>
-            推送确认:
-            <el-radio v-model="temp.receipt" label="true" value="true">需回传</el-radio>
-            <el-radio v-model="temp.receipt" label="false" value="false">不需回传</el-radio>
-            <span>（短信不支持确认）</span>
-          </el-row>
-        </el-form-item>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          {{ dialogStatus==='view'? '关闭' : '取消' }}
-        </el-button>
-        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData()">
-          完成
-        </el-button>
-        <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">
-          完成
-        </el-button>
-        <el-button v-if="dialogStatus==='copy'" type="primary" @click="createData()">
-          完成
-        </el-button>
-        <el-button v-if="dialogStatus==='push'" type="primary" @click="pushData()">
-          推送
-        </el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog
       title="频道订阅"
       :visible.sync="dialogFormSubscribe"
     >
-
       <template>
         <el-table
           :data="channelSubscribeList.data"
@@ -316,7 +149,6 @@
           </el-table-column>
         </el-table>
       </template>
-
       <span slot="footer" class="dialog-footer">
         <!--        <el-button @click="dialogFormSubscribe = false">取 消</el-button>-->
         <el-button type="primary" @click="closeSubscribe">关闭</el-button>
@@ -324,34 +156,215 @@
     </el-dialog>
 
     <el-dialog
-      title="新建推送对象组"
-      width="700px"
-      top="100px"
-      :visible.sync="groupVisible"
-      :before-close="handleClose"
-      @close="dialogClose"
+      :title="textMap[dialogStatus]"
+      width="1100px"
+      :class="'form'"
+      :visible.sync="outerVisible"
+      @opened="handleDialogOpened"
     >
 
-      <el-form ref="groupForm" :rules="rules" :model="groupTemp" label-position="right" label-width="150px" class="main-form">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" class="main-form">
 
-        <el-form-item label="推送对象组名称：" prop="title">
-          <el-input v-model="groupTemp.title" placeholder="输入对象组名称" style="width:400px" />
+        <el-form-item label="频道名称" prop="title">
+          <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
-        <!--       <el-radio-group v-model="tabTo" style="margin-bottom: 30px;">
-          <el-radio-button label="department">按组织结构</el-radio-button>
-          <el-radio-button label="personnel">按人员</el-radio-button>
-        </el-radio-group>-->
-        <PickPersons ref="pickPersons" :data.sync="groupTemp.smGroupItems" :tunnel="groupTemp.tunnelId" />
+        <el-form-item label="选择频道" prop="channelId">
+          <el-select v-model="temp.channelId" class="filter-item" placeholder="请选择" @change="handleChannelFilter">
+            <el-option v-for="item in channelListArr.items" :key="item.id" :label="item.title" :value="item.id" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="数据表">
+          {{ temp.channel.tables.length }}
+        </el-form-item>
+
+        <!--        <el-form-item label="频道标签" prop="tag">
+          <el-tag>{{ temp.channel.tag }}</el-tag>
+        </el-form-item>-->
+
+        <el-form-item label="频道规则" prop="tag">
+          <el-button :disabled="!temp.channelId" size="small" plain @click="editChannel">编辑频道规则（跳转）</el-button>
+
+        </el-form-item>
+
+        <el-form-item label="推送通道" prop="pushChannel">
+          <el-row>
+            <el-table
+              ref="pushChannelTable"
+              :data="channelTypeList.items"
+              style="width:400px"
+              @selection-change="handleSelectionChangePushChannel"
+            >
+              <el-table-column
+                type="selection"
+              />
+              <el-table-column
+                label="通道类型"
+              >
+                <template slot-scope="{row}">
+                  {{ row.type }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="通道名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.title }}
+                </template>
+              </el-table-column>
+
+            </el-table>
+          </el-row>
+
+        </el-form-item>
+        <el-form-item label="选择发送对象" prop="groups">
+
+          <el-row>
+            <el-col :span="12">按推送对象组</el-col>
+            <el-col :span="12" align="right">
+              <el-button @click="handleCreateGroup">新建推送对象组</el-button>
+            </el-col>
+
+          </el-row>
+          <el-row>
+            <el-table
+              ref="groupsTable"
+              :data="groupsArr.data"
+              @selection-change="handleSelectionChange"
+            >
+              <el-table-column
+                type="selection"
+              />
+
+              <el-table-column
+                label="名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.title }}
+                </template>
+              </el-table-column>
+
+              <el-table-column
+                label="通道名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.tunnelId }}
+                </template>
+              </el-table-column>
+
+              <el-table-column
+                prop="name"
+                label="人数"
+              >
+                <template slot-scope="{row}">
+                  {{ row.amount }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="address"
+                label="状态"
+                show-overflow-tooltip
+              >
+                <template slot-scope="{row}">
+                  <el-tag :type="row.status | statusFilter">
+                    {{ row.status === 'enabled' ? '已启用': '未启用' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="创建时间"
+              >
+                <template slot-scope="{row}">
+                  {{ row.updateTime }}
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              v-show="groupsArr.total>0"
+              :total="groupsArr.total"
+              :page.sync="groupsArr.listQuery.page"
+              :limit.sync="groupsArr.listQuery.limit"
+              hide-on-single-page
+              @pagination="getGroups()"
+            />
+          </el-row>
+
+        </el-form-item>
+
+        <el-form ref="dataForm" :model="temp" label-position="right" label-width="100px" class="main-form">
+          <Templates :tmp="temp.tmp" :tables="temp.tables" />
+        </el-form>
+
+        <el-form-item label="推送时间" prop="templateKey">
+          <el-radio v-model="temp.pushPlan" label="instant">实时</el-radio>
+
+          <el-row>
+            推送确认:
+            <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
+              <el-option label="按钮确认" value="1" />
+              <el-option label="阅读读秒计时" value="2" />
+              <el-option label="不需要确认" value="3" />
+            </el-select>
+            <el-input v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
+            <span>（短信不支持确认）</span>
+          </el-row>
+          <el-row>
+            推送确认:
+            <el-radio v-model="temp.receipt" label="true" value="true">需回传</el-radio>
+            <el-radio v-model="temp.receipt" label="false" value="false">不需回传</el-radio>
+            <span>（短信不支持确认）</span>
+          </el-row>
+        </el-form-item>
 
       </el-form>
+      <!--      新建推送组弹窗-->
+      <el-dialog
+        width="700px"
+        top="100px"
+        title="新建推送对象组"
+        :visible.sync="innerVisible"
+        append-to-body
+        @close="dialogClose"
+      >
+        <el-form ref="groupForm" :rules="rules" :model="groupTemp" label-position="right" label-width="150px" class="main-form">
 
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="groupVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createGroup">确 定</el-button>
-      </span>
+          <el-form-item label="推送对象组名称：" prop="title">
+            <el-input v-model="groupTemp.title" placeholder="输入对象组名称" style="width:400px" />
+          </el-form-item>
+
+          <!--       <el-radio-group v-model="tabTo" style="margin-bottom: 30px;">
+            <el-radio-button label="department">按组织结构</el-radio-button>
+            <el-radio-button label="personnel">按人员</el-radio-button>
+          </el-radio-group>-->
+          <PickPersons ref="pickPersons" :data.sync="groupTemp.smGroupItems" :tunnel="groupTemp.tunnelId" />
+
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="innerVisible = false">取 消</el-button>
+          <el-button type="primary" @click="createGroup">确 定</el-button>
+        </span>
+      </el-dialog>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="outerVisible = false">
+          {{ dialogStatus==='view'? '关闭' : '取消' }}
+        </el-button>
+        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData()">
+          完成
+        </el-button>
+        <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">
+          完成
+        </el-button>
+        <el-button v-if="dialogStatus==='copy'" type="primary" @click="createData()">
+          完成
+        </el-button>
+        <el-button v-if="dialogStatus==='push'" type="primary" @click="pushData()">
+          推送
+        </el-button>
+      </div>
     </el-dialog>
-
   </div>
 </template>
 
@@ -381,9 +394,14 @@ export default {
       return statusMap[status]
     }
   },
+  props: {
+    type: {
+      type: String,
+      default: 'Vue!'
+    }
+  },
   data() {
     return {
-      groupVisible: false,
       radio: '1',
       channelTypeList: [],
       channelSubscribeList: {
@@ -402,7 +420,17 @@ export default {
       pushTemplateList: [],
       additionalOptionShow: false,
       channelListArr: [],
-      groupsArr: [],
+      groupsArr: {
+        data: [],
+        total: 0,
+        listQuery: {
+          page: 1,
+          limit: 10,
+          title: undefined,
+          type: undefined,
+          sort: '+id'
+        }
+      },
       ruleOptions: [
         {
           value: '==',
@@ -459,7 +487,11 @@ export default {
           digest2: '',
           msgTitle: '',
           cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          templateURL: ''
+          templateURL: '',
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          arg4: ''
         },
         argTags: [],
         tables: [],
@@ -478,8 +510,11 @@ export default {
         receipt: 'true',
         pushChannel: []
       },
-      dialogFormVisible: false,
       dialogFormSubscribe: false,
+      groupVisible: false,
+      dialogVisible: false,
+      outerVisible: false,
+      innerVisible: false,
       dialogStatus: '',
       textMap: {
         channelPushSet: '频道推送设置（订阅频道）',
@@ -530,9 +565,13 @@ export default {
     this.getChannelTypeList()
     this.getChannelSubscribe()
     this.getPushTemplateList()
-    // this.getGroups()
+    console.log(this.$route.params)
+    console.log(this.type)
   },
   methods: {
+    handleTest() {
+      this.dialogVisible = true
+    },
     handleCreateGroup() {
       this.groupTemp = {
         id: undefined,
@@ -543,7 +582,9 @@ export default {
       }
 
       this.dynamicTags = []
-      this.groupVisible = true
+      // this.groupVisible = true
+      this.innerVisible = true
+
       this.$nextTick(() => {
         this.$refs['groupForm'].clearValidate()
       })
@@ -563,7 +604,7 @@ export default {
           this.groupTemp.status = 'enabled'
           console.log(this.groupTemp)
 
-          this.temp.tunnelId = this.$refs.pickPersons.personsArr.tunnelId
+          this.groupTemp.tunnelId = this.$refs.pickPersons.personsArr.tunnelId
 
           this.groupTemp.smGroupItems.forEach(item => {
             item.type = item.type || '1'
@@ -572,7 +613,7 @@ export default {
           })
 
           createGroup(this.groupTemp).then(() => {
-            this.groupVisible = false
+            this.innerVisible = false
             this.getGroups()
             this.$notify({
               title: '完成',
@@ -698,13 +739,15 @@ export default {
     },
     getGroups(data) {
       if (this.temp.tunnel.length === 0) {
-        this.groupsArr = []
+        this.groupsArr.data = []
         return
       }
-      groups({ tunnel: this.temp.tunnel.join(',') }).then(response => {
-        console.log('groups...')
-        console.log(response)
-        this.groupsArr = response.data.items
+
+      console.log(this.groupsArr.listQuery)
+      this.groupsArr.listQuery.tunnel = this.temp.tunnel.join(',')
+      groups(this.groupsArr.listQuery).then(response => {
+        this.groupsArr.total = response.data.total
+        this.groupsArr.data = response.data.items
       })
     },
     handleDialogOpened() {
@@ -719,7 +762,7 @@ export default {
       if (this.temp.groups) {
         // console.log(this.temp.groups)
         // console.log(this.groupsArr)
-        const rows = this.groupsArr.filter((item) => {
+        const rows = this.groupsArr.data.filter((item) => {
           return this.temp.groups.find((item2) => item2.id === item.id)
         })
         this.groupsTableSelection(rows)
@@ -738,8 +781,10 @@ export default {
     },
 
     pushChannelSelection(rows) {
-      // console.log('pushChannelSelection...')
+      console.log('pushChannelSelection...')
       // console.log(rows)
+
+      this.$refs.pushChannelTable.clearSelection()
       if (rows) {
         rows.forEach(row => {
           this.$refs.pushChannelTable.toggleRowSelection(row)
@@ -795,6 +840,8 @@ export default {
     getChannelTypeList() {
       this.listLoading = true
       channelType().then(response => {
+        console.log('getChannelTypeList...')
+        console.log(response)
         this.channelTypeList = response.data
         this.listLoading = false
       })
@@ -824,11 +871,16 @@ export default {
           id: -1,
           templateType: 'template',
           content: '',
+          title: '',
           digest: '',
           digest2: '',
           msgTitle: '',
           cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          templateURL: ''
+          templateURL: '',
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          arg4: ''
         },
         tables: [],
         argTags: [],
@@ -891,7 +943,8 @@ export default {
       // console.log('resetTemp...')
       // console.log(this.temp)
       this.dialogStatus = 'create'
-      this.dialogFormVisible = true
+      this.outerVisible = true
+
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -902,7 +955,7 @@ export default {
           this.temp.id = -1
           createSource(this.temp).then(() => {
             this.getList()
-            this.dialogFormVisible = false
+            this.outerVisible = false
             this.$notify({
               title: '完成',
               message: '新建数据源',
@@ -922,7 +975,7 @@ export default {
 
         console.log(this.temp.rules)
         this.dialogStatus = 'view'
-        this.dialogFormVisible = true
+        this.outerVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
@@ -957,7 +1010,7 @@ export default {
 
         this.getChannel()
         this.dialogStatus = opt || 'update'
-        this.dialogFormVisible = true
+        this.outerVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
@@ -978,7 +1031,7 @@ export default {
                 break
               }
             }
-            this.dialogFormVisible = false
+            this.outerVisible = false
             this.$notify({
               title: '完成',
               message: '推送成功',
@@ -1003,7 +1056,7 @@ export default {
                 break
               }
             }
-            this.dialogFormVisible = false
+            this.outerVisible = false
             this.$notify({
               title: '完成',
               message: '编辑成功',
@@ -1022,7 +1075,7 @@ export default {
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           copyChannel(tempData).then((res) => {
             this.getList()
-            this.dialogFormVisible = false
+            this.outerVisible = false
             this.$notify({
               title: '完成',
               message: '复制成功',

@@ -229,18 +229,27 @@ export const asyncRoutes = [
         path: '/channel-push',
         name: 'ChannelPush',
         component: () => import('@/views/channelPush/index'),
+        props: {
+          type: 'business'
+        },
         meta: { title: '频道推送', icon: 'table' }
       },
       {
         path: '/pipe-push',
         name: 'PipePush',
-        component: () => import('@/views/pipePush/index'),
+        component: () => import('@/views/channelPush/index'),
+        props: {
+          type: 'channel'
+        },
         meta: { title: '渠道推送', icon: 'table' }
       },
       {
         path: '/content-push',
         name: 'ContentPush',
-        component: () => import('@/views/contentPush/index'),
+        component: () => import('@/views/channelPush/index'),
+        props: {
+          type: 'content'
+        },
         meta: { title: '内容推送', icon: 'tree' }
       }
     ]

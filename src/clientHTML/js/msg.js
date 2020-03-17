@@ -20,11 +20,10 @@ $.ajax({
   dataType: 'json',
   timeout: 3000,
   success: function(res) {
-    console.log('res', res.data)
     data.sendData = JSON.parse(res.data.sendData)
     data.config = JSON.parse(res.data.config)
     data.acceptData = JSON.parse(res.data.acceptData)
-    render()
+    // render()
   },
   error: function(xhr, type) {
     console.log(xhr)
@@ -32,7 +31,7 @@ $.ajax({
 })
 
 function render() {
-  console.log(data.acceptData)
+  console.log(data)
   $('#title').text(data.acceptData.title)
   $('#cover').attr('src', data.acceptData.cover)
   $('#category span').text(data.acceptData.category)

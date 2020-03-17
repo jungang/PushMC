@@ -97,7 +97,7 @@
         <el-button v-if="dialogStatus!=='view'" type="danger" @click="handleAction(false)">
           审批不通过
         </el-button>
-        <el-button v-if="dialogStatus!=='view'" type="primary" @click="handleAction(true)">
+        <el-button v-if="dialogStatus!=='view'" type="primary" @click="handleAction('pro_publish')">
           审批通过
         </el-button>
       </div>
@@ -189,7 +189,7 @@ export default {
       this.examineDetails.action = status
       const data = {
         id: this.examineDetails.id,
-        action: status
+        status: status
       }
       action(data).then(response => {
         this.listLoading = false

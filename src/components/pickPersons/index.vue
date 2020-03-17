@@ -193,7 +193,7 @@ export default {
       domainArr: [],
       personsArr: {
         tunnelId: 1,
-        domain: '',
+        domain: 'xykj',
         items: [],
         total: 0,
         listQuery: {
@@ -276,16 +276,16 @@ export default {
     },
     format(data) {
       const resData = this.recursive(data)
-      // console.log('resData--', resData)
+      console.log('resData--', resData)
       return resData
     },
     recursive(arr) {
       if (!arr) return []
       arr.forEach(item => {
-        item.label = item.deptname || item.departname
-        item.id = item.deptid
+        item.label = item.departname
+        item.id = item.departmentid
 
-        if (item.hasOwnProperty('personnel')) {
+        if (item.personnel) {
           item.persons = item.personnel.items
           if (!item.persons) return
           item.persons.forEach(item => {
@@ -294,7 +294,7 @@ export default {
           })
         }
 
-        if (item.hasOwnProperty('children')) {
+        if (item.children) {
           item.children = item.children.items
           this.recursive(item.children)
         }
@@ -346,7 +346,7 @@ export default {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1)
     },
     addPersons() {
-      const _arr = [...this.multipleSelection, ...this.plaza]
+      const _arr = [...this.multipleSelection, ...this.checkedPerson]
       _arr.forEach(item => {
         item.userId = item.userId || item.userid
         const v = this.dynamicTags.find(item2 => {
