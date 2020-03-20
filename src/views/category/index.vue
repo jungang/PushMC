@@ -90,7 +90,7 @@
     </el-dialog>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogCategoryVisible" width="700px">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
+      <el-form ref="categoryForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
         <el-form-item v-if="dialogStatus==='create'" label="输入分类名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
@@ -252,15 +252,19 @@ export default {
       })
     },
     createCategory() {
-      saveCategory({ title: this.temp.title }).then(() => {
-        this.getList()
-        this.dialogCategoryVisible = false
-        this.$notify({
-          title: '完成',
-          message: '新建',
-          type: 'success',
-          duration: 2000
-        })
+      this.$refs['categoryForm'].validate((valid) => {
+        if (valid) {
+          saveCategory({ title: this.temp.title }).then(() => {
+            this.getList()
+            this.dialogCategoryVisible = false
+            this.$notify({
+              title: '完成',
+              message: '新建',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
       })
     },
     handleUpdate(row) {

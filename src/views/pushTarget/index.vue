@@ -16,7 +16,7 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="序号" prop="index" align="center" min-width="50">
+        <el-table-column label="序号" prop="index" align="center" width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
@@ -26,7 +26,7 @@
             <span>{{ row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="人数" prop="type" align="center" min-width="50">
+        <el-table-column label="人数" prop="type" align="center" width="50">
           <template slot-scope="{row}">
             <span>{{ row.amount }}</span>
           </template>
@@ -47,7 +47,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
               编辑

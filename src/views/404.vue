@@ -30,9 +30,10 @@ export default {
     }
   },
   created() {
-    setTimeout(function() {
+    window.location.href = '#/'
+  /*  setTimeout(function() {
       window.location.href = '#/'
-    }, 2000)
+    }, 2000)*/
   }
 }
 </script>

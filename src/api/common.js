@@ -8,27 +8,28 @@ export function sourceOption(query) {
   })
 }
 
+export function typeList(query) {
+  return request({
+    url: '/push-channel/type/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function upload(data) {
+  return request({
+    url: '/common/upload',
+    method: 'post',
+    data: data
+  })
+}
+
 export function channelType(query) {
   return request({
     url: '/push-channel/list',
     method: 'get',
     params: query
   })
-/*  return new Promise((resolve, reject) => {
-    const res = {
-      'data': {
-        'items': [
-          {
-            'type': 'gocom',
-            'label': 'goCom',
-            'id': 2
-          }
-        ]
-      },
-      'code': 20000
-    }
-    resolve(res)
-  })*/
 }
 
 export function domain(query) {

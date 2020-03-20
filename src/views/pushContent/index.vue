@@ -23,33 +23,33 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="ID" prop="id" align="center" min-width="50">
+        <el-table-column label="ID" prop="id" align="center" width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="内容分类" align="center" min-width="100">
+        <el-table-column label="内容分类" align="center" width="150">
           <template slot-scope="{row}">
             <span>{{ row.category }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="内容标签" align="center" min-width="100">
+        <el-table-column label="内容标签" align="center" width="150">
           <template slot-scope="{row}">
             <span>{{ row.tag }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="审批状态" align="center" min-width="100">
+        <el-table-column label="审批状态" align="center" width="150">
           <template slot-scope="{row}">
             <span>{{ row.status }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="内容标题" prop="type" width="300" align="center" min-width="50">
+        <el-table-column label="内容标题" prop="type" align="center" min-width="200">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-button type="primary" size="mini" @click="handleUpdate(row,'view')">
               查看
@@ -87,12 +87,6 @@
         </el-form-item>
         <el-form-item v-if="isSubhead" label="副标题" prop="subhead">
           <el-input v-model="temp.subhead" style="width:400px" />
-        </el-form-item>
-
-        <el-form-item label="内容分类" prop="categoryId">
-          <el-select v-model="temp.categoryId" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in listCategory" :key="item.id" :label="item.title" :value="item.id" />
-          </el-select>
         </el-form-item>
 
         <el-form-item label="新闻链接" prop="url">
@@ -238,7 +232,7 @@ export default {
       })
     },
     getLabel() {
-      fetchLabel(this.listArr.listQuery).then(response => {
+      fetchLabel({ categoryId: 3 }).then(response => {
         this.listLabel = response.data.items
       })
     },
@@ -290,7 +284,8 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp)
-          this.temp.category = this.listCategory.find(item => item.id === this.temp.categoryId).title
+          this.temp.categoryId = 3
+          this.temp.category = '内容推送'
           this.temp.tag = this.listLabel.find(item => item.id === this.temp.tagId).title
           this.temp.status = 'pro_examine'
           this.temp.contentType = 'content'

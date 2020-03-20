@@ -4,7 +4,9 @@ import Cookies from 'js-cookie'
 const TokenKey = 'token'
 
 export function getToken() {
+  // console.log('getToken...')
   const query = Qs.parse(location.hash.substring(1).split('?')[1])
+  // console.log(query)
   query.token && setToken(query.token)
   return Cookies.get(TokenKey) || query.token
 }

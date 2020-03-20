@@ -10,15 +10,19 @@
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="16" style="line-height: 40px;">
-        业务频道列表：
+        业务频道列表：{{ type }}
       </el-col>
       <el-col :span="8" align="right">
-        <el-button type="primary" @click="handleCreate">+新建内容推送</el-button>
+        <el-button type="primary" @click="handleCreate">
+          <span v-if="type==='content'">+新建内容推送</span>
+        </el-button>
       </el-col>
     </el-row>
 
     <el-row>
+
       <el-table
+        v-if="type==='content'"
         :key="tableKey"
         v-loading="listLoading"
         :data="listArr.data"
@@ -108,6 +112,7 @@
           </template>
         </el-table-column>
       </el-table>
+
       <pagination
         v-show="listArr.total>0"
         :total="listArr.total"
@@ -120,50 +125,142 @@
 
     <el-dialog
       :title="textMap[dialogStatus]"
-      :visible.sync="dialogFormVisible"
       width="1100px"
-      destroy-on-close
       :class="'form'"
+      :visible.sync="outerVisible"
       @opened="handleDialogOpened"
     >
+
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" class="main-form">
 
-        <el-form-item label="频道名称" prop="title">
+        <el-form-item label="内容推送名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="选择频道" prop="channelId">
-          <el-select v-model="temp.channelId" class="filter-item" placeholder="请选择" @change="handleChannelFilter">
-            <el-option v-for="item in channelListArr.items" :key="item.id" :label="item.title" :value="item.id" />
-          </el-select>
+        <el-form-item label="内容规则" prop="tag">
+
+          <el-row>
+            <el-col :span="12">
+              <el-button type="primary" @click="handleAddRule">+添加规则条目</el-button>
+            </el-col>
+          </el-row>
+          <el-table
+            :data="temp.rules"
+          >
+            <el-table-column
+              type="index"
+              label="序号"
+              align="center"
+            />
+            <el-table-column
+              prop="item1.tableKey"
+              label="内容类型"
+              width="100"
+              align="center"
+            >
+              内容
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="条件"
+              width="150"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select v-model="row.expression" placeholder="请选择" style="width: 100px">
+                  <el-option
+                    v-for="item in ruleOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="name"
+              label="内容标签"
+              width="400"
+              align="center"
+            >
+              <template slot-scope="{row}">
+                <el-select
+                  v-model="row.lable"
+                  placeholder="请选择"
+                  style="width:50%"
+                >
+                  <el-option
+                    v-for="item in labelList"
+                    :key="item.id"
+                    :label="item.title"
+                    :value="item.id"
+                  />
+                </el-select>
+
+              </template>
+            </el-table-column>
+
+            <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
+              <template slot-scope="{row}">
+                <el-button size="mini" type="danger" @click="handleRuleDelete(row,'deleted')">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
         </el-form-item>
 
-        <el-form-item label="数据表">
-          {{ temp.channel.tables.length }}
-        </el-form-item>
+        <el-form-item label="推送通道" prop="pushChannel">
+          <el-row>
+            <el-table
+              ref="pushChannelTable"
+              :data="channelTypeList.items"
+              style="width:400px"
+              @selection-change="handleSelectionChangePushChannel"
+            >
+              <el-table-column
+                type="selection"
+              />
+              <el-table-column
+                label="通道类型"
+              >
+                <template slot-scope="{row}">
+                  {{ row.type }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="name"
+                label="通道名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.title }}
+                </template>
+              </el-table-column>
 
-        <el-form-item label="频道标签" prop="tag">
-          <el-tag>{{ temp.channel.tag }}</el-tag>
-        </el-form-item>
+            </el-table>
+          </el-row>
 
-        <el-form-item label="频道规则" prop="tag">
-          <RulesSel :rules="temp.rules" :main-options="mainOptions" :options="options" />
         </el-form-item>
-
         <el-form-item label="选择发送对象" prop="groups">
 
           <el-row>
-            按推送对象组
+            <el-col :span="12">按推送对象组</el-col>
+            <el-col :span="12" align="right">
+              <el-button @click="handleCreateGroup">新建推送对象组</el-button>
+            </el-col>
+
           </el-row>
           <el-row>
             <el-table
               ref="groupsTable"
-              :data="groupsArr"
+              :data="groupsArr.data"
               @selection-change="handleSelectionChange"
             >
               <el-table-column
                 type="selection"
               />
+
               <el-table-column
                 label="名称"
               >
@@ -171,6 +268,15 @@
                   {{ row.title }}
                 </template>
               </el-table-column>
+
+              <el-table-column
+                label="通道名称"
+              >
+                <template slot-scope="{row}">
+                  {{ row.tunnelTitle }}
+                </template>
+              </el-table-column>
+
               <el-table-column
                 prop="name"
                 label="人数"
@@ -199,38 +305,14 @@
                 </template>
               </el-table-column>
             </el-table>
-          </el-row>
-
-        </el-form-item>
-
-        <el-form-item label="推送通道" prop="pushChannel">
-          <el-row>
-            <el-table
-              ref="pushChannelTable"
-              :data="channelTypeList.items"
-              style="width:400px"
-              @selection-change="handleSelectionChangePushChannel"
-            >
-              <el-table-column
-                type="selection"
-              />
-              <el-table-column
-                label="通道类型"
-              >
-                <template slot-scope="{row}">
-                  {{ row.type }}
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="name"
-                label="通道名称"
-              >
-                <template slot-scope="{row}">
-                  {{ row.label }}
-                </template>
-              </el-table-column>
-
-            </el-table>
+            <pagination
+              v-show="groupsArr.total>0"
+              :total="groupsArr.total"
+              :page.sync="groupsArr.listQuery.page"
+              :limit.sync="groupsArr.listQuery.limit"
+              hide-on-single-page
+              @pagination="getGroups()"
+            />
           </el-row>
 
         </el-form-item>
@@ -249,10 +331,10 @@
               <el-option label="阅读读秒计时" value="2" />
               <el-option label="不需要确认" value="3" />
             </el-select>
-            <el-input v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
+            <el-input v-if="temp.pushPlanOption==='2'" v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
             <span>（短信不支持确认）</span>
           </el-row>
-          <el-row>
+          <el-row v-if="temp.pushPlanOption!=='3'">
             推送确认:
             <el-radio v-model="temp.receipt" label="true" value="true">需回传</el-radio>
             <el-radio v-model="temp.receipt" label="false" value="false">不需回传</el-radio>
@@ -261,90 +343,70 @@
         </el-form-item>
 
       </el-form>
+      <!--      新建推送组弹窗-->
+      <el-dialog
+        width="700px"
+        top="100px"
+        title="新建推送对象组"
+        :visible.sync="innerVisible"
+        append-to-body
+        @close="dialogClose"
+      >
+        <el-form ref="groupForm" :rules="rules" :model="groupTemp" label-position="right" label-width="150px" class="main-form">
+
+          <el-form-item label="推送对象组名称：" prop="title">
+            <el-input v-model="groupTemp.title" placeholder="输入对象组名称" style="width:400px" />
+          </el-form-item>
+
+          <!--       <el-radio-group v-model="tabTo" style="margin-bottom: 30px;">
+            <el-radio-button label="department">按组织结构</el-radio-button>
+            <el-radio-button label="personnel">按人员</el-radio-button>
+          </el-radio-group>-->
+          <PickPersons ref="pickPersons" :data.sync="groupTemp.smGroupItems" :tunnel="groupTemp.tunnelId" />
+
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="innerVisible = false">取 消</el-button>
+          <el-button type="primary" @click="createGroup">确 定</el-button>
+        </span>
+      </el-dialog>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
+        <el-button @click="outerVisible = false">
           {{ dialogStatus==='view'? '关闭' : '取消' }}
         </el-button>
         <el-button v-if="dialogStatus==='create'" type="primary" @click="createData()">
-          完成
+          保存
         </el-button>
         <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">
-          完成
+          保存
         </el-button>
         <el-button v-if="dialogStatus==='copy'" type="primary" @click="createData()">
-          完成
+          保存
         </el-button>
-        <el-button v-if="dialogStatus==='push'" type="primary" @click="pushData()">
-          推送
+        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData('save_push')">
+          保存并推送
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog
-      title="频道订阅"
-      :visible.sync="dialogFormSubscribe"
-    >
-
-      <template>
-        <el-table
-          :data="channelSubscribeList.data"
-          stripe
-          border
-          style="width: 100%"
-        >
-          <el-table-column
-            prop="status"
-            label="订阅状态"
-          >
-            <template slot-scope="{row}">
-              <span>{{ row.bookStatus? '已订阅':'未订阅' }}</span>
-            </template>
-
-          </el-table-column>
-
-          <el-table-column
-            prop="title"
-            label="频道名称"
-          />
-          <el-table-column
-            align="center"
-            label="操作"
-          >
-            <template slot-scope="{row}">
-              <el-button v-if="row.bookStatus" type="danger" size="mini" @click="handleSubscribe(row,false)">
-                取消订阅
-              </el-button>
-              <el-button v-else type="primary" size="mini" @click="handleSubscribe(row,true)">
-                订阅
-              </el-button>
-            </template>
-
-          </el-table-column>
-        </el-table>
-      </template>
-
-      <span slot="footer" class="dialog-footer">
-        <!--        <el-button @click="dialogFormSubscribe = false">取 消</el-button>-->
-        <el-button type="primary" @click="closeSubscribe">关闭</el-button>
-      </span>
-    </el-dialog>
-
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, createSource, dele, fetchList, changeStatus, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
+import { copyChannel, dele, fetchList, createSource, changeStatus, channelList, detail, groups, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import Templates from '@/components/Templates'
-import RulesSel from '@/components/RulesSel'
+import PickPersons from '@/components/pickPersons'
+// import RulesSel from '@/components/RulesSel'
 import { channelSubscribe, channelType, pushTemplate } from '@/api/common'
 import Pagination from '@/components/Pagination'
+import { createGroup } from '@/api/pushTarget'
+import { fetchLabel } from '@/api/category'
 // import quillConfig from './quill-config.js'
 
 export default {
   name: 'ChannelPush',
-  components: { Pagination, Templates, RulesSel },
+  components: { Pagination, Templates, PickPersons },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -354,6 +416,12 @@ export default {
         disabled: 'danger'
       }
       return statusMap[status]
+    }
+  },
+  props: {
+    type: {
+      type: String,
+      default: 'Vue!'
     }
   },
   data() {
@@ -373,26 +441,30 @@ export default {
           sort: '+id'
         }
       },
-      pushTemplateList: [],
+      labelList: [],
       additionalOptionShow: false,
       channelListArr: [],
-      groupsArr: [],
+      groupsArr: {
+        data: [],
+        total: 0,
+        listQuery: {
+          page: 1,
+          limit: 10,
+          title: undefined,
+          type: undefined,
+          sort: '+id'
+        }
+      },
       ruleOptions: [
         {
-          value: '==',
-          label: '=='
+          value: 'equal',
+          label: '等于'
         }, {
-          value: '!=',
-          label: '!='
-        }, {
-          value: '>',
-          label: '>'
-        }, {
-          value: '<',
-          label: '<'
+          value: 'like',
+          label: '包含'
         }],
       mainOptions: [],
-      options: [],
+      tags: [],
       content: `<p>内容部分</p>`,
       // editorOption: quillConfig,  //图片上传
       editorOption: {}, // base64
@@ -414,14 +486,16 @@ export default {
           limit: 20,
           importance: undefined,
           title: undefined,
-          pushType: 'content',
+          pushType: this.type,
           searchKey: '',
           sort: '+id'
         }
       },
       listLoading: true,
+      groupTemp: {},
       temp: {
         id: undefined,
+        tunnel: [],
         status: 'enabled',
         tmp: {
           id: -1,
@@ -431,7 +505,11 @@ export default {
           digest2: '',
           msgTitle: '',
           cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          templateURL: ''
+          templateURL: '',
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          arg4: ''
         },
         argTags: [],
         tables: [],
@@ -448,10 +526,14 @@ export default {
         pushPlan: 'instant',
         pushPlanOption: '1',
         receipt: 'true',
+        receiptSecond: 60,
         pushChannel: []
       },
-      dialogFormVisible: false,
       dialogFormSubscribe: false,
+      groupVisible: false,
+      dialogVisible: false,
+      outerVisible: false,
+      innerVisible: false,
       dialogStatus: '',
       textMap: {
         channelPushSet: '频道推送设置（订阅频道）',
@@ -501,11 +583,79 @@ export default {
     this.getChannelList()
     this.getChannelTypeList()
     this.getChannelSubscribe()
-    this.getPushTemplateList()
-    this.getGroups()
+    this.getLabelList()
+    console.log(this.type)
+    console.log(this.listArr.listQuery.pushType)
+    console.log('created.......')
   },
   methods: {
+    getLabelList() {
+      fetchLabel({ categoryId: 3 }).then(response => {
+        this.labelList = response.data.items
+        console.log(response)
+      })
+    },
+    handleTest() {
+      this.dialogVisible = true
+    },
+    handleCreateGroup() {
+      this.groupTemp = {
+        id: undefined,
+        tunnelId: 1,
+        category: 'API',
+        title: '',
+        smGroupItems: []
+      }
 
+      this.dynamicTags = []
+      // this.groupVisible = true
+      this.innerVisible = true
+
+      this.$nextTick(() => {
+        this.$refs['groupForm'].clearValidate()
+      })
+    },
+    dialogClose() {
+      this.plaza = []
+      this.tabTo = 'department'
+      // this.$refs.tree.setCheckedKeys([])
+    },
+    createGroup() {
+      this.$refs['groupForm'].validate((valid) => {
+        if (valid) {
+          console.log(this.$refs.pickPersons.dynamicTags)
+          console.log(this.$refs.pickPersons.personsArr.tunnelId)
+          // this.temp.smGroupItems = this.dynamicTags
+          this.groupTemp.smGroupItems = this.$refs.pickPersons.dynamicTags
+          this.groupTemp.status = 'enabled'
+          console.log(this.groupTemp)
+
+          this.groupTemp.tunnelId = this.$refs.pickPersons.personsArr.tunnelId
+
+          this.groupTemp.smGroupItems.forEach(item => {
+            item.type = item.type || '1'
+            item.itemId = item.itemId || item.userid
+            item.itemName = item.itemName || item.truename
+          })
+
+          createGroup(this.groupTemp).then(() => {
+            this.innerVisible = false
+            this.getGroups()
+            this.$notify({
+              title: '完成',
+              message: '新建对象组',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    editChannel() {
+      if (this.temp.channelId) {
+        this.$router.push({ name: 'BusinessChannel', params: { edit: this.temp.channelId }})
+      }
+    },
     handleModifyStatus(row, status) {
       changeStatus(row.id, status).then(response => {
         this.$message({
@@ -526,14 +676,14 @@ export default {
       this.temp.templateContent.img = res.url
     },
     async insertText(mark) {
-      mark = '{' + mark + '}'
+      mark = '{ ' + mark + ' }'
       // const myField = document.querySelector('#textarea');
       const myField = this.$refs.myQuillEditor
       if (myField.selectionStart || myField.selectionStart === 0) {
         var startPos = myField.selectionStart
         var endPos = myField.selectionEnd
         this.temp.content = myField.value.substring(0, startPos) + mark +
-          myField.value.substring(endPos, myField.value.length)
+            myField.value.substring(endPos, myField.value.length)
         await this.$nextTick() // 这句是重点, 圈起来
         myField.focus()
         myField.setSelectionRange(endPos + mark.length, endPos + mark.length)
@@ -542,25 +692,25 @@ export default {
       }
       /*      const areaField = this.$refs.myQuillEditor
 
-      console.log(document.selection)
-      if (document.selection) {
-        var sel = document.selection.createRange()
-      }
+        console.log(document.selection)
+        if (document.selection) {
+          var sel = document.selection.createRange()
+        }
 
-      console.log(areaField)
-      console.log(areaField.selectionStart)
-      if (areaField.selectionStart || areaField.selectionStart === '0') {
-        const startPos = areaField.selectionStart
-        const endPos = areaField.selectionEnd
-        const restoreTop = areaField.scrollTop // 获取滚动条高度
-        //  this.waitingTextArea 是v-model的值
-        // item.text 是 选择的要插入的值
-        this.waitingTextArea = this.waitingTextArea.substring(0, startPos) + 'item.text' + this.waitingTextArea.substring(endPos, this.waitingTextArea.length)
-        console.log(this.waitingTextArea)
-      } else {
-        this.temp.content += mark
-        areaField.focus()
-      }*/
+        console.log(areaField)
+        console.log(areaField.selectionStart)
+        if (areaField.selectionStart || areaField.selectionStart === '0') {
+          const startPos = areaField.selectionStart
+          const endPos = areaField.selectionEnd
+          const restoreTop = areaField.scrollTop // 获取滚动条高度
+          //  this.waitingTextArea 是v-model的值
+          // item.text 是 选择的要插入的值
+          this.waitingTextArea = this.waitingTextArea.substring(0, startPos) + 'item.text' + this.waitingTextArea.substring(endPos, this.waitingTextArea.length)
+          console.log(this.waitingTextArea)
+        } else {
+          this.temp.content += mark
+          areaField.focus()
+        }*/
 
       // const index = this.editor.selection.savedRange.index
       // console.log('index:', index)
@@ -598,7 +748,7 @@ export default {
       this.temp.tag = this.temp.channel.tag
       this.temp.tagId = this.temp.channel.tagId
       this.temp.mainResourceId = this.temp.channel.mainResourceId
-      this.temp.pushType = 'content'
+      this.temp.pushType = this.type
     },
     getChannelList() {
       channelList().then(response => {
@@ -613,9 +763,17 @@ export default {
         }
       })
     },
-    getGroups() {
-      groups().then(response => {
-        this.groupsArr = response.data
+    getGroups(data) {
+      if (this.temp.tunnel.length === 0) {
+        this.groupsArr.data = []
+        return
+      }
+
+      console.log(this.groupsArr.listQuery)
+      this.groupsArr.listQuery.tunnel = this.temp.tunnel.join(',')
+      groups(this.groupsArr.listQuery).then(response => {
+        this.groupsArr.total = response.data.total
+        this.groupsArr.data = response.data.items
       })
     },
     handleDialogOpened() {
@@ -630,7 +788,7 @@ export default {
       if (this.temp.groups) {
         // console.log(this.temp.groups)
         // console.log(this.groupsArr)
-        const rows = this.groupsArr.filter((item) => {
+        const rows = this.groupsArr.data.filter((item) => {
           return this.temp.groups.find((item2) => item2.id === item.id)
         })
         this.groupsTableSelection(rows)
@@ -649,8 +807,10 @@ export default {
     },
 
     pushChannelSelection(rows) {
-      // console.log('pushChannelSelection...')
+      console.log('pushChannelSelection...')
       // console.log(rows)
+
+      this.$refs.pushChannelTable.clearSelection()
       if (rows) {
         rows.forEach(row => {
           this.$refs.pushChannelTable.toggleRowSelection(row)
@@ -666,6 +826,8 @@ export default {
     },
     handleSelectionChangePushChannel(val) {
       this.temp.pushChannel = val
+      this.temp.tunnel = this.temp.pushChannel.map(i => i.id)
+      this.getGroups()
     },
     handleAddRule() {
       // console.log(this.temp.rules)
@@ -674,11 +836,8 @@ export default {
       this.temp.rules = this.temp.rules || []
 
       this.temp.rules.push({
-        item1: { value: '', tableKey: '', tableName: '' },
-        item2: { value: '', tableKey: '', tableName: '' },
-        item3: { value: '', tableKey: '', tableName: '' },
-        operation1: '==',
-        operation2: '=='
+        expression: 'equal',
+        lable: ''
       })
       // console.log(this.temp.rules)
     },
@@ -704,6 +863,8 @@ export default {
     getChannelTypeList() {
       this.listLoading = true
       channelType().then(response => {
+        console.log('getChannelTypeList...')
+        console.log(response)
         this.channelTypeList = response.data
         this.listLoading = false
       })
@@ -727,16 +888,22 @@ export default {
       this.isUrl = false
       this.temp = {
         id: undefined,
+        tunnel: [],
         status: 'enabled',
         tmp: {
           id: -1,
           templateType: 'template',
           content: '',
+          title: '',
           digest: '',
           digest2: '',
           msgTitle: '',
           cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          templateURL: ''
+          templateURL: '',
+          arg1: '',
+          arg2: '',
+          arg3: '',
+          arg4: ''
         },
         tables: [],
         argTags: [],
@@ -752,6 +919,7 @@ export default {
         pushPlan: 'instant',
         pushPlanOption: '1',
         receipt: 'true',
+        receiptSecond: 60,
         additionalOption: [],
         targetes: [],
         pushTemplateList: [],
@@ -793,12 +961,14 @@ export default {
         // console.log(response)
       })
     },
+
     handleCreate() {
       this.resetTemp()
       // console.log('resetTemp...')
       // console.log(this.temp)
       this.dialogStatus = 'create'
-      this.dialogFormVisible = true
+      this.outerVisible = true
+
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -807,9 +977,11 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.id = -1
+          this.temp.status = (arguments[0] === 'save_push') ? 'enabled' : 'disabled'
+
           createSource(this.temp).then(() => {
             this.getList()
-            this.dialogFormVisible = false
+            this.outerVisible = false
             this.$notify({
               title: '完成',
               message: '新建数据源',
@@ -829,7 +1001,7 @@ export default {
 
         console.log(this.temp.rules)
         this.dialogStatus = 'view'
-        this.dialogFormVisible = true
+        this.outerVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
@@ -853,47 +1025,21 @@ export default {
 
         this.temp.templateType = this.temp.templateType || 'template'
         /*        this.temp.templateContent = this.temp.templateContent || {
-          arg1: '',
-          arg2: '',
-          arg3: '',
-          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          url: ''
-        }*/
+            arg1: '',
+            arg2: '',
+            arg3: '',
+            img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+            url: ''
+          }*/
 
         this.temp.channelId = this.temp.channelId || this.temp.mainResourceId
 
         this.getChannel()
         this.dialogStatus = opt || 'update'
-        this.dialogFormVisible = true
+        this.outerVisible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
-      })
-    },
-
-    pushData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          push(tempData).then((res) => {
-            this.temp.status = 'pushed'
-            for (const v of this.listArr.data) {
-              if (v.id === this.temp.id) {
-                const index = this.listArr.data.indexOf(v)
-                this.listArr.data.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '完成',
-              message: '推送成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
       })
     },
 
@@ -910,7 +1056,7 @@ export default {
                 break
               }
             }
-            this.dialogFormVisible = false
+            this.outerVisible = false
             this.$notify({
               title: '完成',
               message: '编辑成功',
@@ -929,7 +1075,7 @@ export default {
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           copyChannel(tempData).then((res) => {
             this.getList()
-            this.dialogFormVisible = false
+            this.outerVisible = false
             this.$notify({
               title: '完成',
               message: '复制成功',
@@ -968,9 +1114,9 @@ export default {
 
 <style lang="scss">
 
-.ql-editor{
-  height: 200px;
-}
+  .ql-editor{
+    height: 200px;
+  }
   #channelPush{
     .preview{
       border: 1px solid #C1C1C1;

@@ -65,3 +65,10 @@ ssh 账号
 
 /usr/share/nginx/html/push/
 http://39.98.167.246:9910/push/dist/
+
+
+落地页测试地址 /clientHTML/msg.html?id=1&app_token=1
+
+
+dashboard?token=1
+url?token=1 切换账号

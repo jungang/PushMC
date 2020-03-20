@@ -31,7 +31,7 @@
             <span>{{ row.describe }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="通道类型" prop="type" align="center" min-width="50">
+        <el-table-column label="通道类型" prop="type" align="center" min-width="100">
           <template slot-scope="{row}">
             <span>{{ row.type }}</span>
           </template>
@@ -74,7 +74,7 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
         <el-form-item label="通道类型" prop="type">
-          <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.type" :label="item.type"> {{ item.label }} </el-radio>
+          <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.type" :label="item.type"> {{ item.title }} </el-radio>
         </el-form-item>
         <el-form-item label="通道名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
@@ -126,7 +126,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { pushChannelList, detail, create, update, dele, changeStatus } from '@/api/pushChannel'
-import { channelType } from '@/api/common'
+import { typeList } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 
@@ -220,8 +220,8 @@ export default {
   },
   methods: {
     async getChannelType() {
-      await channelType().then(response => {
-        this.channelTypeList = response.data.items
+      await typeList().then(response => {
+        this.channelTypeList = response.data
         console.log(this.channelTypeList)
       })
     },

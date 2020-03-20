@@ -26,7 +26,7 @@
           <span>{{ row.type }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" class-name="status-col" min-width="50">
+      <el-table-column label="状态" class-name="status-col" align="center" min-width="50">
         <template slot-scope="{row}">
 
           <el-tag v-if="row.status !== 'deleted'" :type="row.status">
@@ -40,7 +40,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="数据源名称" min-width="100">
+      <el-table-column label="数据源名称" min-width="100" align="center">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
         </template>
@@ -331,6 +331,8 @@ export default {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
+
+      console.log(this.MODEL.dataSourceTypeOptions)
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -422,5 +424,6 @@ export default {
   .main-form{
     max-height: 600px;
     overflow-y: scroll;
+    padding-right: 30px;
   }
 </style>

@@ -129,11 +129,16 @@ export default {
       this.currentRow.prefix = this.saveQuery.prefix
 
       console.log(this.saveQuery)
+      this.currentRow.smColumns.forEach(item => {
+        item.checked = 0 // 标记左侧项
+      })
       this.saveQuery.targetData.forEach(item => {
         const index = this.currentRow.smColumns.findIndex((t, i, arr) => t.id === item.id)
-        console.log(item)
+        // console.log(item)
         this.currentRow.smColumns[index].column = item.column
+        this.currentRow.smColumns[index].checked = 1 // 标记左侧项
       })
+      console.log(this.currentRow)
       saveTag([this.currentRow]).then(res => {
         this.listLoading = false
         this.$notify({
@@ -160,7 +165,8 @@ export default {
 
       this.value = []
       this.transfer.forEach(item => {
-        if (item.column !== item.title) {
+        // if (item.column !== item.title) {
+        if (item.checked === 1) {
           this.value.push(item.id)
         }
       })

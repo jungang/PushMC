@@ -99,7 +99,7 @@ export default {
       this.visible = false
     },
     async insertText(mark) {
-      mark = '{' + mark + '}'
+      mark = '{ ' + mark + ' }'
       const myField = this.$refs.editor
 
       if (myField.selectionStart || myField.selectionStart === 0) {

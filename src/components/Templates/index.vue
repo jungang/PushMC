@@ -24,7 +24,7 @@
             <div class="img">
               <el-upload
                 class="uploader"
-                action="http://localhost:8080/dev-api/common/upload"
+                action="/smartpush3/rest/common/upload"
                 name="upfile"
                 :show-file-list="false"
                 :on-success="handleSuccess"
@@ -70,6 +70,7 @@
       </el-form-item>
 
       <el-form-item label="模板">
+        <label for="textarea" />
         <textarea
           id="textarea"
           ref="editor"
@@ -138,7 +139,7 @@ export default {
       console.log('toggle...')
     },
     async insertText(mark) {
-      mark = '{' + mark + '}'
+      mark = '{ ' + mark + ' }'
       const myField = this.$refs.editor
 
       if (myField.selectionStart || myField.selectionStart === 0) {

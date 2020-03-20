@@ -32,7 +32,7 @@ export function getUserInfo(token) {
     params: { app_token: token }
   })
 }
-export function getPermission(roles) {
+export function chartData(roles) {
 /*
   return request({
     url: '/user/permission',
@@ -45,20 +45,14 @@ export function getPermission(roles) {
     const res = {
       'code': 20000,
       'data': {
-        'roleTypes': [
-          {
-            'id': '07',
-            'path': '/push-target'
-          },
-          {
-            'id': '08',
-            'path': '/message-template'
-          },
-          {
-            'id': '09',
-            'path': '/message-push'
-          }
-        ]
+        series1: [
+          { value: 235, name: '推送总数' },
+          { value: 274, name: '短信推送总数' },
+          { value: 310, name: '微信推送总数' },
+          { value: 335, name: 'APP推送总数' },
+          { value: 400, name: 'gocom推送总数' }
+        ],
+        series2: [30, 50, 100, 130, 180, 190, 200]
       }
     }
     resolve(res)

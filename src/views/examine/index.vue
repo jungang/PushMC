@@ -3,6 +3,7 @@
 
     <el-select
       v-model="list.listQuery.filter"
+      style="margin-bottom: 10px"
       @change="filter"
     >
       <el-option label="全部" value="all" />
@@ -25,7 +26,7 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="审批状态" prop="title" align="center">
+      <el-table-column label="审批状态" prop="title" align="center" min-width="100">
         <template slot-scope="{row}">
           <span>{{ row.status }}</span>
         </template>
@@ -35,17 +36,17 @@
           <span>{{ row.category }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="标签" align="center" min-width="50">
+      <el-table-column label="标签" align="center" min-width="100">
         <template slot-scope="{row}">
           <span>{{ row.tag }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" min-width="50">
+      <el-table-column label="创建时间" align="center" min-width="100">
         <template slot-scope="{row}">
           <span>{{ row.updateTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" min-width="50" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button size="mini" @click="handleView(row)">
             查看

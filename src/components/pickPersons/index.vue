@@ -141,6 +141,7 @@
           v-for="tag in dynamicTags"
           :key="tag.id"
           closable
+          style="margin-right: 5px"
           :disable-transitions="false"
           @close="handleClose(tag)"
         >

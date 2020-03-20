@@ -39,14 +39,14 @@
           <span>{{ row.type }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="标注状态" class-name="status-col" min-width="50">
+      <el-table-column label="标注状态" class-name="status-col" min-width="50" align="center">
         <template slot-scope="{row}">
 
           {{ row.isLabel ? '已标注': '未标注' }}
 
         </template>
       </el-table-column>
-      <el-table-column label="数据源名称">
+      <el-table-column label="数据源名称" align="center">
         <template slot-scope="{row}">
           <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
         </template>

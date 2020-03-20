@@ -36,7 +36,7 @@ router.beforeEach(async(to, from, next) => {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
-
+          // console.log('40-roles:', roles)
           let roleTypes = []
           roles.forEach(item => {
             // console.log(item)

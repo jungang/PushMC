@@ -246,7 +246,7 @@ export const asyncRoutes = [
       {
         path: '/content-push',
         name: 'ContentPush',
-        component: () => import('@/views/channelPush/index'),
+        component: () => import('@/views/contentPush/index'),
         props: {
           type: 'content'
         },

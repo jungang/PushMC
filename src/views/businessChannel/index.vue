@@ -24,28 +24,33 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="ID" prop="id" align="center" min-width="50">
+        <el-table-column label="ID" prop="id" align="center" width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="业务频道名称" prop="type" align="center" min-width="50">
+        <el-table-column label="业务频道名称" prop="type" align="center" min-width="150">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签" align="center" min-width="100">
+        <el-table-column label="推送类型" prop="type" align="center" width="150">
+          <template slot-scope="{row}">
+            <span>{{ row.title }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="标签" align="center" width="100">
           <template slot-scope="{row}">
             <span>{{ row.tag }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="数据表" align="center" min-width="50">
+        <el-table-column label="数据表" align="center" width="100">
           <template slot-scope="{row}">
             <span>{{ row.tables === null ? '0' : row.tables.length }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-button type="primary" size="mini" @click="handleUpdate(row)">
               编辑
@@ -257,7 +262,7 @@ export default {
       tempValueMax: 3,
       temp: {
         id: undefined,
-        pushType: 'business',
+        // pushType: 'business',
         tagId: '',
         tag: '',
         title: '',
@@ -411,7 +416,7 @@ export default {
       this.tempValue = []
       this.temp = {
         id: undefined,
-        pushType: 'business',
+        // pushType: 'business',
         category: 'API',
         title: '',
         tablesList: [],

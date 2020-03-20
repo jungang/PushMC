@@ -19,24 +19,24 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="ID" prop="id" align="center" min-width="50">
+        <el-table-column label="ID" prop="id" align="center" width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="角色名称" prop="type" align="center" min-width="50">
+        <el-table-column label="角色名称" prop="type" align="center" width="600">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="角色分配" prop="type" width="300" align="center" min-width="50">
+        <el-table-column label="角色分配" prop="type" min-width="200" align="center">
           <template slot-scope="{row}">
             <span>{{ row.persons && row.persons.length || 0 }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" min-width="300" width="300" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-button :disabled="row.status==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
               编辑

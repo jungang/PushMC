@@ -520,7 +520,7 @@ export default {
       this.temp.templateContent.img = res.url
     },
     async insertText(mark) {
-      mark = '{' + mark + '}'
+      mark = '{ ' + mark + ' }'
       // const myField = document.querySelector('#textarea');
       const myField = this.$refs.myQuillEditor
       if (myField.selectionStart || myField.selectionStart === 0) {

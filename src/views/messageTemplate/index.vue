@@ -204,7 +204,7 @@ export default {
       // this.editor.setContents([{ insert: 'Hello ' }])
     },
     async insertText(mark) {
-      mark = '{' + mark + '}'
+      mark = '{ ' + mark + ' }'
       // const myField = document.querySelector('#textarea');
       const myField = this.$refs.myQuillEditor
       if (myField.selectionStart || myField.selectionStart === 0) {

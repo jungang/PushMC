@@ -28,6 +28,7 @@ export default {
       options().then(res => {
         this.MODEL.nginxPath = res.data.nginxPath
         this.MODEL.argu = res.data.argu
+        this.MODEL.dataSourceTypeOptions = res.data.dataSourceTypeOptions
       })
     }
   }

@@ -10,16 +10,21 @@
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="16" style="line-height: 40px;">
-        业务频道列表：
+        业务频道列表：{{ type }}
       </el-col>
       <el-col :span="8" align="right">
-        <el-button type="primary" @click="showSubscribePanel">频道订阅</el-button>
-        <el-button type="primary" @click="handleCreate">+新建频道推送</el-button>
+        <el-button v-if="type==='business'" type="primary" @click="showSubscribePanel">频道订阅</el-button>
+        <el-button type="primary" @click="handleCreate">
+          <span v-if="type==='business'">+新建频道推送</span>
+          <span v-if="type==='channel'">+渠道推送</span>
+          <span v-if="type==='content'">+新建内容推送</span>
+        </el-button>
       </el-col>
     </el-row>
 
     <el-row>
       <el-table
+        v-if="type==='business'"
         :key="tableKey"
         v-loading="listLoading"
         :data="listArr.data"
@@ -36,7 +41,6 @@
         </el-table-column>
         <el-table-column label="频道推送状态" align="center" min-width="50">
           <template slot-scope="{row}">
-            {{ row.pushStatus }}
             <span :style="{color:row.pushStatus === 'pushed'?'green':'red'}">
               {{ row.pushStatus === 'pushed' ? '已推送': '未推送' }}
             </span>
@@ -81,10 +85,10 @@
             <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
               查看
             </el-button>
-            <el-button v-if="row.pushStatus!=='pushed'" type="success" size="mini" @click="handleModifyStatus(row,'pushed')">
+            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
               推送
             </el-button>
-            <el-button v-if="row.pushStatus==='pushed'" size="mini" @click="handleModifyStatus(row,'notuse')">
+            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
               取消推送
             </el-button>
 
@@ -98,6 +102,185 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <el-table
+        v-if="type==='channel'"
+        :key="tableKey"
+        v-loading="listLoading"
+        :data="listArr.data"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+      >
+
+        <el-table-column label="ID" prop="id" align="center" min-width="50">
+          <template slot-scope="{row}">
+            <span>{{ row.id }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="推送状态" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <span :style="{color:row.pushStatus === 'pushed'?'green':'red'}">
+              {{ row.pushStatus === 'pushed' ? '已推送': '未推送' }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="最近推送时间" prop="type" width="200" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.updateTime }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="渠道来源" prop="type" width="100" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.origin }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="渠道标签" prop="type" width="100" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.tag }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="渠道推送名称" prop="type" width="300" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.title }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+          <template slot-scope="{row}">
+            <el-button :disabled="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+              编辑
+            </el-button>
+
+            <el-popconfirm
+              confirm-button-text="好的"
+              cancel-button-text="取消"
+              icon="el-icon-info"
+              icon-color="red"
+              :title="'删除 '+row.title + '?'"
+              @onConfirm="handleDelete(row,'deleted')"
+            >
+              <el-button slot="reference" :disabled="row.pushStatus==='pushed'" type="danger" size="mini">删除</el-button>
+            </el-popconfirm>
+
+            <el-button type="primary" size="mini" @click="handleUpdate(row, 'copy')">
+              复制
+            </el-button>
+            <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
+              查看
+            </el-button>
+
+            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+              推送
+            </el-button>
+            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+              取消推送
+            </el-button>
+
+            <!--            <el-button v-if="row.pushStatus==='notuse'" type="primary" size="mini" @click="handleUpdate(row,'push')">
+              推送
+            </el-button>
+            <el-button v-if="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUnPush(row, false)">
+              取消推送
+            </el-button>-->
+
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-table
+        v-if="type==='content'"
+        :key="tableKey"
+        v-loading="listLoading"
+        :data="listArr.data"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+      >
+        <el-table-column label="ID" prop="id" align="center" min-width="50">
+          <template slot-scope="{row}">
+            <span>{{ row.id }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="推送状态" align="center" min-width="100">
+          <template slot-scope="{row}">
+
+            <span :style="{color:row.pushStatus === 'pushed'?'green':'red'}">
+              {{ row.pushStatus === 'pushed' ? '已推送': '未推送' }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="最近推送时间" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <span>{{ row.updateTime }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="内容分类" align="center" min-width="100">
+          <template slot-scope="{row}">
+            <span>{{ row.contentType==="notice"?"公告":"新闻" }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="内容标签" align="center" min-width="100">
+          <template slot-scope="{row}">
+            {{ row.tag }}
+            <!--            <el-tag v-for="tag in row.tag" :key="tag" style="margin-right: 10px">{{ tag }}</el-tag>-->
+          </template>
+        </el-table-column>
+        <el-table-column label="内容来源" prop="type" width="100" align="center" min-width="50">
+          <template slot-scope="{row}">
+            {{ row.origin }}
+          </template>
+        </el-table-column>
+        <el-table-column label="渠道推送名称" prop="type" width="200" align="center" min-width="50">
+          <template slot-scope="{row}">
+            <span>{{ row.title }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作" align="center" min-width="250" class-name="small-padding fixed-width">
+          <template slot-scope="{row}">
+            <el-button :disabled="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+              编辑
+            </el-button>
+
+            <el-popconfirm
+              confirm-button-text="好的"
+              cancel-button-text="取消"
+              icon="el-icon-info"
+              icon-color="red"
+              :title="'删除 '+row.title + '?'"
+              @onConfirm="handleDelete(row,'deleted')"
+            >
+              <el-button slot="reference" :disabled="row.pushStatus==='pushed'" type="danger" size="mini">删除</el-button>
+            </el-popconfirm>
+
+            <el-button type="primary" size="mini" @click="handleUpdate(row, 'copy')">
+              复制
+            </el-button>
+            <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
+              查看
+            </el-button>
+
+            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+              推送
+            </el-button>
+            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+              取消推送
+            </el-button>
+
+            <!--            <el-button v-if="row.pushStatus==='notuse'" type="primary" size="mini" @click="handleUpdate(row,'push')">
+              推送
+            </el-button>
+            <el-button v-if="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUnPush(row, false)">
+              取消推送
+            </el-button>-->
+
+          </template>
+        </el-table-column>
+      </el-table>
+
       <pagination
         v-show="listArr.total>0"
         :total="listArr.total"
@@ -250,7 +433,7 @@
                 label="通道名称"
               >
                 <template slot-scope="{row}">
-                  {{ row.tunnelId }}
+                  {{ row.tunnelTitle }}
                 </template>
               </el-table-column>
 
@@ -308,10 +491,10 @@
               <el-option label="阅读读秒计时" value="2" />
               <el-option label="不需要确认" value="3" />
             </el-select>
-            <el-input v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
+            <el-input v-if="temp.pushPlanOption==='2'" v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
             <span>（短信不支持确认）</span>
           </el-row>
-          <el-row>
+          <el-row v-if="temp.pushPlanOption!=='3'">
             推送确认:
             <el-radio v-model="temp.receipt" label="true" value="true">需回传</el-radio>
             <el-radio v-model="temp.receipt" label="false" value="false">不需回传</el-radio>
@@ -352,16 +535,16 @@
           {{ dialogStatus==='view'? '关闭' : '取消' }}
         </el-button>
         <el-button v-if="dialogStatus==='create'" type="primary" @click="createData()">
-          完成
+          保存
         </el-button>
         <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">
-          完成
+          保存
         </el-button>
         <el-button v-if="dialogStatus==='copy'" type="primary" @click="createData()">
-          完成
+          保存
         </el-button>
-        <el-button v-if="dialogStatus==='push'" type="primary" @click="pushData()">
-          推送
+        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData('save_push')">
+          保存并推送
         </el-button>
       </div>
     </el-dialog>
@@ -370,7 +553,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, createSource, dele, fetchList, changeStatus, channelList, detail, groups, push, unPush, updateChannel } from '@/api/channelPush'
+import { copyChannel, dele, fetchList, createSource, changeStatus, channelList, detail, groups, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import Templates from '@/components/Templates'
 import PickPersons from '@/components/pickPersons'
@@ -468,7 +651,7 @@ export default {
           limit: 20,
           importance: undefined,
           title: undefined,
-          pushType: 'business',
+          pushType: this.type,
           searchKey: '',
           sort: '+id'
         }
@@ -508,6 +691,7 @@ export default {
         pushPlan: 'instant',
         pushPlanOption: '1',
         receipt: 'true',
+        receiptSecond: 60,
         pushChannel: []
       },
       dialogFormSubscribe: false,
@@ -565,8 +749,9 @@ export default {
     this.getChannelTypeList()
     this.getChannelSubscribe()
     this.getPushTemplateList()
-    console.log(this.$route.params)
     console.log(this.type)
+    console.log(this.listArr.listQuery.pushType)
+    console.log('created.......')
   },
   methods: {
     handleTest() {
@@ -650,7 +835,7 @@ export default {
       this.temp.templateContent.img = res.url
     },
     async insertText(mark) {
-      mark = '{' + mark + '}'
+      mark = '{ ' + mark + ' }'
       // const myField = document.querySelector('#textarea');
       const myField = this.$refs.myQuillEditor
       if (myField.selectionStart || myField.selectionStart === 0) {
@@ -722,10 +907,10 @@ export default {
       this.temp.tag = this.temp.channel.tag
       this.temp.tagId = this.temp.channel.tagId
       this.temp.mainResourceId = this.temp.channel.mainResourceId
-      this.temp.pushType = 'business'
+      this.temp.pushType = this.type
     },
     getChannelList() {
-      channelList().then(response => {
+      channelList({ pushType: this.type }).then(response => {
         this.channelListArr = response.data
         if (!this.channelListArr) {
           this.$notify({
@@ -896,6 +1081,7 @@ export default {
         pushPlan: 'instant',
         pushPlanOption: '1',
         receipt: 'true',
+        receiptSecond: 60,
         additionalOption: [],
         targetes: [],
         pushTemplateList: [],
@@ -953,6 +1139,8 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.id = -1
+          this.temp.status = (arguments[0] === 'save_push') ? 'enabled' : 'disabled'
+
           createSource(this.temp).then(() => {
             this.getList()
             this.outerVisible = false
@@ -1014,32 +1202,6 @@ export default {
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
         })
-      })
-    },
-
-    pushData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          push(tempData).then((res) => {
-            this.temp.status = 'pushed'
-            for (const v of this.listArr.data) {
-              if (v.id === this.temp.id) {
-                const index = this.listArr.data.indexOf(v)
-                this.listArr.data.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.outerVisible = false
-            this.$notify({
-              title: '完成',
-              message: '推送成功',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
       })
     },
 

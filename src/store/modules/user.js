@@ -1,4 +1,4 @@
-import { login, logout, getInfo, getPermission } from '@/api/user'
+import { login, logout, getUserInfo, getPermission } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -55,7 +55,7 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getUserInfo(getToken()).then(response => {
         const { data } = response
 
         if (!data) {
@@ -74,6 +74,7 @@ const actions = {
         commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
+        console.log(error)
         reject(error)
       })
     })
