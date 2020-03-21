@@ -3,7 +3,8 @@
     <logo v-if="showLogo" :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
-        :default-active="activeMenu"
+        :default-active="'/dashboard'"
+        :default-openeds="['/manage','/content','/permission']"
         :collapse="isCollapse"
         :background-color="variables.menuBg"
         :text-color="variables.menuText"

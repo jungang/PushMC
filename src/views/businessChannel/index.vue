@@ -210,7 +210,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, channelDetail, createSource, update, dele } from '@/api/businessChannel'
+import { fetchList, channelDetail, createBusinessChannel, update, dele } from '@/api/businessChannel'
 import { fetchLabel } from '@/api/category'
 import { fetchSourceList, fetchSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
@@ -251,8 +251,7 @@ export default {
         listQuery: {
           page: 1,
           limit: 20,
-          importance: undefined,
-          title: undefined,
+          pushType: 'unknown',
           searchKey: '',
           sort: '+id'
         }
@@ -494,7 +493,7 @@ export default {
 
           })
 
-          createSource(this.temp).then(() => {
+          createBusinessChannel(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({

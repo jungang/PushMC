@@ -494,7 +494,7 @@
             <el-input v-if="temp.pushPlanOption==='2'" v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
             <span>（短信不支持确认）</span>
           </el-row>
-          <el-row v-if="temp.pushPlanOption!=='3'">
+          <el-row>
             推送确认:
             <el-radio v-model="temp.receipt" label="true" value="true">需回传</el-radio>
             <el-radio v-model="temp.receipt" label="false" value="false">不需回传</el-radio>
@@ -709,9 +709,9 @@ export default {
         create: '新建'
       },
       rules: {
-        channelId: [
-          { required: true, message: '请选择分类', trigger: 'change' }
-        ],
+        // channelId: [
+        //   { required: true, message: '请选择分类', trigger: 'change' }
+        // ],
         groups: [
           { required: true, message: '请选择推送对象组', trigger: 'blur' }
         ],
@@ -1136,6 +1136,11 @@ export default {
       })
     },
     createData() {
+      this.temp.channelId = this.temp.channelId || 1 // todo
+      this.temp.tag = this.temp.tag || 1 // todo
+      this.temp.tagId = this.temp.tagId || 1 // todo
+      this.temp.mainResourceId = this.temp.mainResourceId || 1 // todo
+
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.id = -1

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <el-row type="flex" justify="end" style="margin-bottom: 10px">
-      <el-button type="primary" style="margin-right: 10px" @click="handleCreateCategory">添加分类</el-button>
+      <!--      <el-button type="primary" style="margin-right: 10px" @click="handleCreateCategory">添加分类</el-button>-->
       <el-button type="primary" @click="handleCreateTag">添加标签</el-button>
     </el-row>
     <el-row>

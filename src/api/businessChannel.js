@@ -54,9 +54,9 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function createBusinessChannel(data) {
   return request({
-    url: '/business-channel/create',
+    url: '/business-channel/channel/create',
     method: 'post',
     data: data
   })
@@ -64,7 +64,7 @@ export function createSource(data) {
 
 export function update(data) {
   return request({
-    url: '/business-channel/update',
+    url: '/business-channel/channel/update',
     method: 'post',
     data: data
   })

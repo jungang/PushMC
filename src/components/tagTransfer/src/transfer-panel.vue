@@ -50,7 +50,8 @@
           <div v-if="isShowInput" class="right-input">
             {{ customPrefix ? customPrefix + '@' : '' }}
             <el-input v-if="isShowInput" v-model="item.column" :placeholder="item[labelProp]" size="mini" style="width: 150px" />
-            {{ item.title }}
+            <span style="color: #cccccc">{{ item.title }}</span>
+
           </div>
           <div v-else>
             {{ item[labelProp] }}

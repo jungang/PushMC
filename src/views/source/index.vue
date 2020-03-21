@@ -26,6 +26,13 @@
           <span>{{ row.type }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="标注状态" class-name="status-col" min-width="50" align="center">
+        <template slot-scope="{row}">
+
+          {{ row.isLabel ? '已标注': '未标注' }}
+
+        </template>
+      </el-table-column>
       <el-table-column label="状态" class-name="status-col" align="center" min-width="50">
         <template slot-scope="{row}">
 
@@ -60,6 +67,9 @@
           </el-button>
           <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
             停用
+          </el-button>
+          <el-button type="primary" size="mini" @click="handleTag(row)">
+            标注
           </el-button>
           <el-button v-if="row.status==='deleted'" size="mini" @click="handleModifyStatus(row,'draft')">
             恢复
@@ -358,6 +368,11 @@ export default {
             })
           })
         }
+      })
+    },
+    handleTag(row) {
+      sourceDetail({ id: row.id }).then(response => {
+        this.$router.push({ name: 'Edit', params: response.data })
       })
     },
     handleUpdate(row) {

@@ -8,7 +8,7 @@
           :key="businessTableKey"
           :data="listArr"
           highlight-current-row
-          style="width: 100%"
+          style="width: 100%; cursor: pointer"
           @current-change="handleCurrentChange"
         >
           <el-table-column
@@ -47,7 +47,8 @@
           </XcomTagTransfer>
 
           <el-row style="margin-top: 20px">
-            <router-link to="/data-tag/list"><el-button>取消</el-button></router-link>
+
+            <router-link to="/source"><el-button>取消</el-button></router-link>
 
             <el-button type="primary" @click="openDailog">保存并应用</el-button>
           </el-row>

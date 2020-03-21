@@ -23,9 +23,9 @@ export function dele(id, status) {
   })
 }
 
-export function fetchSource(id) {
+export function channelList(id) {
   return request({
-    url: '/push-channel/detail',
+    url: '/source/page',
     method: 'get',
     params: { id }
   })

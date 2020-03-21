@@ -4,7 +4,7 @@
       推送通道
     </el-row>
     <el-row type="flex" justify="end">
-      <el-button type="primary" @click="handleCreate">+新建推送通道</el-button>
+      <el-button type="primary" style="margin-bottom: 10px" @click="handleCreate">+新建推送通道</el-button>
     </el-row>
     <el-row>
       <el-table
@@ -76,7 +76,14 @@
         <el-form-item label="通道类型" prop="type">
           <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.type" :label="item.type"> {{ item.title }} </el-radio>
         </el-form-item>
-        <el-form-item label="通道名称" prop="title">
+        <el-form-item label="通道" prop="title">
+
+          <el-select v-model="temp.channel" class="filter-item" placeholder="请选择">
+            <el-option v-for="item in channelList" :key="item.id" :label="item.title" :value="item.id" />
+          </el-select>
+
+        </el-form-item>
+        <el-form-item label="名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
         <el-form-item label="通道状态" prop="status">
@@ -99,17 +106,6 @@
           </el-form-item>
         </div>
 
-        <el-form-item label="描述" prop="describe">
-          <el-input
-            v-model="temp.describe"
-            :autosize="{ minRows: 4, maxRows: 10}"
-            type="textarea"
-            maxlength="30"
-            show-word-limit
-            placeholder="200字"
-          />
-        </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -125,7 +121,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { pushChannelList, detail, create, update, dele, changeStatus } from '@/api/pushChannel'
+import { pushChannelList, channelList, detail, create, update, dele, changeStatus } from '@/api/pushChannel'
 import { typeList } from '@/api/common'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -150,6 +146,7 @@ export default {
   data() {
     return {
       channelTypeList: [],
+      channelList: [],
       tableKey: 0,
       listArr: {
         data: [],
@@ -216,6 +213,7 @@ export default {
   },
   async created() {
     await this.getChannelType()
+    await this.getChannelList()
     this.getList()
   },
   methods: {
@@ -223,6 +221,12 @@ export default {
       await typeList().then(response => {
         this.channelTypeList = response.data
         console.log(this.channelTypeList)
+      })
+    },
+    async getChannelList() {
+      await channelList().then(response => {
+        this.channelList = response.data.items
+        console.log(this.channelList)
       })
     },
     getList() {

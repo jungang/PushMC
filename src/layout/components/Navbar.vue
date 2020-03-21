@@ -48,7 +48,7 @@ export default {
     }
   },
   created() {
-    console.log(this.$store.state.user.name)
+    // console.log(this.$store.state.user.name)
   },
   methods: {
     toggleSideBar() {

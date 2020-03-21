@@ -11,15 +11,6 @@
           :value="item.id"
         />
       </el-select>
-      选择域：
-      <el-select v-model="personsArr.domain" placeholder="请选择" style="width:150px" @change="handleFilter">
-        <el-option
-          v-for="item in domainArr"
-          :key="item.name"
-          :label="item.name"
-          :value="item.name"
-        />
-      </el-select>
     </el-row>
 
     <el-tabs v-model="tabTo" type="card">
@@ -218,6 +209,7 @@ export default {
     await this.getDomainList()
     this.$nextTick(() => {
       this.handleFilter()
+      this.init(this.data)
     })
   },
   mounted() {
@@ -234,15 +226,14 @@ export default {
     async getPushChannelList() {
       pushChannelList().then(res => {
         this.tunnelArr = res.data.items
-        console.log(this.tunnelArr)
       })
     },
     handleFilter() {
       this.departmentData = []
+      this.dynamicTags = []
       this.getDepartmentData()
     },
     init(val) {
-      console.log('init......')
       this.dynamicTags = val
       this.plaza = []
       this.personsArr.items = []
@@ -263,21 +254,30 @@ export default {
       })
     },
     async getDepartmentData() {
+      console.log('data:', this.data)
+      console.log('tunnelArr:', this.tunnelArr)
+      console.log('personsArr.tunnelId:', this.personsArr.tunnelId)
+
+      const tunnel = this.tunnelArr.find(item => item.id === this.personsArr.tunnelId)
+
+      if (tunnel) {
+        // this.personsArr.domain = tunnel.domain // todo 需要 tunnel.type.domain
+        this.personsArr.domain = tunnel.type // todo 需要 tunnel.type.domain
+      } else {
+        this.personsArr.domain = this.personsArr.domain || 'xykj'
+      }
+
       const data = {
-        domain: this.personsArr.domain || '',
+        domain: this.personsArr.domain,
         tunnelId: this.personsArr.tunnelId
       }
       await department(data).then(response => {
         this.departmentData = this.format(response.data)
-        console.log('department...')
-        console.log(this.departmentData)
-        this.dynamicTags = []
         this.plaza = []
       })
     },
     format(data) {
       const resData = this.recursive(data)
-      console.log('resData--', resData)
       return resData
     },
     recursive(arr) {
@@ -291,7 +291,6 @@ export default {
           if (!item.persons) return
           item.persons.forEach(item => {
             item.name = item.truename
-            // console.log(item)
           })
         }
 
@@ -308,7 +307,6 @@ export default {
     },
 
     handleChangeCheck(arg, status, arg3) {
-      console.log('handleChangeCheck...')
       this.treePersons = []
     },
     handleCheck(status, nodes) {
@@ -322,7 +320,6 @@ export default {
           console.log('node not has any person')
         }
       })
-      console.log(this.plaza.length)
       this.plaza = this.treePersons
       this.checkedPerson = this.treePersons
     },
@@ -340,7 +337,6 @@ export default {
       this.getPersonsList()
     },
     handleSelectionChange(val) {
-      console.log(val)
       this.multipleSelection = val
     },
     handleClose(tag) {
@@ -356,11 +352,6 @@ export default {
         })
         if (!v) this.dynamicTags.push(item)
       })
-      // this.dynamicTags = this.dynamicTags.concat(this.plaza)
-      // this.dynamicTags = this.dynamicTags.concat(this.multipleSelection)
-      // this.dynamicTags = Array.from(new Set(this.dynamicTags)) // 去重*/
-      // console.log(this.plaza)
-      // console.log(this.dynamicTags)
     }
   }
 }

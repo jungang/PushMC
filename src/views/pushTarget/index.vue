@@ -4,7 +4,7 @@
       推送对象
     </el-row>
     <el-row type="flex" justify="end">
-      <el-button type="primary" @click="handleCreate">+新建</el-button>
+      <el-button type="primary" style="margin-bottom: 10px" @click="handleCreate">+新建</el-button>
     </el-row>
     <el-row>
       <el-table
