@@ -85,7 +85,7 @@
 
       <el-table-column label="操作" align="center" width="100" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button size="mini" type="danger" @click="handleRuleDelete(row,'deleted')">
+          <el-button size="mini" type="text" @click="handleRuleDelete(row,'deleted')">
             删除
           </el-button>
         </template>
@@ -158,13 +158,13 @@ export default {
       console.log(this.options)
       if (this.mainOptions.length > 0) {
         this.rules.push({
-          expression: 'equal',
+          expression: '',
           mainColumnPath: '',
           mainColumnPathValue: '',
           mainResourceId: this.mainOptions[0].resourceId,
           valueColumnPath: '',
           valueColumnPathValue: '',
-          valueResourceId: -2
+          valueResourceId: ''
         })
         console.log(this.rules)
       }

@@ -38,10 +38,10 @@
 
         <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button :disabled="row.status==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button :disabled="row.status==='pushed'" type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button type="primary" size="mini" @click="handleView(row)">
+            <el-button type="text" size="mini" @click="handleView(row)">
               查看
             </el-button>
             <el-popconfirm
@@ -52,7 +52,7 @@
               :title="'删除 '+row.title + '?'"
               @onConfirm="handleDelete(row,'deleted')"
             >
-              <el-button slot="reference" :disabled="row.status==='pushed'" type="danger" size="mini" style="margin-left: 10px">删除</el-button>
+              <el-button slot="reference" :disabled="row.status==='pushed'" type="text" size="mini" style="margin-left: 10px">删除</el-button>
             </el-popconfirm>
 
           </template>
@@ -87,7 +87,7 @@
         <el-button @click="dialogFormVisible = false">
           {{ dialogStatus==='view'? '关闭' : '取消' }}
         </el-button>
-        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData()">
+        <el-button v-if="dialogStatus==='create'" type="text" @click="createData()">
           确定
         </el-button>
         <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">

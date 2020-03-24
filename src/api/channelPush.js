@@ -8,6 +8,14 @@ export function fetchList(query) {
   })
 }
 
+export function bookList(query) {
+  return request({
+    url: '/business-channel/book/list',
+    method: 'get',
+    params: query
+  })
+}
+
 export function changeStatus(id, status) {
   return request({
     url: '/business-channel/status',

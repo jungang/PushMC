@@ -35,10 +35,10 @@
 
         <el-table-column label="操作" align="center" min-width="300" width="300" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button :disabled="row.status==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button :disabled="row.status==='pushed'" type="text" size="mini" @click="handleUpdate(row)">
               编辑权限
             </el-button>
-            <el-button type="primary" size="mini" @click="handleView(row)">
+            <el-button type="text" size="mini" @click="handleView(row)">
               查看
             </el-button>
 

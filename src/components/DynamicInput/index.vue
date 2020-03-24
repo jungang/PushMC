@@ -1,72 +1,73 @@
 <template>
   <div>
 
-    <div
-      v-for="(path, index) in data"
-      :key="path.key"
+    <el-button type="text" size="mini" @click="addPathDialog">
+      +添加数据表
+    </el-button>
+
+    <el-table
+      :key="tableKey"
+      :data="data"
+      border
+      size="mini"
+      highlight-current-row
+      style="width: 100%"
     >
-      <el-divider>{{ index + 1 }}</el-divider>
-      <el-row>
-        <el-col :span="6" align="right">
-          表名称：
-        </el-col>
-        <el-col :span="18">
-          <el-input
-            v-model="path.title"
-            placeholder=""
-            class="dy_path"
-          >
-            <el-button v-if="data.length > 1" slot="append" icon="el-icon-delete" @click.prevent="removePath(path)" />
-          </el-input>
-        </el-col>
-      </el-row>
+      <el-table-column label="名称" prop="title" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.title }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="描述" prop="value" show-overflow-tooltip align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.value }}</span>
+        </template>
+      </el-table-column>
 
-      <el-row>
-        <el-col :span="6" align="right">
-          路径 {{ index + 1 }}：
-        </el-col>
-        <el-col :span="15">
+      <el-table-column label="描述" prop="describe" align="center">
+        <template slot-scope="row">
+          <el-button type="text" size="mini" @click="handleUpdate(row)">
+            编辑
+          </el-button>
+          <el-button size="mini" type="text" @click="removePath(row,'deleted')">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog
+      top="250px"
+      :title="textMap[dialogStatus]"
+      :visible.sync="dialogVisible"
+      append-to-body
+    >
+      <el-form ref="ruleForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
+
+        <el-form-item label="名称" prop="title">
+          <el-input v-model="temp.title" style="width:400px" />
+        </el-form-item>
+        <el-form-item v-if="type === 'API'" label="路径" prop="path">
+          <el-input v-model="temp.path" style="width:400px" />
+        </el-form-item>
+
+        <el-form-item :label="type==='API'?'报文格式描述':'数据格式描述'" prop="value">
           <el-input
-            v-model="path.path"
-            placeholder=""
-            class="dy_path"
-          />
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="6" align="right">
-          输入代码 ：<br>（ JSON schema）
-        </el-col>
-        <el-col :span="15">
-          <el-input
-            v-model="path.value"
+            v-model="temp.value"
+            :autosize="{ minRows: 10, maxRows: 10}"
             type="textarea"
-            :rows="5"
-            placeholder="输入schema"
-            class="dy_path"
+            style="width: 400px"
+            placeholder="请输入内容"
           />
-        </el-col>
+        </el-form-item>
 
-      </el-row>
-      <!--      <el-row>
-        <el-col :span="6">
-          上传JSON文件：
-        </el-col>
-        <el-col :span="18">
-          <el-upload
-            action="http://rap2api.taobao.org/app/mock/data/1435500"
-            :on-success="(res,file)=>{return handleSuccess(res,file,path)}"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-          </el-upload>
+      </el-form>
 
-        </el-col>
-      </el-row>-->
-
-    </div>
-
-    <el-button @click="addPath">+添加表</el-button>
-
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogStatus==='create'?addPath():updatePath()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -78,31 +79,90 @@ export default {
     data: {
       required: true,
       type: Array
+    },
+    type: {
+      required: true,
+      type: String
     }
   },
   data() {
-    return {}
+    return {
+      tableKey: 1,
+      dialogVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: '编辑',
+        create: '新建'
+      },
+      currentRow: {},
+      currentIndex: 0,
+      temp: {
+        title: '',
+        path: '',
+        value: ''
+      },
+      rules: {
+        title: [
+          { required: true, message: '不能为空', trigger: 'blur' },
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+        ],
+        path: [
+          { required: true, message: '不能为空', trigger: 'blur' }
+        ],
+        value: [
+          { required: true, message: '不能为空', trigger: 'blur' }
+        ]
+      }
+    }
   },
   computed: {},
   created() {
     // console.log(this.data)
   },
   methods: {
+    resetTemp() {
+      this.temp = {
+        title: '',
+        path: '',
+        value: ''
+      }
+    },
+    handleUpdate(row) {
+      this.temp = { ...row.row }
+      this.currenIndex = row.$index
+      this.dialogStatus = 'update'
+      this.dialogVisible = true
+    },
+    updatePath() {
+      this.$refs['ruleForm'].validate((valid) => {
+        if (valid) {
+          this.data.splice(this.currenIndex, 1, this.temp)
+          this.dialogVisible = false
+        }
+      })
+    },
+    addPathDialog() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogVisible = true
+    },
+    addPath() {
+      this.$refs['ruleForm'].validate((valid) => {
+        if (valid) {
+          valid && this.data.push({ ...this.temp })
+          this.dialogVisible = false
+        }
+      })
+    },
     handleSuccess(file, fileList, path) {
       path.fileUrl = file.url
     },
-    removePath(item) {
-      var index = this.data.indexOf(item)
+    removePath(row) {
+      this.data.splice(row.index, 1)
+      /*      var index = this.data.indexOf(item)
       if (index !== -1) {
         this.data.splice(index, 1)
-      }
-    },
-    addPath() {
-      this.data.push({
-        title: '',
-        value: ''
-      })
-      console.log(this.temp)
+      }*/
     }
   }
 }

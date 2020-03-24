@@ -1,254 +1,91 @@
 <template>
   <div class="container">
 
-    <el-tabs v-model="toTab" type="border-card" @tab-click="handleClick">
-      <el-tab-pane label="业务频道推送" name="first">
-        <el-table
-          :key="tableKey"
-          v-loading="listLoading"
-          :data="list_bc.data"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%;"
-        >
-          <el-table-column label="ID" prop="id" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.id }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="频道名称" prop="title" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.title }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="频道标签" prop="channelTag" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.channelTag }}</span>1
-            </template>
-          </el-table-column>
-          <el-table-column label="表格数量" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.tableCount }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="创建人" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.creator }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送匹配" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushMatched }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送状态" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushStatus }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送成功" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushSucceed }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送失败" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushFailed }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送确认" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.feedback }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="最近推送" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.lastPushTime }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" min-width="50" class-name="small-padding fixed-width">
-            <template slot-scope="{row}">
-              <el-button type="primary" size="mini" @click="handleView(row)">
-                查看
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <pagination
-          v-show="list_bc.total>0"
-          :total="list_bc.total"
-          :page.sync="list_bc.listQuery.page"
-          :limit.sync="list_bc.listQuery.limit"
-          hide-on-single-page
-          @pagination="getBusinessChannelList()"
-        />
-      </el-tab-pane>
-      <el-tab-pane label="内容推送" name="second">
-        <el-table
-          :key="tableKey"
-          v-loading="listLoading"
-          :data="list_c.data"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%;"
-        >
-          <el-table-column label="ID" prop="id" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.id }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="内容推送名称" prop="title" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.title }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="内容类型" prop="channelTag" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.contentType }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="内容标签" prop="channelTag" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.contentTag }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="内容来源" prop="channelTag" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.contentOrigin }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="创建人" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.creator }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送匹配" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushMatched }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送状态" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushStatus }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送成功" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushSucceed }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送失败" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.pushFailed }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送确认" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.feedback }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="最近推送" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.lastPushTime }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" min-width="50" class-name="small-padding fixed-width">
-            <template slot-scope="{row}">
-              <el-button type="primary" size="mini" @click="handleView(row)">
-                查看
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <pagination
-          v-show="list_c.total>0"
-          :total="list_c.total"
-          :page.sync="list_c.listQuery.page"
-          :limit.sync="list_c.listQuery.limit"
-          hide-on-single-page
-          @pagination="getContentList()"
-        />
-      </el-tab-pane>
-      <el-tab-pane label="渠道推送" name="third">
-        <el-table
-          :key="tableKey"
-          v-loading="listLoading"
-          :data="list_p.data"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%;"
-        >
-          <el-table-column label="ID" prop="id" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.id }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="渠道推送名称" prop="title" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.channelTitle }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="渠道类型" prop="title" align="center">
-            <template slot-scope="{row}">
-              <span>{{ row.pushType }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="渠道标签" prop="channelTag" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.channelLabel }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送匹配" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.channelMappingNum }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送状态" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.channelPushStatus }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送成功" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.channelSuccessNum }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送失败" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.channelFailNum }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="推送确认" align="center" min-width="50">
-            <template slot-scope="{row}">
-              <span>{{ row.feedback }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="最近推送" align="center" min-width="100">
-            <template slot-scope="{row}">
-              <span>{{ row.channelListTime }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center" min-width="50" class-name="small-padding fixed-width">
-            <template slot-scope="{row}">
-              <el-button type="primary" size="mini" @click="handleView(row)">
-                查看
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <pagination
-          v-show="list_p.total>0"
-          :total="list_p.total"
-          :page.sync="list_p.listQuery.page"
-          :limit.sync="list_p.listQuery.limit"
-          hide-on-single-page
-          @pagination="getPipeList()"
-        />
-      </el-tab-pane>
-    </el-tabs>
+    <el-table
+      :key="tableKey"
+      v-loading="listLoading"
+      :data="list_bc.data"
+      border
+      fit
+      highlight-current-row
+      style="width: 100%;"
+    >
+      <el-table-column label="ID" prop="id" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.id }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="推送名称" prop="title" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.channelTitle }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="标签" prop="channelTag" align="center" min-width="100">
+        <template slot-scope="{row}">
+          <span>{{ row.channelLabel }}</span>1
+        </template>
+      </el-table-column>
+      <el-table-column label="表格数量" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.channelTableNum }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建人" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.channelAuthor }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="来源" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.channelOrigin }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="推送匹配" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.channelMappingNum }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="推送状态" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.channelPushStatus }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="推送成功" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.channelSuccessNum }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="推送失败" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.channelFailNum }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="推送确认" align="center" min-width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.feedback }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="最近推送" align="center" min-width="100">
+        <template slot-scope="{row}">
+          <span>{{ row.channelListTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" min-width="50" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-button type="text" size="mini" @click="handleView(row)">
+            查看
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination
+      v-show="list_bc.total>0"
+      :total="list_bc.total"
+      :page.sync="list_bc.listQuery.page"
+      :limit.sync="list_bc.listQuery.limit"
+      hide-on-single-page
+      @pagination="getBusinessChannelList()"
+    />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="1200px">
 
@@ -288,11 +125,11 @@
 
         <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleDetailView(row)">
+            <el-button type="text" size="mini" @click="handleDetailView(row)">
               查看
             </el-button>
 
-            <el-button size="mini" type="primary" icon="el-icon-document" @click="handleDownload(row)">
+            <el-button size="mini" type="text" icon="el-icon-document" @click="handleDownload(row)">
               导出
             </el-button>
 
@@ -348,7 +185,6 @@ export default {
           title: undefined,
           type: undefined,
           sort: '+id',
-          pushType: 'business',
           group: 'default'
         }
       },
@@ -402,8 +238,6 @@ export default {
   },
   created() {
     this.getBusinessChannelList()
-    this.getContentList()
-    this.getPipeList()
   },
   methods: {
     formatJson(filterVal, jsonData) {

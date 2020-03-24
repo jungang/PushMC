@@ -7,7 +7,7 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img src="http://pic.90sjimg.com/design/03/29/25/25/5d18cdcacbf42.png" class="user-avatar">
+          <!--          <img src="http://pic.90sjimg.com/design/03/29/25/25/5d18cdcacbf42.png" class="user-avatar">-->
           <el-tag>
             {{ $store.state.user.name }}
           </el-tag>

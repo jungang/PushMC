@@ -104,6 +104,12 @@ export const asyncRoutes = [
         meta: { title: '数据源', icon: 'table' }
       },
       {
+        path: 'category',
+        name: 'Category',
+        component: () => import('@/views/category/index'),
+        meta: { title: '标签分类', icon: 'table' }
+      },
+      {
         path: 'source/edit',
         name: 'Edit',
         component: () => import('@/views/dataTag/edit'),
@@ -114,22 +120,13 @@ export const asyncRoutes = [
         path: '/business-channel',
         name: 'BusinessChannel',
         component: () => import('@/views/businessChannel/index'),
-        meta: { title: '业务频道', icon: 'form' }
+        meta: { title: '推送频道', icon: 'form' }
       },
       {
         path: 'push-channel',
         name: 'PushChannel',
         component: () => import('@/views/pushChannel/index'),
-        meta: { title: '通道', icon: 'table' }
-      },
-      {
-        path: 'channel-push',
-        name: 'ChannelPush',
-        component: () => import('@/views/channelPush/index'),
-        props: {
-          type: 'business'
-        },
-        meta: { title: '频道推送', icon: 'table' }
+        meta: { title: '推送通道', icon: 'table' }
       },
       {
         path: 'push-target',
@@ -138,29 +135,32 @@ export const asyncRoutes = [
         meta: { title: '推送对象', icon: 'form' }
       },
       {
-        path: 'pipe-push',
-        name: 'PipePush',
+        path: 'channel-push',
+        name: 'ChannelPush',
         component: () => import('@/views/channelPush/index'),
         props: {
-          type: 'channel'
+          type: 'business'
         },
-        meta: { title: '渠道推送', icon: 'table' }
-      },
-      {
-        path: 'content-push',
-        name: 'ContentPush',
-        component: () => import('@/views/contentPush/index'),
-        props: {
-          type: 'content'
-        },
-        meta: { title: '内容推送', icon: 'tree' }
-      },
-      {
-        path: 'category',
-        name: 'Category',
-        component: () => import('@/views/category/index'),
-        meta: { title: '标签分类', icon: 'table' }
+        meta: { title: '消息推送', icon: 'table' }
       }
+      // {
+      //   path: 'pipe-push',
+      //   name: 'PipePush',
+      //   component: () => import('@/views/channelPush/index'),
+      //   props: {
+      //     type: 'channel'
+      //   },
+      //   meta: { title: '渠道推送', icon: 'table' }
+      // },
+      // {
+      //   path: 'content-push',
+      //   name: 'ContentPush',
+      //   component: () => import('@/views/contentPush/index'),
+      //   props: {
+      //     type: 'content'
+      //   },
+      //   meta: { title: '内容推送', icon: 'tree' }
+      // }
     ]
   },
 
@@ -183,12 +183,6 @@ export const asyncRoutes = [
         name: 'Examine',
         component: () => import('@/views/examine/index'),
         meta: { title: '内容审批', icon: 'form' }
-      },
-      {
-        path: '',
-        name: 'MessageTemplate',
-        component: () => import('@/views/messageTemplate/index'),
-        meta: { title: '消息模版', icon: 'form' }
       }
     ]
   },

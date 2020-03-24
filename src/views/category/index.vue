@@ -31,7 +31,7 @@
         </el-table-column>
         <el-table-column label="标签来源" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.origin === 'CUSTOM' ? '自定义': '默认' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="标签使用" align="center" min-width="50">
@@ -46,10 +46,10 @@
         </el-table-column>
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+            <el-button v-if="row.status!='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>
@@ -136,6 +136,7 @@ export default {
         listQuery: {
           page: 1,
           limit: 20,
+          categoryTitle: '内容推送',
           importance: undefined,
           title: undefined,
           type: undefined,

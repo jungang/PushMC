@@ -10,7 +10,7 @@
 
     <el-row style="margin-bottom: 10px">
       <el-col :span="16" style="line-height: 40px;">
-        业务频道列表：{{ type }}
+        业务频道列表：
       </el-col>
       <el-col :span="8" align="right">
         <el-button v-if="type==='business'" type="primary" @click="showSubscribePanel">频道订阅</el-button>
@@ -46,7 +46,12 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="业务频道名称" prop="type" width="300" align="center" min-width="50">
+        <el-table-column label="推送名称" prop="type" width="200" align="center" min-width="50">
+          <template slot-scope="{row}">
+            <span>{{ row.pushTitle }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="业务频道名称" prop="type" width="200" align="center" min-width="50">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
           </template>
@@ -58,13 +63,14 @@
         </el-table-column>
         <el-table-column label="来源" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.origin === 'CUSTOM' ? '自定义': '默认' }}</span>
           </template>
         </el-table-column>
-
-        <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+        业务频道列表：
+        <el-table-column label="操作" align="left" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button :disabled="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+
+            <el-button :disabled="row.pushStatus==='pushed'" type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
 
@@ -76,19 +82,19 @@
               :title="'删除 '+row.title + '?'"
               @onConfirm="handleDelete(row,'deleted')"
             >
-              <el-button slot="reference" :disabled="row.pushStatus==='pushed'" type="danger" size="mini">删除</el-button>
+              <el-button slot="reference" class="action_btn" :disabled="row.pushStatus==='pushed'" type="text" size="mini">删除</el-button>
             </el-popconfirm>
 
-            <el-button type="primary" size="mini" @click="handleUpdate(row, 'copy')">
+            <el-button type="text" size="mini" @click="handleUpdate(row, 'copy')">
               复制
             </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
+            <el-button type="text" size="mini" @click="handleUpdate(row, 'view')">
               查看
             </el-button>
-            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+            <el-button v-if="row.status!=='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'enabled')">
               推送
             </el-button>
-            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+            <el-button v-if="row.status==='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'disabled')">
               取消推送
             </el-button>
 
@@ -133,7 +139,7 @@
         </el-table-column>
         <el-table-column label="渠道来源" prop="type" width="100" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.origin === 'CUSTOM' ? '自定义': '默认' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="渠道标签" prop="type" width="100" align="center">
@@ -149,7 +155,7 @@
 
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button :disabled="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button :disabled="row.pushStatus==='pushed'" type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
 
@@ -164,14 +170,14 @@
               <el-button slot="reference" :disabled="row.pushStatus==='pushed'" type="danger" size="mini">删除</el-button>
             </el-popconfirm>
 
-            <el-button type="primary" size="mini" @click="handleUpdate(row, 'copy')">
+            <el-button type="text" size="mini" @click="handleUpdate(row, 'copy')">
               复制
             </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
+            <el-button type="text" size="mini" @click="handleUpdate(row, 'view')">
               查看
             </el-button>
 
-            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+            <el-button v-if="row.status!=='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'enabled')">
               推送
             </el-button>
             <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
@@ -230,7 +236,7 @@
         </el-table-column>
         <el-table-column label="内容来源" prop="type" width="100" align="center" min-width="50">
           <template slot-scope="{row}">
-            {{ row.origin }}
+            {{ row.origin === 'CUSTOM' ? '自定义': '默认' }}
           </template>
         </el-table-column>
         <el-table-column label="渠道推送名称" prop="type" width="200" align="center" min-width="50">
@@ -241,7 +247,7 @@
 
         <el-table-column label="操作" align="center" min-width="250" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button :disabled="row.pushStatus==='pushed'" type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button :disabled="row.pushStatus==='pushed'" type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
 
@@ -253,20 +259,20 @@
               :title="'删除 '+row.title + '?'"
               @onConfirm="handleDelete(row,'deleted')"
             >
-              <el-button slot="reference" :disabled="row.pushStatus==='pushed'" type="danger" size="mini">删除</el-button>
+              <el-button slot="reference" :disabled="row.pushStatus==='pushed'" type="text" size="mini">删除</el-button>
             </el-popconfirm>
 
-            <el-button type="primary" size="mini" @click="handleUpdate(row, 'copy')">
+            <el-button type="text" size="mini" @click="handleUpdate(row, 'copy')">
               复制
             </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row, 'view')">
+            <el-button type="text" size="mini" @click="handleUpdate(row, 'view')">
               查看
             </el-button>
 
-            <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+            <el-button v-if="row.status!=='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'enabled')">
               推送
             </el-button>
-            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+            <el-button v-if="row.status==='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'disabled')">
               取消推送
             </el-button>
 
@@ -302,29 +308,17 @@
           border
           style="width: 100%"
         >
-          <el-table-column
-            prop="status"
-            label="订阅状态"
-          >
-            <template slot-scope="{row}">
-              <span>{{ row.bookStatus? '已订阅':'未订阅' }}</span>
-            </template>
-
-          </el-table-column>
 
           <el-table-column
             prop="title"
-            label="频道名称"
+            label="推送名称"
           />
           <el-table-column
             align="center"
             label="操作"
           >
             <template slot-scope="{row}">
-              <el-button v-if="row.bookStatus" type="danger" size="mini" @click="handleSubscribe(row,false)">
-                取消订阅
-              </el-button>
-              <el-button v-else type="primary" size="mini" @click="handleSubscribe(row,true)">
+              <el-button type="text" size="mini" @click="handleSubscribe(row,true)">
                 订阅
               </el-button>
             </template>
@@ -348,12 +342,18 @@
 
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" class="main-form">
 
-        <el-form-item label="频道名称" prop="title">
-          <el-input v-model="temp.title" style="width:400px" />
+        <el-form-item label="推送名称" prop="title">
+          <el-input v-model="temp.title" style="width:400px" :disabled="dialogStatus==='view'" />
         </el-form-item>
 
         <el-form-item label="选择频道" prop="channelId">
-          <el-select v-model="temp.channelId" class="filter-item" placeholder="请选择" @change="handleChannelFilter">
+          <el-select
+            v-model="temp.channelId"
+            class="filter-item"
+            placeholder="请选择"
+            :disabled="dialogStatus==='view'"
+            @change="handleChannelFilter"
+          >
             <el-option v-for="item in channelListArr.items" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
@@ -367,7 +367,7 @@
         </el-form-item>-->
 
         <el-form-item label="频道规则" prop="tag">
-          <el-button :disabled="!temp.channelId" size="small" plain @click="editChannel">编辑频道规则（跳转）</el-button>
+          <el-button :disabled="!temp.channelId || dialogStatus==='view'" size="small" plain @click="editChannel">编辑频道规则（跳转）</el-button>
 
         </el-form-item>
 
@@ -451,9 +451,9 @@
                 show-overflow-tooltip
               >
                 <template slot-scope="{row}">
-                  <el-tag :type="row.status | statusFilter">
-                    {{ row.status === 'enabled' ? '已启用': '未启用' }}
-                  </el-tag>
+
+                  {{ row.status === 'enabled' ? '已启用': '未启用' }}
+
                 </template>
               </el-table-column>
               <el-table-column
@@ -482,22 +482,23 @@
         </el-form>
 
         <el-form-item label="推送时间" prop="templateKey">
-          <el-radio v-model="temp.pushPlan" label="instant">实时</el-radio>
+          <el-radio v-model="temp.pushPlan" label="instant" :disabled="dialogStatus==='view'">实时</el-radio>
 
           <el-row>
             推送确认:
-            <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认">
-              <el-option label="按钮确认" value="1" />
-              <el-option label="阅读读秒计时" value="2" />
-              <el-option label="不需要确认" value="3" />
+            <el-select v-model="temp.pushPlanOption" placeholder="选择推送确认" :disabled="dialogStatus==='view'">
+              <el-option label="按钮确认" :value="1" />
+              <el-option label="阅读读秒计时" :value="2" />
+              <el-option label="不需要确认" :value="3" />
             </el-select>
-            <el-input v-if="temp.pushPlanOption==='2'" v-model="temp.receiptSecond" placeholder="输入秒" style="width: 100px" />
+            <el-input v-if="temp.pushPlanOption==='2'" v-model="temp.receiptSecond" :disabled="dialogStatus==='view'" placeholder="输入秒" style="width: 100px" />
             <span>（短信不支持确认）</span>
           </el-row>
           <el-row>
-            推送确认:
-            <el-radio v-model="temp.receipt" label="true" value="true">需回传</el-radio>
-            <el-radio v-model="temp.receipt" label="false" value="false">不需回传</el-radio>
+            确认位置:
+            {{ temp.receipt }}{{ typeof temp.receipt }}
+            <el-radio v-model="temp.receipt" label="true" :value="true" :disabled="dialogStatus==='view'">需回传</el-radio>
+            <el-radio v-model="temp.receipt" label="false" :value="false" :disabled="dialogStatus==='view'">不需回传</el-radio>
             <span>（短信不支持确认）</span>
           </el-row>
         </el-form-item>
@@ -553,7 +554,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, dele, fetchList, createSource, changeStatus, channelList, detail, groups, unPush, updateChannel } from '@/api/channelPush'
+import { copyChannel, dele, bookList, createSource, changeStatus, channelList, detail, groups, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 import Templates from '@/components/Templates'
 import PickPersons from '@/components/pickPersons'
@@ -586,6 +587,8 @@ export default {
   data() {
     return {
       radio: '1',
+      title: '',
+      channelId: '',
       channelTypeList: [],
       channelSubscribeList: {
         data: [],
@@ -660,6 +663,7 @@ export default {
       groupTemp: {},
       temp: {
         id: undefined,
+        pushTitle: '',
         tunnel: [],
         status: 'enabled',
         tmp: {
@@ -689,7 +693,7 @@ export default {
         content: '',
         targetType: 1,
         pushPlan: 'instant',
-        pushPlanOption: '1',
+        pushPlanOption: 1,
         receipt: 'true',
         receiptSecond: 60,
         pushChannel: []
@@ -718,7 +722,7 @@ export default {
         pushChannel: [
           { required: true, message: '请选择推送通道', trigger: 'blur' }
         ],
-        title: [
+        pushTitle: [
           { required: true, message: '名称不能为空', trigger: 'blur' },
           { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
         ],
@@ -880,9 +884,14 @@ export default {
       this.getChannel()
     },
     getChannel() {
+      this.temp.channelId = this.temp.channelId || 10
+
       this.temp.channel = this.channelListArr.items.find(item => item.id === this.temp.channelId)
 
-      // console.log('getChannel...')
+      console.log('getChannel...')
+      console.log(this.channelListArr.items)
+      console.log(this.temp.channelId)
+      console.log(this.temp.channel)
 
       if (this.temp.channel.tables.length > 0) {
         this.mainOptions = []
@@ -1016,7 +1025,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      fetchList(this.listArr.listQuery).then(response => {
+      bookList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -1050,6 +1059,7 @@ export default {
       this.isUrl = false
       this.temp = {
         id: undefined,
+        pushTitle: '',
         tunnel: [],
         status: 'enabled',
         tmp: {
@@ -1079,7 +1089,7 @@ export default {
         url: '',
         content: '',
         pushPlan: 'instant',
-        pushPlanOption: '1',
+        pushPlanOption: 1,
         receipt: 'true',
         receiptSecond: 60,
         additionalOption: [],
@@ -1183,23 +1193,10 @@ export default {
       detail({ id: row.id }).then((res) => {
         this.resetTemp()
         this.temp = { ...this.temp, ...res.data }
-        this.temp.channel = res.data
-
-        console.log('detail...')
-        console.log('res.data', res.data)
+        this.temp.receipt = this.temp.receipt.toString()
+        // this.temp.channel = res.data
         console.log('this.temp', this.temp)
         this.setGroups()
-
-        this.temp.templateType = this.temp.templateType || 'template'
-        /*        this.temp.templateContent = this.temp.templateContent || {
-          arg1: '',
-          arg2: '',
-          arg3: '',
-          img: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          url: ''
-        }*/
-
-        this.temp.channelId = this.temp.channelId || this.temp.mainResourceId
 
         this.getChannel()
         this.dialogStatus = opt || 'update'

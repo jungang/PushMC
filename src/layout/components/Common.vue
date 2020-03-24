@@ -34,3 +34,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.action_btn{
+        color: red;
+}
+
+</style>

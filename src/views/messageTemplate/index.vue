@@ -33,7 +33,7 @@
         </el-table-column>
         <el-table-column label="模板来源" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.origin === 'CUSTOM' ? '自定义': '默认' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="模板名称" prop="type" width="300" align="center" min-width="50">
@@ -44,15 +44,14 @@
         <el-table-column label="状态" align="center" min-width="50">
           <template slot-scope="{row}">
 
-            <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
-              {{ row.status === 'enabled' ? '启用': '未启用' }}
-            </el-tag>
+            {{ row.status === 'enabled' ? '启用': '未启用' }}
+
           </template>
         </el-table-column>
 
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
             <!--
@@ -97,30 +96,6 @@
           完成
         </el-button>
       </div>
-
-      <!--      <el-dialog
-        :id="`messageTemplatePreview`"
-        width="30%"
-        title="预览"
-        :visible.sync="previewVisible"
-        append-to-body
-      >
-
-        <div v-if="temp.type!=='text'">
-          <div class="title">内容标题</div>
-          <div class="content">内容标题</div>
-          <div class="warp">
-            <span class="time">时间</span>
-            <span class="id">发布ID</span>
-          </div>
-          <div class="link">阅读全文</div>
-        </div>
-        <div v-else>
-          王经理，您好！感谢您的来电咨询！品牌销售顾问—成功为您服务，欢迎您的来店亲临体验！祝您及家人身体健康，事事如意！
-        </div>
-
-      </el-dialog>-->
-
     </el-dialog>
   </div>
 </template>

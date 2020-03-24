@@ -1,10 +1,24 @@
 <template>
   <div class="container">
-    <el-row>
-      数据源列表
-    </el-row>
-    <el-row type="flex" justify="end" style="margin-bottom: 10px">
-      <el-button type="primary" @click="handleCreate">新建数据源</el-button>
+
+    <el-row style="margin-bottom: 10px">
+
+      <el-col :span="12">
+        <el-select
+          v-model="listArr.listQuery.type"
+          style="margin-bottom: 10px"
+          @change="filter"
+        >
+          <el-option label="全部" value="" />
+          <el-option label="API" value="API" />
+          <el-option label="webhooks" value="webhooks" />
+        </el-select>
+      </el-col>
+      <el-col :span="12" align="right">
+
+        <el-button type="primary" @click="handleCreate">新建数据源</el-button>
+      </el-col>
+
     </el-row>
     <el-table
       :key="tableKey"
@@ -36,9 +50,8 @@
       <el-table-column label="状态" class-name="status-col" align="center" min-width="50">
         <template slot-scope="{row}">
 
-          <el-tag v-if="row.status !== 'deleted'" :type="row.status">
-            {{ row.status === 'enabled' ? '启用': '未启用' }}
-          </el-tag>
+          {{ row.status === 'enabled' ? '启用': '未启用' }}
+
           <el-tag
             v-if="row.status==='deleted'"
             type="danger"
@@ -59,22 +72,22 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="text" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!=='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+          <el-button v-if="row.status!=='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'enabled')">
             启用
           </el-button>
-          <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+          <el-button v-if="row.status==='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'disabled')">
             停用
           </el-button>
-          <el-button type="primary" size="mini" @click="handleTag(row)">
+          <el-button type="text" size="mini" @click="handleTag(row)">
             标注
           </el-button>
           <el-button v-if="row.status==='deleted'" size="mini" @click="handleModifyStatus(row,'draft')">
             恢复
           </el-button>
-          <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row)">
+          <el-button v-if="row.status!=='deleted'" size="mini" type="text" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -89,48 +102,55 @@
       @pagination="getList()"
     />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="900px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item label="数据源" prop="type">
-          <el-select v-model="temp.type" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.label" :value="item.key" />
-          </el-select>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
 
-        <el-form-item label="数据源名称" prop="title">
-          <el-input v-model="temp.title" />
-        </el-form-item>
+            <el-form-item label="名称" prop="title">
+              <el-input v-model="temp.title" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
 
-        <el-form-item v-if="temp.type==='API'" label="服务器地址" prop="serverAddress">
-          <el-input v-model="temp.serverAddress" />
-        </el-form-item>
-
-        <el-form-item v-if="temp.type==='API'" label="定时更新" prop="interval">
-
-          <div>
-            <el-input v-model="temp.interval" placeholder="请输入内容" style="width: 200px">
-              <template slot="append">分钟</template>
-            </el-input>
-          </div>
-
-        </el-form-item>
-
-        <el-form-item label="数据表" prop="paths">
-
-          <DynamicInput :data.sync="temp.paths" />
-
-        </el-form-item>
-
+            <el-form-item label="类型" prop="type">
+              <el-select v-model="temp.type" class="filter-item" placeholder="请选择">
+                <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.label" :value="item.key" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item v-if="temp.type==='API'" label="地址" prop="serverAddress">
+              <el-input v-model="temp.serverAddress" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="temp.type==='API'" label="拉取频率" prop="interval">
+              <div>
+                <el-input v-model="temp.interval" placeholder="请输入内容" style="width: 200px">
+                  <template slot="append">分钟</template>
+                </el-input>
+              </div>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="说明" prop="describe">
           <el-input
             v-model="temp.describe"
-            :autosize="{ minRows: 4, maxRows: 10}"
+            :autosize="{ minRows: 3, maxRows: 10}"
             type="textarea"
-            maxlength="30"
+            maxlength="2000"
             show-word-limit
-            placeholder="200字"
+            placeholder="请输入内容"
           />
+        </el-form-item>
+        <el-form-item label="数据表" prop="paths">
+
+          <DynamicInput :data.sync="temp.paths" :type.sync="temp.type" />
+
         </el-form-item>
 
       </el-form>
@@ -175,11 +195,11 @@ export default {
         total: 0,
         listQuery: {
           sheet: 'business',
+          type: '',
           page: 1,
           limit: 20,
           importance: undefined,
           title: undefined,
-          type: undefined,
           sort: '+id'
         }
       },
@@ -257,6 +277,10 @@ export default {
     this.getList()
   },
   methods: {
+    filter() {
+      this.listArr.listQuery.page = 1
+      this.getList()
+    },
     getList() {
       this.listLoading = true
       fetchSourceList(this.listArr.listQuery).then(response => {
@@ -327,13 +351,10 @@ export default {
         title: '',
         status: 'disabled',
         secretKey: '',
-        serverAddress: 'http://00000.com',
+        serverAddress: '',
         updatePlanHours: '4',
         updatePlanTimes: '8',
-        paths: [{
-          title: '',
-          value: '{}'
-        }],
+        paths: [],
         describe: ''
       }
     },

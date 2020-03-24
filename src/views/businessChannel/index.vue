@@ -50,12 +50,15 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
+        <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+            <el-button type="text" size="mini" @click="handleMsgUpdate(row)">
+              消息模板
+            </el-button>
+            <el-button v-if="row.status!='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>
@@ -74,7 +77,6 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      center
       destroy-on-close
       top="5vh"
       custom-class="bcdialog"
@@ -163,7 +165,7 @@
                 label="操作"
               >
                 <template slot-scope="{row}">
-                  <el-button size="mini" type="danger" @click="handleTableDelete(row,'deleted')">
+                  <el-button size="mini" type="text" @click="handleTableDelete(row,'deleted')">
                     删除
                   </el-button>
                 </template>
@@ -205,6 +207,26 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      :title="textMap[dialogStatus]"
+      :visible.sync="msgFormVisible"
+      width="800px"
+    >
+      <el-form ref="msgForm" :model="temp" label-position="right" label-width="100px" class="main-form">
+        <Templates :tmp="temp.tmp" :tables="temp.tables" />
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="msgFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="msgUpdateData()">
+          完成
+        </el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -215,11 +237,12 @@ import { fetchLabel } from '@/api/category'
 import { fetchSourceList, fetchSource } from '@/api/source'
 import Pagination from '@/components/Pagination'
 import RulesSel from '@/components/RulesSel'
+import Templates from '@/components/Templates'
 import XcomTagTransfer from '@/components/tagTransfer/index'
 
 export default {
   name: 'BusinessChannel',
-  components: { Pagination, XcomTagTransfer, RulesSel },
+  components: { Pagination, XcomTagTransfer, RulesSel, Templates },
   data() {
     return {
       ruleOptions: [
@@ -270,6 +293,7 @@ export default {
         tablesList: []
       },
       dialogFormVisible: false,
+      msgFormVisible: false,
       step: 'step1',
       dialogStatus: '',
       textMap: {
@@ -441,10 +465,10 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+
     handleUpdate(row) {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
-
       channelDetail({ id: row.id }).then((res) => {
         Object.keys(res.data).forEach(item => {
           this.temp[item] = res.data[item]
@@ -467,13 +491,25 @@ export default {
         })
       })
     },
+
+    handleMsgUpdate(row) {
+      channelDetail({ id: row.id }).then((res) => {
+        this.temp = res.data
+        this.dialogStatus = 'update'
+        this.msgFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['msgForm'].clearValidate()
+        })
+      })
+    },
+
     handleAddRule() {
       this.temp.rules.push({
-        expression: 'equal',
+        expression: '',
         mainColumnPath: '',
         mainResourceId: this.temp.mainResourceId,
         valueColumnPath: '',
-        valueResourceId: -2
+        valueResourceId: ''
       })
       console.log(this.temp.rules)
     },
@@ -492,6 +528,18 @@ export default {
           this.temp.bookTables.forEach(item => {
 
           })
+
+          this.temp.tmp = {
+            title: '',
+            templateType: 'template',
+            content: '',
+            arg1: '',
+            arg2: '',
+            arg3: '',
+            arg4: '',
+            isURL: false,
+            templateURL: ''
+          }
 
           createBusinessChannel(this.temp).then(() => {
             this.getList()
@@ -525,6 +573,30 @@ export default {
               }
             }
             this.dialogFormVisible = false
+            this.$notify({
+              title: '完成',
+              message: '编辑成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    msgUpdateData() {
+      this.$refs['msgForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+
+          update(tempData).then(() => {
+            for (const v of this.listArr.data) {
+              if (v.id === this.temp.id) {
+                const index = this.listArr.data.indexOf(v)
+                this.listArr.data.splice(index, 1, this.temp)
+                break
+              }
+            }
+            this.msgFormVisible = false
             this.$notify({
               title: '完成',
               message: '编辑成功',

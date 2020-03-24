@@ -39,23 +39,22 @@
         <el-table-column label="状态" align="center" min-width="50">
           <template slot-scope="{row}">
 
-            <el-tag v-if="row.status !== 'deleted'" :type="row.status | statusFilter">
-              {{ row.status === 'enabled' ? '启用': '未启用' }}
-            </el-tag>
+            {{ row.status === 'enabled' ? '启用': '未启用' }}
+
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button v-if="row.status!='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
+            <el-button v-if="row.status!='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'enabled')">
               启用
             </el-button>
-            <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
+            <el-button v-if="row.status==='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'disabled')">
               停用
             </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+            <el-button v-if="row.status!='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>
@@ -73,16 +72,17 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
-        <el-form-item label="通道类型" prop="type">
-          <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.type" :label="item.type"> {{ item.title }} </el-radio>
-        </el-form-item>
-        <el-form-item label="通道" prop="title">
 
+        <el-form-item label="通道类型" prop="typeId">
+          <el-radio v-for=" (item, key) in channelTypeList" :key="key" v-model="temp.typeId" :label="item.id"> {{ item.type }} </el-radio>
+        </el-form-item>
+
+        <!--        <el-form-item label="通道">
           <el-select v-model="temp.channel" class="filter-item" placeholder="请选择">
             <el-option v-for="item in channelList" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
+        </el-form-item>-->
 
-        </el-form-item>
         <el-form-item label="名称" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
@@ -90,21 +90,6 @@
           <el-radio v-model="temp.status" label="enabled">启用</el-radio>
           <el-radio v-model="temp.status" label="disabled">未启用</el-radio>
         </el-form-item>
-
-        <div v-if="temp.type==='gocom'">
-          <el-form-item label="API 地址" prop="apiUrl">
-            <el-input v-model="temp.apiUrl" style="width:400px" />
-          </el-form-item>
-          <el-form-item label="数据库链接" prop="dbUrl">
-            <el-input v-model="temp.dbUrl" style="width:400px" />
-          </el-form-item>
-          <el-form-item label="数据库用户名" prop="dbUser">
-            <el-input v-model="temp.dbUser" style="width:400px" />
-          </el-form-item>
-          <el-form-item label="数据库密码" prop="dbPassword">
-            <el-input v-model="temp.dbPassword" style="width:400px" />
-          </el-form-item>
-        </div>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -163,9 +148,10 @@ export default {
       listLoading: true,
       temp: {
         id: undefined,
-        type: '',
+        typeId: '',
         describe: '',
-        title: ''
+        title: '',
+        status: 'enabled'
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -174,30 +160,15 @@ export default {
         create: '新建'
       },
       rules: {
-        type: [
+        typeId: [
           { required: true, message: '请选择', trigger: 'change' }
         ],
         status: [
           { required: true, message: '请选择', trigger: 'change' }
         ],
-        category: [
-          { required: true, message: '请选择分类', trigger: 'change' }
-        ],
         title: [
           { required: true, message: '标签名称不能为空', trigger: 'blur' },
           { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
-        ],
-        apiUrl: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        dbUrl: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        dbUser: [
-          { required: true, message: '不能为空', trigger: 'blur' }
-        ],
-        dbPassword: [
-          { required: true, message: '不能为空', trigger: 'blur' }
         ]
       }
     }
@@ -269,12 +240,8 @@ export default {
       console.log(this.$store.state.publicData.model.argu)
       this.temp = {
         id: undefined,
-        category: 'API',
         title: '',
-        apiUrl: this.$store.state.publicData.model.argu.apiUrl,
-        dbUrl: this.$store.state.publicData.model.argu.dbUrl,
-        dbUser: this.$store.state.publicData.model.argu.dbUser,
-        dbPassword: this.$store.state.publicData.model.argu.dbPassword
+        status: 'enabled'
       }
     },
     handleCreate() {
@@ -288,8 +255,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
+          this.temp.id = -1
           create(this.temp).then(() => {
             this.getList()
             this.dialogFormVisible = false

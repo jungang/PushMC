@@ -51,13 +51,13 @@
 
         <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row,'view')">
+            <el-button type="text" size="mini" @click="handleUpdate(row,'view')">
               查看
             </el-button>
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button v-if="row.status!=='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+            <el-button v-if="row.status!=='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>
@@ -82,7 +82,7 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
         <el-form-item label="内容标题" prop="title">
-          <el-input v-model="temp.title" style="width:400px" />
+          <el-input v-model="temp.title" style="width:400px" @contextmenu.prevent.native="openMenu($event)" />
           <el-checkbox v-model="isSubhead">使用副标题</el-checkbox>
         </el-form-item>
         <el-form-item v-if="isSubhead" label="副标题" prop="subhead">
@@ -127,6 +127,9 @@
         </el-button>
       </div>
     </el-dialog>
+    <div v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
+      <p @click="addArg">插入字段</p>
+    </div>
   </div>
 </template>
 
@@ -142,6 +145,9 @@ export default {
   components: { Pagination },
   data() {
     return {
+      visible: false,
+      top: 0,
+      left: 0,
       content: `<p>内容部分</p>`,
       // editorOption: quillConfig,  //图片上传
       editorOption: {}, // base64
@@ -216,12 +222,43 @@ export default {
       return this.$refs.myQuillEditor.quill
     }
   },
+  watch: {
+    visible(value) {
+      if (value) {
+        document.body.addEventListener('click', this.closeMenu)
+      } else {
+        document.body.removeEventListener('click', this.closeMenu)
+      }
+    }
+  },
   created() {
     this.getList()
     this.getCategory()
     this.getLabel()
   },
   methods: {
+    addArg() {
+      console.log('addArg...')
+    },
+    openMenu(e) {
+      const menuMinWidth = 105
+      const offsetLeft = this.$el.getBoundingClientRect().left // container margin left
+      const offsetWidth = this.$el.offsetWidth // container width
+      const maxLeft = offsetWidth - menuMinWidth // left boundary
+      const left = e.clientX - offsetLeft // 15: margin right
+
+      if (left > maxLeft) {
+        this.left = maxLeft
+      } else {
+        this.left = left
+      }
+
+      this.top = e.clientY - 60 // fix 位置bug
+      this.visible = true
+    },
+    closeMenu() {
+      this.visible = false
+    },
     handleRuleDelete(row) {
       const index = this.temp.rules.indexOf(row)
       this.temp.rules.splice(index, 1)
@@ -232,7 +269,7 @@ export default {
       })
     },
     getLabel() {
-      fetchLabel({ categoryId: 3 }).then(response => {
+      fetchLabel({ categoryTitle: '内容推送' }).then(response => {
         this.listLabel = response.data.items
       })
     },
@@ -284,7 +321,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp)
-          this.temp.categoryId = 3
+          this.temp.categoryTitle = '内容推送'
           this.temp.category = '内容推送'
           this.temp.tag = this.listLabel.find(item => item.id === this.temp.tagId).title
           this.temp.status = 'pro_examine'
@@ -372,4 +409,17 @@ export default {
 .ql-editor{
   height: 200px;
 }
+  .contextmenu{
+    position: absolute;
+    cursor: pointer;
+    border: 1px solid #d4d4d4;
+    box-shadow: 3px 3px 5px #888888;
+    background: white;
+    z-index: 9999;
+    padding: 5px;
+    p{
+      margin: 0;
+      font-size: 14px;
+    }
+  }
 </style>

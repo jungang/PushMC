@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <el-form-item label="消息模版" prop="templateType">
       <el-radio v-model="tmp.templateType" label="template"> 图文消息 </el-radio>
       <el-radio v-model="tmp.templateType" label="text"> 文本消息 </el-radio>

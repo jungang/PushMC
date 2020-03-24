@@ -2,13 +2,13 @@
   <div class="container">
 
     <el-select
-      v-model="list.listQuery.filter"
+      v-model="list.listQuery.examineStatus"
       style="margin-bottom: 10px"
       @change="filter"
     >
-      <el-option label="全部" value="all" />
-      <el-option label="已审批" value="approved" />
-      <el-option label="待审批" value="unsolved" />
+      <el-option label="全部" value="" />
+      <el-option label="已审批" value="agree" />
+      <el-option label="待审批" value="disagree" />
     </el-select>
 
     <el-table
@@ -48,10 +48,10 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button size="mini" @click="handleView(row)">
+          <el-button size="mini" type="text" @click="handleView(row)">
             查看
           </el-button>
-          <el-button :disabled="row.status==='examine_pass'" type="primary" size="mini" @click="handleExamine(row)">
+          <el-button :disabled="row.status==='examine_pass'" type="text" size="mini" @click="handleExamine(row)">
             审批
           </el-button>
         </template>
@@ -140,7 +140,7 @@ export default {
         data: [],
         total: 0,
         listQuery: {
-          filter: 'all',
+          examineStatus: '',
           page: 1,
           limit: 20,
           importance: undefined,

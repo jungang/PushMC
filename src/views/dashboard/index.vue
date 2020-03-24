@@ -56,40 +56,53 @@
       <el-col :span="8">
         <h4>业务频道推送</h4>
 
+        <el-card class="box-card">
+          业务相关的各类数据的推送，由平台与数据源对接拉取数据，推送到指定通道。
+        </el-card>
+
         <p>step1: 初始化设置</p>
-        <router-link :to="{path:'/source'}"> <el-tag>数据源</el-tag></router-link>
-        <router-link :to="{path:'/data-tag'}"> <el-tag>标签分类</el-tag></router-link>
+        <router-link :to="{path:'/manage/source'}"> <el-tag>数据源</el-tag></router-link>
+        <router-link :to="{path:'/manage/source'}"> <el-tag>数据标注</el-tag></router-link>
+        <router-link :to="{path:'/manage/category'}"> <el-tag>标签分类</el-tag></router-link>
         <router-link :to="{path:'/business-channel'}"> <el-tag type="info">业务频道</el-tag></router-link>
-        <router-link :to="{path:'/push-channel'}"> <el-tag>推送通道</el-tag></router-link>
+        <router-link :to="{path:'/manage/push-channel'}"> <el-tag>推送通道</el-tag></router-link>
 
         <p>step2: 设置业务频道推送</p>
-        <router-link :to="{path:'/channel-push'}"> <el-tag>频道推送</el-tag></router-link>
+        <router-link :to="{path:'/manage/channel-push'}"> <el-tag>频道推送</el-tag></router-link>
         <p>step3: 完成推送</p>
-        <router-link :to="{path:'/statistics/index'}"> <el-tag>推送统计</el-tag></router-link>
+        <router-link :to="{path:'/permission/statistics'}"> <el-tag>推送统计</el-tag></router-link>
 
       </el-col>
       <el-col :span="8">
+
         <h4>内容推送</h4>
+        <el-card class="box-card">
+          自定义内容，如新闻、公告等内容类型的消息推送。
+        </el-card>
         <p>step1: 初始化设置</p>
-        <router-link :to="{path:'/source'}"> <el-tag>数据源</el-tag></router-link>
-        <router-link :to="{path:'/data-tag'}"> <el-tag type="info">标签分类</el-tag></router-link>
-        <router-link :to="{path:'/push-content'}"> <el-tag type="danger">推送内容</el-tag></router-link>
-        <router-link :to="{path:'/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
+        <router-link :to="{path:'/manage/source'}"> <el-tag>数据源</el-tag></router-link>
+        <router-link :to="{path:'/manage/source'}"> <el-tag>数据标注</el-tag></router-link>
+        <router-link :to="{path:'/manage/category'}"> <el-tag type="info">标签分类</el-tag></router-link>
+        <router-link :to="{path:'/business-channel'}"> <el-tag type="danger">推送内容</el-tag></router-link>
+        <router-link :to="{path:'/manage/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
         <p>step2: 设置内容推送规则</p>
-        <router-link :to="{path:'/content-push'}"> <el-tag type="danger">内容推送</el-tag></router-link>
+        <router-link :to="{path:'/manage/channel-push'}"> <el-tag type="danger">内容推送</el-tag></router-link>
         <p>step3: 完成推送</p>
-        <router-link :to="{path:'/statistics/index'}"> <el-tag>推送统计</el-tag></router-link>
+        <router-link :to="{path:'/permission/statistics'}"> <el-tag>推送统计</el-tag></router-link>
 
       </el-col>
       <el-col :span="8">
         <h4>渠道推送</h4>
+        <el-card class="box-card">
+          推送到平台的数据，例如邮件、jira等数据源。
+        </el-card>
         <p>step1: 初始化设置</p>
-        <router-link :to="{path:'/source'}"> <el-tag>数据源</el-tag></router-link>
-        <router-link :to="{path:'/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
+        <router-link :to="{path:'/manage/source'}"> <el-tag>数据源</el-tag></router-link>
+        <router-link :to="{path:'/manage/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
         <p>step2: 设置渠道推送规则</p>
-        <router-link :to="{path:'/pipe-push'}"> <el-tag effect="dark">渠道推送</el-tag></router-link>
+        <router-link :to="{path:'/manage/channel-push'}"> <el-tag>渠道推送</el-tag></router-link>
         <p>step3: 完成推送</p>
-        <router-link :to="{path:'/statistics/index'}"> <el-tag>推送统计</el-tag></router-link>
+        <router-link :to="{path:'/permission/statistics'}"> <el-tag>推送统计</el-tag></router-link>
       </el-col>
     </el-row>
   </div>
@@ -219,6 +232,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+  .info{
+    font-size: 14px;
+    padding: 10px;
+  }
+
   #homeChartL,#homeChartR{
     height: 400px;
   }
