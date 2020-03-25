@@ -24,7 +24,7 @@ export function pipeList(query) {
 
 export function detail(query) {
   return request({
-    url: '/statistics/detail',
+    url: '/message/detail/page',
     method: 'get',
     params: query
   })

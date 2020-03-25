@@ -67,7 +67,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleSave">确 定</el-button>
+        <el-button type="primary" :loading="listLoading" @click="handleSave">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -96,7 +96,7 @@ export default {
       listArr: [],
       transfer: [],
       value: [],
-      listLoading: true,
+      listLoading: false,
       dialogStatus: '',
       saveQuery: {
         sourceData: [],
@@ -140,6 +140,7 @@ export default {
         this.currentRow.smColumns[index].checked = 1 // 标记左侧项
       })
       console.log(this.currentRow)
+      this.listLoading = true
       saveTag([this.currentRow]).then(res => {
         this.listLoading = false
         this.$notify({

@@ -23,11 +23,11 @@ export function fetchTables(query) {
     params: query
   })
 }
-export function searchList(keyWord) {
+export function searchList(query) {
   return request({
     url: '/push-content/list',
     method: 'get',
-    params: { searchKey: keyWord }
+    params: query
   })
 }
 

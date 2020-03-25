@@ -2,7 +2,7 @@
   <div>
 
     <el-row style="margin-bottom: 10px">
-      选择推送通道：
+      选择通道：
       <el-select v-model="personsArr.tunnelId" placeholder="请选择" style="width:150px" @change="handleFilter">
         <el-option
           v-for="item in tunnelArr"

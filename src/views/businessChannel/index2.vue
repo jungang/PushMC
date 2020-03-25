@@ -77,7 +77,6 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      center
       destroy-on-close
       top="5vh"
       custom-class="bcdialog"
@@ -86,102 +85,242 @@
     >
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
 
-        <div v-if="step==='step1'" class="zone-step-1">
-          <el-form-item v-if="dialogStatus==='create'" label="输入名称" prop="title">
-            <el-input v-model="temp.title" style="width:400px" />
-          </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="频道名称" prop="title">
+              <el-input v-model="temp.title" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="分类标签" prop="tagId">
+              <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
+                <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-          <el-form-item label="选择数据源" prop="resourceId">
-            <el-select
-              v-model="temp.resourceId"
-              class="filter-item"
-              placeholder="请选择"
-              @change="filter"
-            >
-              <el-option v-for="item in listSource" :key="item.id" :label="item.title" :value="item.id" />
-            </el-select>
-          </el-form-item>
+        <el-form-item label="内容更新方式" prop="type">
+          <el-select
+            v-model="temp.type"
+            class="filter-item"
+            placeholder="请选择"
+            @change="typeFilter"
+          >
+            <el-option v-for="item in types" :key="item.type" :label="item.title" :value="item.type" />
+          </el-select>
+        </el-form-item>
 
-          <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
-            <XcomTagTransfer
-              ref="transfer"
-              v-model="tempValue"
-              :props="{
-                key: 'id',
-                label: 'title'
-              }"
-              :data="temp.tablesList"
-              :left-default-checked="temp.transferStatus"
-              :right-default-checked="temp.transferStatus"
-              type="businessChannel"
-              :titles="['最多选择三张表', '已选数据表']"
-
-              :format="{
-                noChecked: '0/'+ tempValueMax,
-                hasChecked: '${checked}/'+ tempValueMax
-              }"
-              @left-check-change="handleCheckLeft"
-              @right-check-change="handleCheckRight"
-              @change="handleChange"
+        <el-form-item v-if="temp.type ==='pull'" label="主动拉取">
+          <el-table
+            ref="singleTable"
+            :data="temp.tables || []"
+            size="mini"
+            style="width: 100%"
+            border
+            @current-change="handleCurrentChange"
+          >
+            <el-table-column
+              type="index"
+              width="50"
+              align="center"
+              label="序号"
             />
-          </el-row>
 
-          <el-row type="flex" justify="end">
-            <el-button type="primary" @click="handleAdd">加入已选</el-button>
-          </el-row>
+            <el-table-column label="数据源" align="center">
 
-          <el-form-item label="已选全部数据表:" prop="mainTable">
-            <el-table
-              ref="singleTable"
-              :data="temp.tables || []"
-              highlight-current-row
-              style="width: 100%"
-              @current-change="handleCurrentChange"
+              <template slot-scope="{row}">
+                <el-select
+                  v-model="row.sourceId"
+                  class="filter-item"
+                  placeholder="请选择"
+                  size="small"
+                  @change="filter(row)"
+                >
+                  <el-option v-for="item in listSource" :key="item.id" :label="item.title" :value="item.id" />
+                </el-select>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              property="title"
+              align="center"
+              label="表名"
             >
-              <el-table-column
-                type="index"
-                width="50"
-                label="序号"
-              />
-              <el-table-column
-                property="isMain"
-                label="主表"
-              >
-                <template slot-scope="scope">
-                  <el-radio v-model="temp.mainTable" :label="scope.row"><i /></el-radio>
-                </template>
-              </el-table-column>
+              <template slot-scope="{row}">
+                <el-select
+                  v-model="row.id"
+                  class="filter-item"
+                  placeholder="请选择"
+                  size="small"
+                  @change="filter2(row)"
+                >
+                  <el-option v-for="item in row.tablesList" :key="item.id" :label="item.title" :value="item.id" />
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column
+              property="isMain"
+              label="主表"
+              align="center"
+              width="70"
+            >
+              <template slot-scope="scope">
+                <el-radio v-model="temp.mainTable" :label="scope.row"><i /></el-radio>
+              </template>
+            </el-table-column>
 
-              <el-table-column
-                property="sourceTitle"
-                label="数据源"
-                width="120"
-              />
-              <el-table-column
-                property="title"
-                label="数据表名"
-                width="120"
-              />
-              <el-table-column
-                label="操作"
-              >
-                <template slot-scope="{row}">
-                  <el-button size="mini" type="text" @click="handleTableDelete(row,'deleted')">
-                    删除
-                  </el-button>
-                </template>
-              </el-table-column>
+            <el-table-column
+              width="70"
+              align="center"
+              label="操作"
+            >
+              <template slot-scope="{row}">
+                <el-button size="mini" type="text" @click="handleTableDelete(row,'deleted')">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
 
-            </el-table>
+          </el-table>
+          <el-button size="mini" type="primary" @click="addTable">+添加数据表</el-button>
 
-          </el-form-item>
+        </el-form-item>
 
-          <el-form-item label="选择标签" prop="tagId">
-            <el-select v-model="temp.tagId" class="filter-item" placeholder="请选择">
-              <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
-            </el-select>
-          </el-form-item>
-        </div>
+        <el-form-item v-if="temp.type ==='receive'" label="被动接受">
+          <el-table
+            ref="singleTable"
+            :data="temp.tables || []"
+            highlight-current-row
+            size="mini"
+            style="width: 100%"
+            border
+            @current-change="handleCurrentChange"
+          >
+            <el-table-column
+              type="index"
+              width="50"
+              align="center"
+              label="序号"
+            />
+            <el-table-column
+              property="title"
+              label="表名"
+            />
+            <el-table-column
+              property="sourceTitle"
+              label="数据源"
+            />
+            <el-table-column
+              property="isMain"
+              label="主表"
+              align="center"
+              width="70"
+            >
+              <template slot-scope="scope">
+                <el-radio v-model="temp.mainTable" :label="scope.row"><i /></el-radio>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              width="70"
+              align="center"
+              label="操作"
+            >
+              <template slot-scope="{row}">
+                <el-button size="mini" type="text" @click="handleTableDelete(row,'deleted')">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+
+          </el-table>
+        </el-form-item>
+
+        <el-form-item label="数据源" prop="resourceId">
+          <el-select
+            v-model="temp.resourceId"
+            class="filter-item"
+            placeholder="请选择"
+            @change="filter"
+          >
+            <el-option v-for="item in listSource" :key="item.id" :label="item.title" :value="item.id" />
+          </el-select>
+        </el-form-item>
+
+        <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
+          <XcomTagTransfer
+            ref="transfer"
+            v-model="tempValue"
+            :props="{
+              key: 'id',
+              label: 'title'
+            }"
+            :data="temp.tablesList"
+            :left-default-checked="temp.transferStatus"
+            :right-default-checked="temp.transferStatus"
+            type="businessChannel"
+            :titles="['最多选择三张表', '已选数据表']"
+
+            :format="{
+              noChecked: '0/'+ tempValueMax,
+              hasChecked: '${checked}/'+ tempValueMax
+            }"
+            @left-check-change="handleCheckLeft"
+            @right-check-change="handleCheckRight"
+            @change="handleChange"
+          />
+        </el-row>
+
+        <el-row type="flex" justify="end">
+          <el-button type="primary" @click="handleAdd">加入已选</el-button>
+        </el-row>
+
+        <el-form-item label="已选全部数据表:" prop="mainTable">
+          <el-table
+            ref="singleTable"
+            :data="temp.tables || []"
+            highlight-current-row
+            style="width: 100%"
+            @current-change="handleCurrentChange"
+          >
+            <el-table-column
+              type="index"
+              width="50"
+              label="序号"
+            />
+            <el-table-column
+              property="isMain"
+              label="主表"
+            >
+              <template slot-scope="scope">
+                <el-radio v-model="temp.mainTable" :label="scope.row"><i /></el-radio>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              property="sourceTitle"
+              label="数据源"
+              width="120"
+            />
+            <el-table-column
+              property="title"
+              label="数据表名"
+              width="120"
+            />
+            <el-table-column
+              label="操作"
+            >
+              <template slot-scope="{row}">
+                <el-button size="mini" type="text" @click="handleTableDelete(row,'deleted')">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+
+          </el-table>
+
+        </el-form-item>
 
         <div v-if="step==='step2'" class="zone-step-2">
           <p>名称： <span>{{ temp.title }}</span></p>
@@ -203,7 +342,7 @@
         <el-button v-if="step==='step2'" type="primary" @click="step='step1'">
           上一步
         </el-button>
-        <el-button v-if="step==='step2'" :loading="listLoading" type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button v-if="step==='step2'" type="primary" @click="dialogStatus==='create'?createData():updateData()">
           完成
         </el-button>
       </div>
@@ -267,6 +406,17 @@ export default {
       searchKey: '',
       tablesList: [],
       tableKey: 0,
+      types: [
+        {
+          title: '主动拉取',
+          type: 'pull'
+        },
+        {
+          title: '被动接受',
+          type: 'receive'
+        }
+      ],
+      tableData: [],
       listLabel: [],
       listSource: [],
       listArr: {
@@ -285,6 +435,7 @@ export default {
       tempValueMax: 3,
       temp: {
         id: undefined,
+        type: 'pull',
         // pushType: 'business',
         tagId: '',
         tag: '',
@@ -324,6 +475,11 @@ export default {
       return this.$store.state.publicData.model
     }
   },
+  watch: {
+    // temp(val) {
+    //   console.log(val)
+    // }
+  },
   async created() {
     await this.getList()
     await this.getSourceList()
@@ -338,6 +494,24 @@ export default {
     }
   },
   methods: {
+    firstView() {
+      console.log('firstView...')
+      this.temp.tables.forEach(item => {
+        if (!item.tablesList) {
+          fetchSource(item.sourceId).then(response => {
+            console.log(response)
+
+            this.$set(item, 'tablesList', response.data.paths)
+            // item.tablesList = response.data.paths
+          })
+        }
+      })
+      console.log( this.temp)
+    },
+    addTable() {
+      console.log('addTable...')
+      this.temp.tables.push({})
+    },
     handleCurrentChange(val) {
       this.currentRow = val
     },
@@ -383,9 +557,21 @@ export default {
         this.step = 'step2'
       }
     },
-    filter() {
-      this.getTables()
+    typeFilter() {
+      console.log('typeFilter...')
     },
+    filter(row) {
+      this.$set(row, 'id', '')
+      fetchSource(row.sourceId).then(response => {
+        this.$set(row, 'tablesList', response.data.paths)
+      })
+    },
+    filter2(row) {
+      console.log('row:', row)
+    },
+    // filter() {
+    //   this.getTables()
+    // },
     handleTableDelete(row) {
       console.log(row)
       const index = this.temp.tables.indexOf(row)
@@ -408,9 +594,11 @@ export default {
     getLabel() {
       fetchLabel(this.temp.resourceId).then(response => {
         this.listLabel = response.data.items
+        console.log('this.listLabel:', this.listLabel)
       })
     },
     getTables() {
+      console.log('getTables...')
       fetchSource(this.temp.resourceId).then(response => {
         this.temp.tablesList = response.data.paths
         this.temp.tablesList.forEach(item => {
@@ -440,6 +628,7 @@ export default {
       this.tempValue = []
       this.temp = {
         id: undefined,
+        type: 'pull',
         // pushType: 'business',
         category: 'API',
         title: '',
@@ -470,6 +659,7 @@ export default {
     handleUpdate(row) {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
+
       channelDetail({ id: row.id }).then((res) => {
         Object.keys(res.data).forEach(item => {
           this.temp[item] = res.data[item]
@@ -486,9 +676,10 @@ export default {
           }
         })
 
-        this.getTables()
+        // this.getTables()
         this.$nextTick(() => {
           this.$refs['dataForm'].clearValidate()
+          this.firstView()
         })
       })
     },
@@ -542,9 +733,7 @@ export default {
             templateURL: ''
           }
 
-          this.listLoading = true
           createBusinessChannel(this.temp).then(() => {
-            this.listLoading = false
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
@@ -636,10 +825,10 @@ export default {
 </script>
 
 <style lang="scss">
-.bcdialog{
-  .el-dialog__body{
-    max-height: 700px;
-    overflow: auto;
+  .bcdialog{
+    .el-dialog__body{
+      max-height: 700px;
+      overflow: auto;
+    }
   }
-}
 </style>

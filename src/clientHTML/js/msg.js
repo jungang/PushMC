@@ -13,22 +13,19 @@ const detailUrl = 'http://39.98.167.246:9910/smartpush/rest/message/detail' // �
 const affirmUrl = 'http://39.98.167.246:9910/smartpush/rest/message/affirm' // 代理
 const loginUrl = 'http://39.98.167.246:9910/smartpush/rest/user/login' // 代理
 const id = GetQueryString('id') || 1
-const app_token = GetQueryString('app_token') || 1
+const app_token = GetQueryString('app_token') || null
 let data = {}
 let config = {}
 let uuid = ''
 let userId = ''
 
-
 // eslint-disable-next-line no-undef
 Zepto(function($) {
-
   $.get(`${loginUrl}?app_token=${app_token}`, function(data, status, xhr) {
     console.log(data.data.userId)
     userId = data.data.userId
   })
-  //app_token
-
+  // app_token
 
   $.ajax({
     type: 'GET',
@@ -87,7 +84,6 @@ Zepto(function($) {
     console.log('config.pushPlanOption:', config.pushPlanOption)
     // pushPlanOption =1 处理按钮确认
     $('.btn').click(function() {
-
       console.log('config.receipt:', config.receipt)
       console.log(typeof config.receipt)
       console.log(config.receipt === 'true')
@@ -118,8 +114,6 @@ function countDown(seconds) {
         console.log(data)
       })
     }
-
-
   }
 }
 

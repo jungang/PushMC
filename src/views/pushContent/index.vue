@@ -4,13 +4,23 @@
     <el-row style="margin-bottom: 10px">
       <el-col :span="20">
         内容列表：
-        <el-select v-model="listArr.listQuery.type" style="width: 140px" class="filter-item" @change="handleFilter">
-          <el-option v-for="item in MODEL.tagCategory" :key="item.key" :label="item.label" :value="item.key" />
+        <el-select
+          v-model="listArr.listQuery.type"
+          style="width: 140px"
+          class="filter-item"
+          @change="handleFilter"
+        >
+          <el-option label="全部" value="" />
+          <el-option label="新闻" value="news" />
+          <el-option label="公告" value="notice" />
         </el-select>
-        <el-input v-model="searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
+
+        <el-input v-model="listArr.listQuery.searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
         <el-button type="primary" icon="el-icon-search" style="width: 100px" @click="handleSearch">查询</el-button>
       </el-col>
-      <el-col :span="4" align="right"><el-button type="primary" @click="handleCreate">+ 新建内容</el-button></el-col>
+      <el-col :span="4" align="right">
+        <el-button type="primary" :loading="listLoading" @click="handleCreate">+ 新建内容</el-button>
+      </el-col>
     </el-row>
 
     <el-row>
@@ -122,7 +132,7 @@
         <el-button @click="dialogFormVisible = false">
           {{ dialogStatus==='view'?'关闭':'取消' }}
         </el-button>
-        <el-button v-if="dialogStatus!=='view'" type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button v-if="dialogStatus!=='view'" :loading="listLoading" type="primary" @click="dialogStatus==='create'?createData():updateData()">
           完成
         </el-button>
       </div>
@@ -168,9 +178,9 @@ export default {
         listQuery: {
           page: 1,
           limit: 20,
-          importance: undefined,
+          searchKey: '',
           title: undefined,
-          type: 'all',
+          type: '',
           sort: '+id'
         }
       },
@@ -303,7 +313,7 @@ export default {
     handleSearch() {
       this.listLoading = true
       this.listArr.listQuery.page = 1
-      searchList(this.searchKey).then(response => {
+      searchList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
@@ -326,7 +336,9 @@ export default {
           this.temp.tag = this.listLabel.find(item => item.id === this.temp.tagId).title
           this.temp.status = 'pro_examine'
           this.temp.contentType = 'content'
+          this.listLoading = true
           create(this.temp).then(() => {
+            this.listLoading = false
             this.getList()
             this.dialogFormVisible = false
             this.$notify({

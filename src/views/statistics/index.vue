@@ -62,7 +62,7 @@
       </el-table-column>
       <el-table-column label="推送确认" align="center" min-width="50">
         <template slot-scope="{row}">
-          <span>{{ row.feedback }}</span>
+          <span>{{ row.feedback === null ? '0': row.feedback }}</span>
         </template>
       </el-table-column>
       <el-table-column label="最近推送" align="center" min-width="100">
@@ -104,30 +104,31 @@
         </el-table-column>
         <el-table-column label="频道消息" prop="title" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.title }}</span>
+            <span>{{ row.sendData.SendTitle }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="最近推送时间" prop="channelTag" align="center" min-width="100">
+        <el-table-column label="发送时间" prop="channelTag" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.lastPushTime }}</span>
+            <span>{{ row.updateTime }}</span>
           </template>
         </el-table-column>
         <el-table-column label="推送人数" prop="channelTag" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.pushCount }}</span>
+            <span>{{ row.sendNum }}</span>
           </template>
         </el-table-column>
         <el-table-column label="阅读确认" prop="channelTag" align="center" min-width="100">
           <template slot-scope="{row}">
-            <span>{{ row.feedback }}</span>
+            <span>{{ row.readerNum }}</span>
           </template>
         </el-table-column>
 
         <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="text" size="mini" @click="handleDetailView(row)">
+
+            <!--            <el-button type="text" size="mini" @click="handleDetailView(row)">
               查看
-            </el-button>
+            </el-button>-->
 
             <el-button size="mini" type="text" icon="el-icon-document" @click="handleDownload(row)">
               导出
@@ -136,7 +137,14 @@
           </template>
         </el-table-column>
       </el-table>
-
+      <pagination
+        v-show="detailList.total>0"
+        :total="detailList.total"
+        :page.sync="detailList.listQuery.page"
+        :limit.sync="detailList.listQuery.limit"
+        hide-on-single-page
+        @pagination="getDetail()"
+      />
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           关闭
@@ -198,7 +206,6 @@ export default {
           title: undefined,
           type: undefined,
           sort: '+id',
-          pushType: 'content',
           group: 'default'
         }
       },
@@ -212,11 +219,20 @@ export default {
           title: undefined,
           type: undefined,
           sort: '+id',
-          pushType: 'channel',
           group: 'default'
         }
       },
-      detailList: { data: [] },
+      detailList: {
+        data: [],
+        total: 0,
+        listQuery: {
+          page: 1,
+          limit: 20,
+          channelId: 0,
+          sort: '+id',
+          group: 'default'
+        }
+      },
       listLoading: true,
       dialogFormVisible: false,
       dialogStatus: '',
@@ -301,8 +317,19 @@ export default {
       this.dialogStatus = 'view'
       this.dialogFormVisible = true
       this.detailList.data = []
-      detail({ id: row.id }).then(res => {
+      console.log('row:', row)
+      this.detailList.listQuery.channelId = row.channelId
+      this.getDetail()
+    },
+
+    getDetail() {
+      detail(this.detailList.listQuery).then(res => {
+        this.detailList.total = res.data.total
         this.detailList.data = res.data.items
+        this.detailList.data.forEach(item => {
+          item.sendData = JSON.parse(item.sendData)
+          console.log(item.sendData)
+        })
       })
     },
 

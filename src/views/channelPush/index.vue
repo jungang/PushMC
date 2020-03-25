@@ -535,16 +535,16 @@
         <el-button @click="outerVisible = false">
           {{ dialogStatus==='view'? '关闭' : '取消' }}
         </el-button>
-        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData()">
+        <el-button v-if="dialogStatus==='create'" :loading="listLoading"  type="primary" @click="createData()">
           保存
         </el-button>
-        <el-button v-if="dialogStatus==='update'" type="primary" @click="updateData()">
+        <el-button v-if="dialogStatus==='update'" :loading="listLoading"  type="primary" @click="updateData()">
           保存
         </el-button>
-        <el-button v-if="dialogStatus==='copy'" type="primary" @click="createData()">
+        <el-button v-if="dialogStatus==='copy'" :loading="listLoading" type="primary" @click="createData()">
           保存
         </el-button>
-        <el-button v-if="dialogStatus==='create'" type="primary" @click="createData('save_push')">
+        <el-button v-if="dialogStatus==='create'" :loading="listLoading" type="primary" @click="createData('save_push')">
           保存并推送
         </el-button>
       </div>
@@ -752,7 +752,6 @@ export default {
     this.getChannelList()
     this.getChannelTypeList()
     this.getChannelSubscribe()
-    this.getPushTemplateList()
     console.log(this.type)
     console.log(this.listArr.listQuery.pushType)
     console.log('created.......')
@@ -1156,7 +1155,9 @@ export default {
           this.temp.id = -1
           this.temp.status = (arguments[0] === 'save_push') ? 'enabled' : 'disabled'
 
+          this.listLoading = true
           createSource(this.temp).then(() => {
+            this.listLoading = false
             this.getList()
             this.outerVisible = false
             this.$notify({

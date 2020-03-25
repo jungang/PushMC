@@ -83,7 +83,7 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button type="primary" :loading="listLoading" @click="dialogStatus==='create'?createData():updateData()">
           确定
         </el-button>
       </div>
@@ -239,7 +239,9 @@ export default {
           }
           ).title
 
+          this.listLoading = true
           createTag(this.temp).then(() => {
+            this.listLoading = false
             this.getList()
             this.dialogFormVisible = false
             this.$notify({

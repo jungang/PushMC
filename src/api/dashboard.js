@@ -32,15 +32,13 @@ export function getUserInfo(token) {
     params: { app_token: token }
   })
 }
-export function chartData(roles) {
-/*
+export function chartData(params) {
   return request({
-    url: '/user/permission',
-    method: 'get',
-    params: { roles }
+    url: '/home/data',
+    method: 'POST',
+    params: { params }
   })
-*/
-
+/*
   return new Promise((resolve, reject) => {
     const res = {
       'code': 20000,
@@ -56,7 +54,7 @@ export function chartData(roles) {
       }
     }
     resolve(res)
-  })
+  })*/
 }
 
 export function logout() {

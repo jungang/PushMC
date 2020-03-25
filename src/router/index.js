@@ -198,7 +198,7 @@ export const asyncRoutes = [
         path: 'user',
         name: 'User',
         component: () => import('@/views/permission/index'),
-        meta: { title: '用户角色', icon: 'table' }
+        meta: { title: '用户权限', icon: 'table' }
       },
       {
         path: 'role',
