@@ -106,7 +106,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { create, dele, fetchList, update, allPermission } from '@/api/permission'
+import { create, dele, fetchList, updatePermis, allPermission } from '@/api/permission'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -265,7 +265,7 @@ export default {
           })
 
           const tempData = Object.assign({}, this.temp)
-          update(tempData).then(() => {
+          updatePermis(tempData).then(() => {
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {
                 const index = this.listArr.data.indexOf(v)

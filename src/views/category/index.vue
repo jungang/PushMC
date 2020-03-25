@@ -109,7 +109,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, createTag, saveCategory, fetchCategory, updateTag, dele } from '@/api/category'
+import { labelFetchList, createTag, saveCategory, fetchCategory, updateTag, dele } from '@/api/category'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 
@@ -185,7 +185,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listArr.listQuery).then(response => {
+      labelFetchList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false

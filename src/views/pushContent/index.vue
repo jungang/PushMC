@@ -5,14 +5,13 @@
       <el-col :span="20">
         内容列表：
         <el-select
-          v-model="listArr.listQuery.type"
+          v-model="listArr.listQuery.labelId"
           style="width: 140px"
           class="filter-item"
           @change="handleFilter"
         >
           <el-option label="全部" value="" />
-          <el-option label="新闻" value="news" />
-          <el-option label="公告" value="notice" />
+          <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
         </el-select>
 
         <el-input v-model="listArr.listQuery.searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
@@ -50,7 +49,7 @@
         </el-table-column>
         <el-table-column label="审批状态" align="center" width="150">
           <template slot-scope="{row}">
-            <span>{{ row.status }}</span>
+            <span>{{ row.status | statusFilter }}</span>
           </template>
         </el-table-column>
         <el-table-column label="内容标题" prop="type" align="center" min-width="200">
@@ -153,6 +152,25 @@ import Pagination from '@/components/Pagination'
 export default {
   name: 'PushContent',
   components: { Pagination },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        pro_examine: '待审核',
+        examine_pass: '审核通过',
+        examine_reject: '审核拒绝',
+        pro_publish: '待发布',
+        publish: '已发布'
+      }
+      return statusMap[status]
+    },
+    categoryFilter(status) {
+      const categoryMap = {
+        notice: '公告',
+        news: '新闻'
+      }
+      return categoryMap[status]
+    }
+  },
   data() {
     return {
       visible: false,
@@ -179,7 +197,7 @@ export default {
           page: 1,
           limit: 20,
           searchKey: '',
-          title: undefined,
+          labelId: '',
           type: '',
           sort: '+id'
         }

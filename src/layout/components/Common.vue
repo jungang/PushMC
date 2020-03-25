@@ -39,5 +39,7 @@ export default {
 .action_btn{
         color: red;
 }
-
+.el-form-item {
+  margin-bottom: 15px;
+}
 </style>

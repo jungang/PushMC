@@ -7,8 +7,8 @@
       @change="filter"
     >
       <el-option label="全部" value="" />
-      <el-option label="已审批" value="agree" />
-      <el-option label="待审批" value="disagree" />
+      <el-option label="已审批" value="examine_pass" />
+      <el-option label="待审批" value="pro_examine" />
     </el-select>
 
     <el-table
@@ -28,7 +28,7 @@
       </el-table-column>
       <el-table-column label="审批状态" prop="title" align="center" min-width="100">
         <template slot-scope="{row}">
-          <span>{{ row.status }}</span>
+          <span>{{ row.status | statusFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="分类" prop="channelTag" align="center" min-width="100">
@@ -119,9 +119,11 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        unsolved: '未处理',
-        approved: '已审批',
-        rejective: '已拒绝'
+        pro_examine: '待审核',
+        examine_pass: '审核通过',
+        examine_reject: '审核拒绝',
+        pro_publish: '待发布',
+        publish: '已发布'
       }
       return statusMap[status]
     },
@@ -133,6 +135,7 @@ export default {
       return categoryMap[status]
     }
   },
+
   data() {
     return {
       tableKey: 0,

@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function fetchList(query) {
+export function labelFetchList(query) {
   return request({
     url: '/label/list',
     method: 'get',

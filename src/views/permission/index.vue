@@ -27,9 +27,9 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="角色分配" prop="type" min-width="200" align="center">
+        <el-table-column label="角色分配" prop="type" show-overflow-tooltip min-width="200" align="center">
           <template slot-scope="{row}">
-            <span>{{ row.persons && row.persons.length || 0 }}</span>
+            <span>{{ row.roster.join(', ') }}</span>
           </template>
         </el-table-column>
 
@@ -40,9 +40,6 @@
             </el-button>
             <el-button type="text" size="mini" @click="handlePermis(row)">
               编辑权限
-            </el-button>
-            <el-button type="text" size="mini" @click="handleView(row)">
-              查看
             </el-button>
             <el-popconfirm
               confirm-button-text="好的"
@@ -84,9 +81,6 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ dialogStatus==='view'? '关闭' : '取消' }}
-        </el-button>
-        <el-button v-if="dialogStatus==='create'" :loading="listLoading" type="primary" @click="createData()">
-          确定
         </el-button>
         <el-button v-if="dialogStatus==='update'" :loading="listLoading" type="primary" @click="updateData()">
           完成
@@ -140,7 +134,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { allPermission, dele, fetchList, update } from '@/api/permission'
+import { allPermission, dele, fetchList, updatePermis } from '@/api/permission'
 import Pagination from '@/components/Pagination'
 import PickPersons from '@/components/pickPersons'
 
@@ -229,8 +223,14 @@ export default {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listArr.data.forEach(item => {
+          console.log(item.persons)
           item.persons = item.persons || []
           item.tunnelId = item.tunnelId || 1
+          item.roster = []
+          item.persons.forEach(p => {
+            item.roster.push(p.name)
+          })
+          // console.log(item)
         })
         this.listLoading = false
       })
@@ -248,7 +248,29 @@ export default {
       this.permisFormVisible = true
     },
     permisData() {
-      console.log('permisData...')
+      // console.log('permisData...')
+      this.permisTemp.smPermissions = []
+      console.log(this.checkedPermissions)
+      this.checkedPermissions.forEach(item => {
+        // console.log(item)
+        this.permissionsTree.items.forEach(item2 => {
+          if (item2.id === item) {
+            this.permisTemp.smPermissions.push(item2)
+          }
+        })
+      })
+
+      delete this.permisTemp.persons
+      updatePermis(this.permisTemp).then(() => {
+        this.getList()
+        this.permisFormVisible = false
+        this.$notify({
+          title: '完成',
+          message: '编辑成功',
+          type: 'success',
+          duration: 2000
+        })
+      })
     },
 
     handleView(row) {
@@ -283,8 +305,12 @@ export default {
           this.temp.persons = this.$refs.pickPersons.dynamicTags
           const tempData = Object.assign({}, this.temp)
           this.listLoading = true
-          update(tempData).then(() => {
-            this.listLoading = false
+
+          delete tempData.smPermissions
+          console.log(tempData)
+
+          updatePermis(tempData).then(() => {
+            this.getList()
             for (const v of this.listArr.data) {
               if (v.id === this.temp.id) {
                 const index = this.listArr.data.indexOf(v)

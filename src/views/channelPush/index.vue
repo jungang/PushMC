@@ -535,10 +535,10 @@
         <el-button @click="outerVisible = false">
           {{ dialogStatus==='view'? '关闭' : '取消' }}
         </el-button>
-        <el-button v-if="dialogStatus==='create'" :loading="listLoading"  type="primary" @click="createData()">
+        <el-button v-if="dialogStatus==='create'" :loading="listLoading" type="primary" @click="createData()">
           保存
         </el-button>
-        <el-button v-if="dialogStatus==='update'" :loading="listLoading"  type="primary" @click="updateData()">
+        <el-button v-if="dialogStatus==='update'" :loading="listLoading" type="primary" @click="updateData()">
           保存
         </el-button>
         <el-button v-if="dialogStatus==='copy'" :loading="listLoading" type="primary" @click="createData()">

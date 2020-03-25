@@ -24,7 +24,7 @@ export function create(data) {
   })
 }
 
-export function update(data) {
+export function updatePermis(data) {
   return request({
     url: '/user/role',
     method: 'put',
