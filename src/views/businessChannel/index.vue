@@ -100,18 +100,18 @@
           </el-col>
         </el-row>
 
-        <el-form-item label="内容更新方式" prop="type">
+        <el-form-item label="内容更新方式">
           <el-select
             v-model="temp.type"
             class="filter-item"
             placeholder="请选择"
-            @change="typeFilter"
+            @change="getSourceList"
           >
             <el-option v-for="item in types" :key="item.type" :label="item.title" :value="item.type" />
           </el-select>
         </el-form-item>
 
-        <el-form-item v-if="temp.type ==='pull'" label="主动拉取">
+        <el-form-item :label="temp.type==='pull'?'主动拉取':'被动接受'">
           <el-table
             ref="singleTable"
             :data="temp.tables || []"
@@ -160,13 +160,14 @@
               </template>
             </el-table-column>
             <el-table-column
+              v-if="temp.type==='pull'"
               property="isMain"
               label="主表"
               align="center"
               width="70"
             >
               <template slot-scope="{row}">
-                <el-radio v-model="temp.mainTable" :label="row.smColumns"><i /></el-radio>
+                <el-radio v-model="temp.mainTable" :label="row"><i /></el-radio>
               </template>
             </el-table-column>
 
@@ -183,144 +184,9 @@
             </el-table-column>
 
           </el-table>
-          <el-button size="mini" type="primary" @click="addTable">+添加数据表</el-button>
+          <el-button v-if="temp.type==='pull'" size="mini" type="primary" @click="addTable">+添加数据表</el-button>
 
         </el-form-item>
-
-        <el-form-item v-if="temp.type ==='receive'" label="被动接受">
-          <el-table
-            ref="singleTable"
-            :data="temp.tables || []"
-            highlight-current-row
-            size="mini"
-            style="width: 100%"
-            border
-            @current-change="handleCurrentChange"
-          >
-            <el-table-column
-              type="index"
-              width="50"
-              align="center"
-              label="序号"
-            />
-            <el-table-column
-              property="title"
-              label="表名"
-            />
-            <el-table-column
-              property="sourceTitle"
-              label="数据源"
-            />
-            <el-table-column
-              property="isMain"
-              label="主表"
-              align="center"
-              width="70"
-            >
-              <template slot-scope="scope">
-                <el-radio v-model="temp.mainTable" :label="scope.row"><i /></el-radio>
-              </template>
-            </el-table-column>
-
-            <el-table-column
-              width="70"
-              align="center"
-              label="操作"
-            >
-              <template slot-scope="{row}">
-                <el-button size="mini" type="text" @click="handleTableDelete(row,'deleted')">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-
-          </el-table>
-        </el-form-item>
-
-        <!--        <el-form-item label="数据源" prop="resourceId">
-          <el-select
-            v-model="temp.resourceId"
-            class="filter-item"
-            placeholder="请选择"
-            @change="filter"
-          >
-            <el-option v-for="item in listSource" :key="item.id" :label="item.title" :value="item.id" />
-          </el-select>
-        </el-form-item>-->
-
-        <!--        <el-row type="flex" class="row-bg" justify="center" style="margin-bottom: 20px">
-          <XcomTagTransfer
-            ref="transfer"
-            v-model="tempValue"
-            :props="{
-              key: 'id',
-              label: 'title'
-            }"
-            :data="temp.tablesList"
-            :left-default-checked="temp.transferStatus"
-            :right-default-checked="temp.transferStatus"
-            type="businessChannel"
-            :titles="['最多选择三张表', '已选数据表']"
-
-            :format="{
-              noChecked: '0/'+ tempValueMax,
-              hasChecked: '${checked}/'+ tempValueMax
-            }"
-            @left-check-change="handleCheckLeft"
-            @right-check-change="handleCheckRight"
-            @change="handleChange"
-          />
-        </el-row>-->
-
-        <!--        <el-row type="flex" justify="end">
-          <el-button type="primary" @click="handleAdd">加入已选</el-button>
-        </el-row>-->
-
-        <!--        <el-form-item label="已选全部数据表:" prop="mainTable">
-          <el-table
-            ref="singleTable"
-            :data="temp.tables || []"
-            highlight-current-row
-            style="width: 100%"
-            @current-change="handleCurrentChange"
-          >
-            <el-table-column
-              type="index"
-              width="50"
-              label="序号"
-            />
-            <el-table-column
-              property="isMain"
-              label="主表"
-            >
-              <template slot-scope="scope">
-                <el-radio v-model="temp.mainTable" :label="scope.row"><i /></el-radio>
-              </template>
-            </el-table-column>
-
-            <el-table-column
-              property="sourceTitle"
-              label="数据源"
-              width="120"
-            />
-            <el-table-column
-              property="title"
-              label="数据表名"
-              width="120"
-            />
-            <el-table-column
-              label="操作"
-            >
-              <template slot-scope="{row}">
-                <el-button size="mini" type="text" @click="handleTableDelete(row,'deleted')">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-
-          </el-table>
-
-        </el-form-item>-->
 
         <el-form-item label="频道规则" prop="type">
           <RulesSel :rules="temp.rules" :main-options="mainOptions" :options="options" />
@@ -438,7 +304,7 @@ export default {
         mainTable: {
           smColumns: []
         },
-        tables: [],
+        tables: [{}],
         tablesList: [],
         rules: []
       },
@@ -475,22 +341,17 @@ export default {
   },
   watch: {
     'temp.mainTable': {
-      handler: function(val) {
-        console.log('watch:mainTable', val)
-        if (!this.startEdit) {
-          console.log(this.startEdit)
-          // this.mainOptions = []
-          // this.options = []
-          this.nextStep()
-        } else {
-          this.startEdit = false
-        }
+      handler: function(val, oldVal) {
+        console.log('---> 2')
+        if (!val) return // 保留编辑状态
+        if (!oldVal.id) return // 保留编辑状态
+
+        console.log('---> 3')
+
+        this.nextStep()
       }
       // deep: true
     }
-    // temp(val) {
-    //   console.log(val)
-    // }
   },
   async created() {
     await this.getList()
@@ -508,27 +369,22 @@ export default {
       this.temp.tables.forEach(item => {
         if (!item.tablesList) {
           fetchSource(item.sourceId).then(response => {
-            // console.log(response)
-
             this.$set(item, 'tablesList', response.data.paths)
-            // item.tablesList = response.data.paths
           })
         }
       })
-      console.log(this.temp)
     },
     addTable() {
-      console.log('addTable...')
-      console.log('temp.mainTable...', this.temp.mainTable)
-      console.log('temp.tables...', this.temp.tables)
       this.temp.tables.push({})
+      // 默认第一张表为主表
+      if (!this.temp.mainTable.id) {
+        this.temp.mainTable = this.temp.tables[0]
+      }
     },
     handleCurrentChange(val) {
       this.currentRow = val
     },
     handleAdd() {
-      console.log(this.temp.tables)
-      console.log(this.$refs.transfer.targetData)
       this.$refs.transfer.targetData.forEach(item => {
         const v = this.temp.tables.find(item2 => item2.id === item.id) // 排重
         if (!v) {
@@ -537,45 +393,58 @@ export default {
       })
     },
     nextStep() {
-      // console.log(!!this.temp.mainTable)
-
-      // console.log(v)
+      console.log('nextStep...')
+      if (this.startEdit) {
+        this.startEdit = false
+      } else {
+        this.temp.rules = []
+      }
+      this.mainOptions = []
       this.options = []
 
-      if (this.temp.mainTable.id) {
-        this.temp.mainResourceId = this.temp.mainTable.id
-        this.mainOptions = this.temp.mainTable.smColumns
-        this.temp.tables.forEach((item) => {
-          if (this.temp.mainTable.id !== item.id) {
-            this.options = this.options.concat(item.smColumns)
-          }
-        })
-      }
+      this.temp.mainResourceId = this.temp.mainTable.id
+      this.mainOptions = this.temp.mainTable.smColumns
 
-      console.log('this.temp.tables', this.temp.tables)
-      console.log('this.temp.mainTable', this.temp.mainTable)
-      console.log('this.temp.mainTable.id', this.temp.mainTable.id)
-      console.log('mainOptions', this.mainOptions)
+      this.temp.tables.forEach((item) => {
+        if (this.temp.mainTable.id !== item.id) {
+          console.log('=============================')
+          console.log(item)
+          this.options = this.options.concat(item.smColumns)
+        }
+      })
+      console.log('this.mainOptions:', this.mainOptions)
+      console.log('this.options:', this.options)
+      // console.log('this.rules:', this.rules)
+
+      // console.log('this.temp.mainTable', this.temp.mainTable)
+      // console.log('this.temp.mainTable.id', this.temp.mainTable.id)
+      // console.log('mainOptions', this.mainOptions)
     },
     typeFilter() {
       console.log('typeFilter...')
+      console.log(this.temp.type)
     },
     filter(row) {
       this.$set(row, 'id', '')
+      // row.id = ''
       fetchSource(row.sourceId).then(response => {
         this.$set(row, 'tablesList', response.data.paths)
+        // row.tablesList = response.data.paths
       })
     },
     filter2(row) {
       row.smColumns = row.tablesList.find(item => item.id === row.id).smColumns
-      console.log('row.tablesList:', row.tablesList)
-      console.log(this.temp.tables)
+      this.nextStep()
+      // console.log('row:', row)
+      // console.log('row.id:', row.id)
+      // console.log('this.temp.mainTable:', this.temp.mainTable)
+      // console.log('this.temp.mainTable.id:', this.temp.mainTable.id)
+      // console.log('mainOptions:', this.mainOptions)
     },
     // filter() {
     //   this.getTables()
     // },
     handleTableDelete(row) {
-      console.log(row)
       const index = this.temp.tables.indexOf(row)
       this.temp.tables.splice(index, 1)
     },
@@ -584,10 +453,10 @@ export default {
       this.temp.rules.splice(index, 1)
     },
     handleDialogClose() {
-      // console.log('handleDialogClose...')
-      this.step = 'step1'
       this.tempValue = []
-      // console.log(this.tempValue)
+      this.temp.mainTable = {
+        smColumns: []
+      }
     },
     handleCheckLeft(value, direction) {
     },
@@ -615,9 +484,21 @@ export default {
         this.listLoading = false
       })
     },
+
+    // 拉去数据源列表
     async getSourceList() {
+      this.temp.tables = [{
+        smColumns: []
+      }]
+      this.temp.mainTable = this.temp.tables[0]
+      // this.temp.mainTable = this.temp.tables[0]
+      // await fetchSourceList({ type: this.temp.type }).then(response => { //类型参数
       await fetchSourceList().then(response => {
         this.listSource = response.data.items
+        // this.temp.mainTable = {
+        //   smColumns: []
+        // }
+        this.nextStep()
       })
     },
     handleFilter() {
@@ -637,13 +518,15 @@ export default {
         mainTable: {
           smColumns: []
         },
-        tables: [],
+        tables: [{
+          smColumns: []
+        }],
         transferStatus: [],
         rules: [],
         tagId: '',
         tag: ''
-
       }
+      this.temp.mainTable = this.temp.tables[0]
     },
     handleSearch() {
       this.listLoading = true
@@ -673,15 +556,17 @@ export default {
 
         this.temp = { ...this.temp, ...res.data }
         console.log('channelDetail...')
-        console.log(this.temp)
-        console.log(this.temp.rules)
-        console.log(this.temp.mainTable)
 
         this.temp.id = res.data.id
         this.temp.resourceId = this.temp.resourceId || 1
         this.temp.tables.forEach(item => {
           if (item.id === this.temp.mainResourceId) {
+            console.log('change mainTable... 1')
             this.temp.mainTable = item
+            this.$nextTick(() => {
+              console.log('this.temp.rules = res.data.rules')
+              this.temp.rules = res.data.rules
+            })
           }
         })
 
@@ -712,12 +597,19 @@ export default {
         valueColumnPath: '',
         valueResourceId: ''
       })
-      console.log(this.temp.rules)
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.resourceTitle = this.listSource.find(o => o.id === this.temp.resourceId).title
+          console.log(this.temp)
+          console.log(this.listSource)
+          console.log(this.temp.resourceId)
+
+          console.log(this.temp.mainResourceId)
+
+          this.temp.tag = this.listLabel.find(o => o.id === this.temp.tagId).title
+          // this.temp.resourceTitle = this.listSource.find(o => o.id === this.temp.mainResourceId).title
+          // this.temp.resourceTitle = this.listSource.find(o => o.id === this.temp.resourceId).title
           this.temp.status = 'enabled'
 
           this.temp.tablesList.forEach(item => {
@@ -836,7 +728,7 @@ export default {
 <style lang="scss">
   .bcdialog{
     .el-dialog__body{
-      height: 70vh;
+
       max-height: 80vh;
       overflow: auto;
     }

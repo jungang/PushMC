@@ -39,7 +39,7 @@
         align="center"
       >
         <template slot-scope="{row}">
-          <el-select v-model="row.expression" :disabled="options.length===0" placeholder="请选择">
+          <el-select v-model="row.expression" placeholder="请选择">
             <el-option
               v-for="item in ruleOptions"
               :key="item.value"
@@ -57,8 +57,7 @@
       >
         <template slot-scope="{row}" style="text-align: left">
           <el-select
-            v-model="row.valueColumnPathName"
-            :disabled="options.length===0"
+            v-model="row.valueColumn"
             placeholder="请选择"
             style="width:150px"
             @change="handleSel(row)"
@@ -70,11 +69,12 @@
             <el-option
               v-for="item in options"
               :key="item.id"
-              :label="item.valueColumnPathName"
-              :value="`${item.valueColumnPathName}--${item.path}--${item.resourceId}`"
+              :label="item.pathTitle"
+              :value="item.id"
             />
           </el-select>
-          <el-input v-model="row.valueColumnPathValue" :disabled="row.valueColumnPathName !== '-2'" placeholder="请输入" style="width:100px" />
+
+          <el-input v-model="row.valueColumnPathValue" :disabled="row.valueColumn !== '-2'" placeholder="请输入" style="width:100px" />
 
         </template>
       </el-table-column>
@@ -90,7 +90,7 @@
 
     <el-row>
       <el-col :span="12">
-        <el-button type="primary" size="mini" @click="handleAddRule">+添加规则条目</el-button>
+        <el-button type="primary" :disabled="mainOptions.length === 0" size="mini" @click="handleAddRule">+添加规则条目</el-button>
       </el-col>
     </el-row>
 
@@ -130,9 +130,6 @@ export default {
         }, {
           value: 'like',
           label: 'like'
-        }, {
-          value: '<',
-          label: '<'
         }]
     }
   },
@@ -150,16 +147,18 @@ export default {
       const index = this.rules.indexOf(row)
       this.rules.splice(index, 1)
     },
-    handleSel(val) {
-      console.log(val)
-      if (val.valueColumnPathName === '-2') {
-        val.valueResourceId = ''
-        val.valueColumnPath = ''
+    handleSel(row) {
+      if (row.valueColumn === '-2') {
+        row.valueResourceId = ''
       } else {
-        val.valueResourceId = val.valueColumnPathName.split('--')[2]
-        val.valueColumnPath = val.valueColumnPathName.split('--')[1]
-        val.valueColumnPathName = val.valueColumnPathName.split('--')[0]
+        this.options.forEach(item => {
+          if (item.id === row.valueColumn) {
+            row.valueResourceId = item.resourceId
+            row.valueColumnPath = item.path
+          }
+        })
       }
+      console.log(row)
     },
     handleAddRule() {
       console.log(this.mainOptions)
@@ -170,6 +169,7 @@ export default {
           mainColumnPath: '',
           mainColumnPathValue: '',
           mainResourceId: this.mainOptions[0].resourceId,
+          valueColumn: '-2',
           valueColumnPath: '',
           valueColumnPathValue: '',
           valueResourceId: ''
