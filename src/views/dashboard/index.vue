@@ -251,7 +251,7 @@ export default {
         this.optionR.series[0].data = response.data.series2
         this.optionR.yAxis.data = []
         this.optionR.series[0].data.forEach(item => {
-          console.log(item.name)
+          // console.log(item.name)
           this.optionR.yAxis.data.push(item.name)
         })
         this.chartL.setOption({ ...this.optionL })

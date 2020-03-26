@@ -496,7 +496,7 @@
           </el-row>
           <el-row>
             确认位置:
-            {{ temp.receipt }}{{ typeof temp.receipt }}
+
             <el-radio v-model="temp.receipt" label="true" :value="true" :disabled="dialogStatus==='view'">需回传</el-radio>
             <el-radio v-model="temp.receipt" label="false" :value="false" :disabled="dialogStatus==='view'">不需回传</el-radio>
             <span>（短信不支持确认）</span>

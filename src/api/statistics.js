@@ -37,3 +37,11 @@ export function download(query) {
     params: query
   })
 }
+
+export function ept(query) {
+  return request({
+    url: '/statistics/export',
+    method: 'get',
+    params: query
+  })
+}

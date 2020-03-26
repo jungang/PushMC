@@ -123,6 +123,12 @@ export const asyncRoutes = [
         meta: { title: '推送频道', icon: 'form' }
       },
       {
+        path: '/business-channel2',
+        name: 'BusinessChannel2',
+        component: () => import('@/views/businessChannel/index2'),
+        meta: { title: '推送频道!!', icon: 'form' }
+      },
+      {
         path: 'push-channel',
         name: 'PushChannel',
         component: () => import('@/views/pushChannel/index'),

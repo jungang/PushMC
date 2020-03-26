@@ -156,7 +156,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { businessChannelList, contentList, pipeList, detail, download } from '@/api/statistics'
+import { businessChannelList, contentList, pipeList, detail, ept } from '@/api/statistics'
 import { parseTime } from '@/utils'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -267,9 +267,9 @@ export default {
     },
     handleDownload(row) {
       this.downloadLoading = true
-      download(row).then(response => {
-        console.log(response.data.items)
-        import('@/vendor/Export2Excel').then(excel => {
+      ept({ id: row.id }).then(response => {
+        console.log(response)
+        /*      import('@/vendor/Export2Excel').then(excel => {
           const keys = Object.keys(response.data.items[0])
           const tHeader = keys
           const data = this.formatJson(keys, response.data.items)
@@ -281,7 +281,7 @@ export default {
             bookType: this.bookType
           })
           this.downloadLoading = false
-        })
+        })*/
       })
     },
     handleClick(tab, event) {
