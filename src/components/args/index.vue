@@ -1,51 +1,63 @@
 <template>
   <div class="warp">
-    <el-popover
-      v-model="visible"
-      placement="bottom"
-      title="推送字段"
-      trigger="click"
-      style="background: white"
-    >
-      <div class="panel">
-
-        <el-row class="btnArea" :class="showAll?'show-all':'show-part'">
-          <el-button v-for="tag in options" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
-          <el-button round size="small" class="toggle" :icon="showAll?'el-icon-arrow-up':'el-icon-arrow-down'" circle @click="showAll = !showAll" />
-        </el-row>
-        <el-row>
-
-          <label for="textarea" />
-          <textarea
-            id="textarea"
-            ref="editor"
-            v-model="value"
-            autocomplete="off"
-            type="textarea"
-            :rows="5"
-            placeholder="请输入内容"
-            style="width: 100%"
-          />
-
-        </el-row>
-
-        <div class="btn">
-          <el-button @click="visible = false">
-            取消
-          </el-button>
-          <el-button type="primary" @click="updateValue">
-            确定
-          </el-button>
-        </div>
-
-      </div>
-
-      <el-button slot="reference" @click=" value = parentValue ">+选择推送字段</el-button>
-
-    </el-popover>
 
     <el-row>
-      {{ parentValue }}
+      <el-col :span="4">
+        <el-popover
+          v-model="visible"
+          placement="bottom"
+          title="推送字段"
+          trigger="click"
+          style="background: white"
+        >
+          <div class="panel">
+
+            <el-row class="btnArea" :class="showAll?'show-all':'show-part'">
+              <el-button v-for="tag in options" :key="tag.id" size="mini" @click="insertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
+              <el-button round size="small" class="toggle" :icon="showAll?'el-icon-arrow-up':'el-icon-arrow-down'" circle @click="showAll = !showAll" />
+            </el-row>
+            <el-row>
+
+              <label for="textarea" />
+              <textarea
+                id="textarea"
+                ref="editor"
+                v-model="value"
+                autocomplete="off"
+                type="textarea"
+                :rows="5"
+                placeholder="请输入内容"
+                style="width: 100%"
+              />
+
+            </el-row>
+
+            <div class="btn">
+              <el-button @click="visible = false">
+                取消
+              </el-button>
+              <el-button type="primary" @click="updateValue">
+                确定
+              </el-button>
+            </div>
+
+          </div>
+
+          <el-button slot="reference" @click=" value = parentValue ">{{ text }}</el-button>
+
+        </el-popover>
+      </el-col>
+      <el-col v-if="read" :span="20">
+        <el-input
+          v-model="parentValue"
+          type="textarea"
+          autosize
+          placeholder="请输入内容"
+        />
+      </el-col>
+      <el-col v-if="!read" :span="20">
+        {{ parentValue }}
+      </el-col>
     </el-row>
 
   </div>
@@ -59,6 +71,16 @@ export default {
     options: {
       required: true,
       type: Array
+    },
+    text: {
+      required: true,
+      type: String
+    },
+    read: {
+      type: Boolean,
+      default() {
+        return false
+      }
     },
     parentValue: {
       type: String,

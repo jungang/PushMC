@@ -62,7 +62,7 @@
       </el-table-column>
       <el-table-column label="数据源名称" min-width="100" align="center">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
+          <span class="link-type">{{ row.title }}</span>
         </template>
       </el-table-column>
       <el-table-column label="数据源描述" align="center" min-width="100">

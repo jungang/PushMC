@@ -111,7 +111,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="temp.type==='pull'?'主动拉取':'被动接受'">
+        <el-form-item :label="temp.type==='API'?'主动拉取':'被动接受'">
           <el-table
             ref="singleTable"
             :data="temp.tables || []"
@@ -160,7 +160,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              v-if="temp.type==='pull'"
+              v-if="temp.type==='API'"
               property="isMain"
               label="主表"
               align="center"
@@ -184,7 +184,7 @@
             </el-table-column>
 
           </el-table>
-          <el-button v-if="temp.type==='pull'" size="mini" type="primary" @click="addTable">+添加数据表</el-button>
+          <el-button v-if="temp.type==='API'" size="mini" type="primary" @click="addTable">+添加数据表</el-button>
 
         </el-form-item>
 
@@ -210,12 +210,14 @@
     </el-dialog>
 
     <el-dialog
+      top="5vh"
       :title="textMap[dialogStatus]"
       :visible.sync="msgFormVisible"
       width="800px"
+      @closed="handleMsgDialogClose"
     >
       <el-form ref="msgForm" :model="temp" label-position="right" label-width="100px" class="main-form">
-        <Templates :tmp="temp.tmp" :tables="temp.tables" />
+        <Templates ref="msg" :tmp="temp.tmp" :tables="temp.tables" />
       </el-form>
 
       <div slot="footer" class="dialog-footer">
@@ -270,11 +272,11 @@ export default {
       types: [
         {
           title: '主动拉取',
-          type: 'pull'
+          type: 'API'
         },
         {
           title: '被动接受',
-          type: 'receive'
+          type: 'webhooks'
         }
       ],
       tableData: [],
@@ -296,7 +298,7 @@ export default {
       tempValueMax: 3,
       temp: {
         id: undefined,
-        type: 'pull',
+        type: 'API',
         // pushType: 'business',
         tagId: '',
         tag: '',
@@ -458,6 +460,9 @@ export default {
         smColumns: []
       }
     },
+    handleMsgDialogClose() {
+      this.$refs.msg.step = 1
+    },
     handleCheckLeft(value, direction) {
     },
     handleCheckRight() {},
@@ -492,8 +497,8 @@ export default {
       }]
       this.temp.mainTable = this.temp.tables[0]
       // this.temp.mainTable = this.temp.tables[0]
-      // await fetchSourceList({ type: this.temp.type }).then(response => { //类型参数
-      await fetchSourceList().then(response => {
+      await fetchSourceList({ type: this.temp.type }).then(response => { // 类型参数
+      // await fetchSourceList().then(response => {
         this.listSource = response.data.items
         // this.temp.mainTable = {
         //   smColumns: []
@@ -510,7 +515,7 @@ export default {
       this.tempValue = []
       this.temp = {
         id: undefined,
-        type: 'pull',
+        type: 'API',
         category: 'API',
         title: '',
         tablesList: [],
@@ -581,6 +586,26 @@ export default {
     handleMsgUpdate(row) {
       channelDetail({ id: row.id }).then((res) => {
         this.temp = res.data
+
+        this.temp.tmp = {
+          id: -1,
+          templateType: 'template',
+          content: '',
+          digest: '',
+          digest2: '',
+          msgTitle: '',
+          cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+          pageTitle: '',
+          pageSubhead: '',
+          pageIsUrl: false,
+          pageUrl: '',
+          pageContent: ''
+        }
+
+        if (res.data.tmp !== null) {
+          this.temp.tmp = { ...this.temp.tmp, ...res.data.tmp }
+        }
+
         this.dialogStatus = 'update'
         this.msgFormVisible = true
         this.$nextTick(() => {
@@ -601,11 +626,11 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log(this.temp)
-          console.log(this.listSource)
-          console.log(this.temp.resourceId)
-
-          console.log(this.temp.mainResourceId)
+          // console.log(this.temp)
+          // console.log(this.listSource)
+          // console.log(this.temp.resourceId)
+          //
+          // console.log(this.temp.mainResourceId)
 
           this.temp.tag = this.listLabel.find(o => o.id === this.temp.tagId).title
           // this.temp.resourceTitle = this.listSource.find(o => o.id === this.temp.mainResourceId).title
@@ -623,15 +648,18 @@ export default {
           })
 
           this.temp.tmp = {
-            title: '',
+            id: -1,
             templateType: 'template',
             content: '',
-            arg1: '',
-            arg2: '',
-            arg3: '',
-            arg4: '',
-            isURL: false,
-            templateURL: ''
+            digest: '',
+            digest2: '',
+            msgTitle: '',
+            cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
+            pageTitle: '',
+            pageSubhead: '',
+            pageIsUrl: false,
+            pageUrl: '',
+            pageContent: ''
           }
 
           createBusinessChannel(this.temp).then(() => {
@@ -652,6 +680,8 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
+
+          console.log('tempData.tablesList:', tempData.tablesList)
 
           tempData.tablesList.forEach(item => {
             item.resourceId = item.id

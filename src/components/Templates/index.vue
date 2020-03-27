@@ -11,15 +11,11 @@
     <el-form-item v-if="tmp.templateType==='template'" label="">
       <el-row>
         <el-col>
-          <div v-if="step===1" class="preview">
+          <div v-if="step===1" class="preview" style="width: 90%">
             <div class="top">
-              <Args :options="options" :parent-value.sync="tmp.msgTitle" />
+              <Args :options="options" text="+题目" :parent-value.sync="tmp.msgTitle" />
             </div>
 
-            <!--            $store.state.publicData.model.nginxPath -->
-            <!--            http://39.98.167.246:9910/offlinefile/-->
-            <!--            http://rap2api.taobao.org/app/mock/241291/dev-api/source/upload-->
-            <!--            http://39.98.167.246:9910/smartpush/rest/common/upload-->
             <div class="img">
               <el-upload
                 class="uploader"
@@ -30,32 +26,52 @@
               >
                 <el-button size="small" type="primary" class="btn">点击上传图片</el-button>
               </el-upload>
-              <img :src="tmp.cover" alt="">
+              <img :src="tmp.cover || 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943'" alt="">
             </div>
 
             <el-row>
-              <Args :options="options" :parent-value.sync="tmp.digest" />
+              <Args :options="options" text="+概述" :parent-value.sync="tmp.digest" />
+            </el-row>
+          </div>
+          <div v-if="step===2" class="preview" style="width: 90%">
+
+            <el-row>
+              <el-radio v-model="tmp.pageIsUrl" :label="true">引用URL</el-radio>
+              <el-input
+                v-model="tmp.pageUrl"
+                :disabled="tmp.pageIsUrl !== true"
+                placeholder="请输入url"
+                style="width: 300px"
+              />
+            </el-row>
+            <el-row>
+              <el-radio v-model="tmp.pageIsUrl" :label="false">自定义</el-radio>
             </el-row>
 
-            <div class="url">
-              +URL <br>
-              <el-input v-model="tmp.templateURL" placeholder="+推送URL" />
-            </div>
-          </div>
-          <div v-if="step===2" class="preview">
+            <el-row>
 
-            <Args :options="options" :parent-value.sync="tmp.arg1" />
-            <Args :options="options" :parent-value.sync="tmp.arg2" />
-            <Args :options="options" :parent-value.sync="tmp.arg3" />
-            <Args :options="options" :parent-value.sync="tmp.arg4" />
+              <Args :options="options" text="标题" read :parent-value.sync="tmp.pageTitle" />
+              <Args :options="options" text="副标题" read :parent-value.sync="tmp.pageSubhead" />
 
+            </el-row>
+
+            <el-row>
+              <el-form-item label="正文" prop="content" style="height: 300px">
+                <quill-editor
+                  ref="myQuillEditor"
+                  v-model="tmp.pageContent"
+                  :options="editorOption"
+                  style="height: 250px"
+                />
+              </el-form-item>
+            </el-row>
           </div>
 
         </el-col>
       </el-row>
       <el-row style="width: 400px; text-align: right; margin-top: 10px">
         <el-button :disabled="step===1" @click="step=1">上一步</el-button>
-        <el-button :disabled="step===2" @click="step=2">下一步</el-button>
+        <el-button :disabled="step===2" @click="next">下一步</el-button>
       </el-row>
     </el-form-item>
 
@@ -91,6 +107,24 @@
 
 import Args from '@/components/args'
 
+const toolbarOptions = [
+  ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线
+  // ['blockquote', 'code-block'], // 引用  代码块
+  // [{ header: 1 }, { header: 2 }], // 1、2 级标题
+  // [{ list: 'ordered' }, { list: 'bullet' }], // 有序、无序列表
+  // [{ script: 'sub' }, { script: 'super' }], // 上标/下标
+  // [{ indent: '-1' }, { indent: '+1' }], // 缩进
+  // [{'direction': 'rtl'}],                         // 文本方向
+  // [{ size: ['small', false, 'large', 'huge'] }], // 字体大小
+  // [{ header: [1, 2, 3, 4, 5, 6, false] }], // 标题
+  // [{ color: [] }, { background: [] }], // 字体颜色、字体背景颜色
+  // [{ font: [] }], // 字体种类
+  // [{ align: [] }], // 对齐方式
+  // ['clean'], // 清除文本格式
+  ['image'], // 链接、图片、视频
+  ['link'] // 链接、图片、视频
+]
+
 export default {
   name: 'Templates',
   components: { Args },
@@ -108,8 +142,20 @@ export default {
     return {
       argVisible: false,
       showAll: false,
-      step: 1
-    }
+      step: 1,
+      editorOption: {
+        theme: 'snow', // or 'bubble'
+        placeholder: '请输入正文内容',
+        modules: {
+          toolbar: {
+            container: toolbarOptions,
+            // container: "#toolbar",
+            handlers: {
+              link: this.editorAction
+            }
+          }
+        }
+      }}
   },
   computed: {
     options: function() {
@@ -123,17 +169,31 @@ export default {
   },
   watch: {
     tmp(val) {
-      this.step = 1
+      // this.step = 1
       // this.thisTemplate = val
     }
     // thisTemplate(val) {
     //   this.$emit('update:template', val)
     // }
   },
+  mounted() {
+  },
   created() {
     console.log(this.$store.state.publicData.model.nginxPath)
   },
   methods: {
+    next() {
+      this.step = 2
+      setTimeout(function() {
+        console.log('next...')
+        console.log(document.querySelector('.ql-link'))
+      }, 0)
+    },
+    editorAction() {
+      console.log('editorAction.')
+      console.log(document.querySelector('.ql-link'))
+    },
+
     toggle() {
       console.log('toggle...')
     },
@@ -160,6 +220,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .el-row{
+    margin-bottom: 10px;
+  }
+  .el-form-item{
+    margin-bottom: 10px;
+  }
+
   .preview{
     border: 1px solid #C1C1C1;
     padding: 10px;
@@ -186,5 +253,8 @@ export default {
     bottom: 5px;
     right: 0;
     position: absolute;
+  }
+  .ql-editor{
+    height:400px;
   }
 </style>
