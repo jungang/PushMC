@@ -14,8 +14,7 @@
 
             <el-col :span="8">消息推送通道统计：</el-col>
             <el-col :span="16">
-              {{ checkL }}
-              <el-checkbox-group v-model="checkL" @change="handleCheckedL">
+              <el-checkbox-group v-model="checkL" @change="handleChecked">
                 <el-checkbox v-for="item in chartItemsL" :key="item.id" :label="item.id">{{ item.title }}</el-checkbox>
               </el-checkbox-group>
             </el-col>
@@ -24,8 +23,7 @@
           <el-row style="width: 500px; margin-top: 20px">
             <el-col :span="8">消息推送频道统计：</el-col>
             <el-col :span="16">
-              {{ checkR }}
-              <el-checkbox-group v-model="checkR" @change="handleCheckedR">
+              <el-checkbox-group v-model="checkR" @change="handleChecked">
                 <el-checkbox v-for="item in chartItemsR" :key="item.id" :label="item.id">{{ item.title }}</el-checkbox>
               </el-checkbox-group>
             </el-col>
@@ -46,72 +44,72 @@
       </el-col>
     </el-row>
 
-    <el-row>
+    <el-row style="margin-top: 50px">
       <el-col :span="4" align="center">
         <h4>业务频道推送</h4>
       </el-col>
       <el-col :span="20">
-        <el-card class="box-card">
-          <el-row>
-            业务相关的各类数据的推送，平台与数据源对接，将使用主动拉取或推送到平台的数据，推送到指定通道。
+        <!--        <el-card class="box-card">-->
+        <el-row>
+          业务相关的各类数据的推送，平台与数据源对接，将使用主动拉取或推送到平台的数据，推送到指定通道。
 
-          </el-row>
-          <el-row>
-            <el-col :span="8">
-              <p>step1: 初始化设置</p>
-              <router-link :to="{path:'/manage/source'}"> <el-tag>数据源</el-tag></router-link>
-              <router-link :to="{path:'/manage/source'}"> <el-tag>数据标注</el-tag></router-link>
-              <br>
-              <router-link :to="{path:'/manage/category'}"> <el-tag>标签分类</el-tag></router-link>
-              <router-link :to="{path:'/business-channel'}"> <el-tag type="info">业务频道</el-tag></router-link>
-              <router-link :to="{path:'/manage/push-channel'}"> <el-tag>推送通道</el-tag></router-link>
-            </el-col>
-            <el-col :span="8">
-              <p>step2: 设置业务频道推送</p>
-              <router-link :to="{path:'/manage/channel-push'}"> <el-tag>消息推送</el-tag></router-link>
-            </el-col>
-            <el-col :span="8">
-              <p>step3: 完成推送</p>
-              <router-link :to="{path:'/permission/statistics'}"> <el-tag>推送统计</el-tag></router-link>
-            </el-col>
-          </el-row>
-        </el-card>
+        </el-row>
+        <el-row>
+          <el-col :span="8">
+            <p>step1: 初始化设置</p>
+            <router-link :to="{path:'/manage/source'}"> <el-tag>数据源</el-tag></router-link>
+            <router-link :to="{path:'/manage/source'}"> <el-tag>数据标注</el-tag></router-link>
+            <br>
+            <router-link :to="{path:'/manage/category'}"> <el-tag>标签分类</el-tag></router-link>
+            <router-link :to="{path:'/business-channel'}"> <el-tag type="info">业务频道</el-tag></router-link>
+            <router-link :to="{path:'/manage/push-channel'}"> <el-tag>推送通道</el-tag></router-link>
+          </el-col>
+          <el-col :span="8">
+            <p>step2: 设置业务频道推送</p>
+            <router-link :to="{path:'/manage/channel-push'}"> <el-tag>消息推送</el-tag></router-link>
+          </el-col>
+          <el-col :span="8">
+            <p>step3: 完成推送</p>
+            <router-link :to="{path:'/permission/statistics'}"> <el-tag>推送统计</el-tag></router-link>
+          </el-col>
+        </el-row>
+        <!--        </el-card>-->
       </el-col>
     </el-row>
 
-    <el-row style="margin-top: 10px">
+    <el-row style="margin-top: 50px">
       <el-col :span="4" align="center">
         <h4>内容推送</h4>
       </el-col>
       <el-col :span="20">
-        <el-card class="box-card">
-          <el-row>
-            自定义内容，如新闻、公告等内容类型的消息推送。
-          </el-row>
-          <el-row>
-            <el-col :span="8">
+        <!--        <el-card class="box-card">-->
+        <el-row>
+          自定义内容，如新闻、公告等内容类型的消息推送。
+        </el-row>
+        <el-row>
+          <el-col :span="8">
 
-              <p>step1: 初始化设置</p>
-              <router-link :to="{path:'/manage/source'}"> <el-tag>数据源</el-tag></router-link>
-              <router-link :to="{path:'/manage/source'}"> <el-tag>数据标注</el-tag></router-link>
-              <br>
-              <router-link :to="{path:'/manage/category'}"> <el-tag type="info">标签分类</el-tag></router-link>
-              <router-link :to="{path:'/business-channel'}"> <el-tag type="danger">推送内容</el-tag></router-link>
-              <router-link :to="{path:'/manage/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
+            <p>step1: 初始化设置</p>
+            <router-link :to="{path:'/manage/source'}"> <el-tag>数据源</el-tag></router-link>
+            <router-link :to="{path:'/manage/source'}"> <el-tag>数据标注</el-tag></router-link>
+            <br>
+            <router-link :to="{path:'/manage/category'}"> <el-tag type="info">标签分类</el-tag></router-link>
+            <router-link :to="{path:'/business-channel'}"> <el-tag type="danger">推送内容</el-tag></router-link>
+            <router-link :to="{path:'/manage/push-channel'}"> <el-tag type="warning">推送通道</el-tag></router-link>
 
-            </el-col>
-            <el-col :span="8">
-              <p>step2: 设置内容推送规则</p>
-              <router-link :to="{path:'/manage/channel-push'}"> <el-tag type="danger">消息推送</el-tag></router-link>
-              <router-link :to="{path:'/content/push-content'}"> <el-tag type="danger">内容编辑</el-tag></router-link>
-              <router-link :to="{path:'/content/examine-content'}"> <el-tag type="danger">内容审批</el-tag></router-link>
-            </el-col>
-            <el-col :span="8">
-              <p>step3: 完成推送</p>
-              <router-link :to="{path:'/permission/statistics'}"> <el-tag>推送统计</el-tag></router-link>
-            </el-col>
-          </el-row>
-        </el-card>
+          </el-col>
+          <el-col :span="8">
+            <p>step2: 设置内容推送规则</p>
+            <router-link :to="{path:'/manage/channel-push'}"> <el-tag type="danger">消息推送</el-tag></router-link>
+            <router-link :to="{path:'/content/push-content'}"> <el-tag type="danger">内容编辑</el-tag></router-link>
+            <router-link :to="{path:'/content/examine-content'}"> <el-tag type="danger">内容审批</el-tag></router-link>
+          </el-col>
+          <el-col :span="8">
+            <p>step3: 完成推送</p>
+            <router-link :to="{path:'/permission/statistics'}"> <el-tag>推送统计</el-tag></router-link>
+          </el-col>
+        </el-row>
+        <!--        </el-card>-->
       </el-col>
     </el-row>
 
@@ -123,7 +121,7 @@
 
 import { mapGetters } from 'vuex'
 
-import { chartData } from '@/api/dashboard'
+import { chartData, chartFilter, updateFilter } from '@/api/dashboard'
 // import { isExternal } from '@/utils/validate'
 var echarts = require('echarts')
 export default {
@@ -133,18 +131,8 @@ export default {
     return {
       checkL: [],
       checkR: [],
-      chartItemsL: [
-        { id: 1, title: '推送总数', check: true },
-        { id: 2, title: '推送总数' },
-        { id: 3, title: '微信推送总数' },
-        { id: 4, title: 'APP推送总数' },
-        { id: 5, title: 'gocom推送总数' }
-      ],
-      chartItemsR: [
-        { id: 1, title: '业务频道1' },
-        { id: 2, title: '业务频道1' },
-        { id: 3, title: '业务频道1' }
-      ],
+      chartItemsL: [],
+      chartItemsR: [],
       optionL: {
         title: {
           text: '消息推送渠道统计'
@@ -190,18 +178,18 @@ export default {
         },
         yAxis: {
           type: 'category',
-          data: ['业务频道消息推送总数', '内容消息推送总数', '渠道消息推送总数', '公告推送', '新闻推送', 'JIRA', 'PDCA']
+          data: []
         },
         visualMap: {
           orient: 'horizontal',
           left: 'center',
-          min: 10,
-          max: 200,
+          min: 800,
+          max: 4000,
           text: ['*', '.'],
           // Map the score column to color
           dimension: 0,
           inRange: {
-            color: ['rgb(255,174,172)', '#e14c01']
+            color: ['rgb(255,213,212)', '#e14c01']
           }
         },
         series: [{
@@ -234,16 +222,41 @@ export default {
     init() {
       this.getConfig()
     },
-    handleCheckedL() {
-      this.chartL.setOption(this.optionL)
-    },
+    handleChecked() {
+      this.chartItemsL.forEach(item => {
+        item.check = (this.checkL.find(item2 => item.id === item2)) ? 1 : 0
+      })
 
-    handleCheckedR() {
-      this.chartR.setOption(this.optionR)
+      this.chartItemsR.forEach(item => {
+        item.check = (this.checkR.find(item2 => item.id === item2)) ? 1 : 0
+      })
+
+      const data = {
+        series1: this.chartItemsL,
+        series2: this.chartItemsR
+      }
+
+      updateFilter(data).then(() => this.getData())
     },
 
     getConfig() {
       this.getData()
+      this.getFilter()
+    },
+
+    getFilter() {
+      chartFilter().then(response => {
+        this.chartItemsL = response.data.series1
+        this.chartItemsR = response.data.series2
+
+        this.chartItemsL.forEach(item => {
+          if (item.check === 1) this.checkL.push(item.id)
+        })
+
+        this.chartItemsR.forEach(item => {
+          if (item.check === 1) this.checkR.push(item.id)
+        })
+      })
     },
     getData() {
       chartData().then(response => {
@@ -251,7 +264,6 @@ export default {
         this.optionR.series[0].data = response.data.series2
         this.optionR.yAxis.data = []
         this.optionR.series[0].data.forEach(item => {
-          // console.log(item.name)
           this.optionR.yAxis.data.push(item.name)
         })
         this.chartL.setOption({ ...this.optionL })

@@ -14,22 +14,22 @@
         highlight-current-row
         style="width: 100%;"
       >
-        <el-table-column label="ID" prop="id" align="center" min-width="50">
+        <el-table-column label="ID" prop="id" align="center" width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签名称" prop="type" align="center" min-width="50">
+        <el-table-column label="标签名称" prop="type" align="center">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="分类" align="center" min-width="100">
+        <el-table-column label="分类" align="center">
           <template slot-scope="{row}">
             <span>{{ row.category }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签来源" align="center" min-width="50">
+        <!--        <el-table-column label="标签来源" align="center" min-width="50">
           <template slot-scope="{row}">
             <span>{{ row.origin === 'CUSTOM' ? '自定义': '默认' }}</span>
           </template>
@@ -43,8 +43,8 @@
           <template slot-scope="{row}">
             <span>{{ row.creationTime }}</span>
           </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+        </el-table-column>-->
+        <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-button type="text" size="mini" @click="handleUpdate(row)">
               编辑

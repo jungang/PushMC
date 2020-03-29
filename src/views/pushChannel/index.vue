@@ -39,13 +39,15 @@
         <el-table-column label="状态" align="center" min-width="50">
           <template slot-scope="{row}">
 
-            {{ row.status === 'enabled' ? '启用': '未启用' }}
+            <span :style="{color:row.status === 'enabled'?'#409eff':'#606266'}">
+              {{ row.status === 'enabled' ? '启用': '停用' }}
+            </span>
 
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="text" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" :disabled="row.revamp" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
             <el-button v-if="row.status!='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'enabled')">
@@ -54,7 +56,7 @@
             <el-button v-if="row.status==='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'disabled')">
               停用
             </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
+            <el-button v-if="row.status!='deleted'" :disabled="row.revamp" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>

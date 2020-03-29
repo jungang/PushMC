@@ -52,13 +52,13 @@
 
         <el-table-column label="操作" align="center" width="250" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="text" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" size="mini" :disabled="row.revamp" @click="handleUpdate(row)">
               编辑
             </el-button>
             <el-button type="text" size="mini" @click="handleMsgUpdate(row)">
               消息模板
             </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
+            <el-button :disabled="row.revamp" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>
@@ -587,24 +587,7 @@ export default {
       channelDetail({ id: row.id }).then((res) => {
         this.temp = res.data
 
-        this.temp.tmp = {
-          id: -1,
-          templateType: 'template',
-          content: '',
-          digest: '',
-          digest2: '',
-          msgTitle: '',
-          cover: 'https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943',
-          pageTitle: '',
-          pageSubhead: '',
-          pageIsUrl: false,
-          pageUrl: '',
-          pageContent: ''
-        }
-
-        if (res.data.tmp !== null) {
-          this.temp.tmp = { ...this.temp.tmp, ...res.data.tmp }
-        }
+        console.log(this.temp.tmp)
 
         this.dialogStatus = 'update'
         this.msgFormVisible = true
@@ -659,7 +642,11 @@ export default {
             pageSubhead: '',
             pageIsUrl: false,
             pageUrl: '',
-            pageContent: ''
+            pageContent: '',
+            pushPlan: 'instant',
+            pushPlanOption: 1,
+            receipt: 'true',
+            receiptSecond: 60
           }
 
           createBusinessChannel(this.temp).then(() => {

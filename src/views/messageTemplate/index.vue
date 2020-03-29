@@ -44,7 +44,9 @@
         <el-table-column label="状态" align="center" min-width="50">
           <template slot-scope="{row}">
 
-            {{ row.status === 'enabled' ? '启用': '未启用' }}
+             <span :style="{color:row.status === 'enabled'?'#409eff':'#606266'}">
+              {{ row.status === 'enabled' ? '启用': '停用' }}
+            </span>
 
           </template>
         </el-table-column>
@@ -179,7 +181,7 @@ export default {
       // this.editor.setContents([{ insert: 'Hello ' }])
     },
     async insertText(mark) {
-      mark = '{ ' + mark + ' }'
+      mark = '{{ ' + mark + ' }}'
       // const myField = document.querySelector('#textarea');
       const myField = this.$refs.myQuillEditor
       if (myField.selectionStart || myField.selectionStart === 0) {

@@ -7,8 +7,8 @@
       @change="filter"
     >
       <el-option label="全部" value="" />
-      <el-option label="已审批" value="examine_pass" />
-      <el-option label="待审批" value="pro_examine" />
+      <el-option label="已审批" value="agree" />
+      <el-option label="待审批" value="disagree" />
     </el-select>
 
     <el-table
@@ -95,7 +95,7 @@
         <el-button @click="dialogFormVisible = false">
           关闭
         </el-button>
-        <el-button v-if="dialogStatus!=='view'" type="danger" @click="handleAction(false)">
+        <el-button v-if="dialogStatus!=='view'" type="danger" @click="handleAction('examine_reject')">
           审批不通过
         </el-button>
         <el-button v-if="dialogStatus!=='view'" type="primary" @click="handleAction('pro_publish')">

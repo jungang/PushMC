@@ -16,6 +16,10 @@
       </el-col>
       <el-col :span="12" align="right">
 
+        <!--        {{ checkPermission(101) }}-->
+        <el-tag v-permission="101">admin</el-tag>
+        <el-tag v-permission="103">editor</el-tag>
+        <el-tag v-permission="104">Both admin or editor can see this</el-tag>
         <el-button type="primary" @click="handleCreate">新建数据源</el-button>
       </el-col>
 
@@ -50,7 +54,9 @@
       <el-table-column label="状态" class-name="status-col" align="center" min-width="50">
         <template slot-scope="{row}">
 
-          {{ row.status === 'enabled' ? '启用': '未启用' }}
+          <span :style="{color:row.status === 'enabled'?'#409eff':'#606266'}">
+            {{ row.status === 'enabled' ? '启用': '停用' }}
+          </span>
 
           <el-tag
             v-if="row.status==='deleted'"
@@ -72,7 +78,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-button type="text" size="mini" @click="handleUpdate(row)">
+          <el-button type="text" size="mini" :disabled="row.revamp" @click="handleUpdate(row)">
             编辑
           </el-button>
           <el-button v-if="row.status!=='enabled'" type="text" size="mini" @click="handleModifyStatus(row,'enabled')">
@@ -84,10 +90,7 @@
           <el-button type="text" size="mini" @click="handleTag(row)">
             标注
           </el-button>
-          <el-button v-if="row.status==='deleted'" size="mini" @click="handleModifyStatus(row,'draft')">
-            恢复
-          </el-button>
-          <el-button v-if="row.status!=='deleted'" size="mini" type="text" @click="handleDelete(row)">
+          <el-button v-if="row.status!=='deleted'" :disabled="row.revamp" size="mini" type="text" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -130,7 +133,7 @@
           <el-col :span="12">
             <el-form-item v-if="temp.type==='API'" label="拉取频率" prop="interval">
               <div>
-                <el-input v-model="temp.interval" placeholder="请输入内容" style="width: 200px">
+                <el-input v-model="temp.interval" type="number" placeholder="请输入内容" style="width: 200px;-webkit-appearance: none;">
                   <template slot="append">分钟</template>
                 </el-input>
               </div>
@@ -173,11 +176,13 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import DynamicInput from '@/components/DynamicInput'
-
+import { validURL } from '@/utils/validate'
+import permission from '@/directive/permission/index.js' // 权限判断指令
+import checkPermission from '@/utils/permission' // 权限判断函数
 export default {
   name: 'ComplexTable',
   components: { Pagination, DynamicInput },
-  directives: { waves },
+  directives: { waves, permission },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -188,6 +193,13 @@ export default {
     }
   },
   data() {
+    const checkUrl = (rule, value, callback) => {
+      if (!validURL(value)) {
+        callback(new Error('请输入URL'))
+      } else {
+        callback()
+      }
+    }
     return {
       tableKey: 0,
       listArr: {
@@ -241,8 +253,12 @@ export default {
           { required: true, message: '不能为空', trigger: 'blur' }
         ],
         serverAddress: [
-          { required: true, message: '服务器地址不能为空', trigger: 'blur' }
+          { required: true, message: '不能为空', trigger: 'blur' },
+          { validator: checkUrl, trigger: 'blur' }
         ],
+        // serverAddress: [
+        //   { required: true, message: '服务器地址不能为空', trigger: 'blur' }
+        // ],
         paths: [
           { required: true, message: '请输入', trigger: 'blur' }
         ],
@@ -277,6 +293,7 @@ export default {
     this.getList()
   },
   methods: {
+    checkPermission,
     filter() {
       this.listArr.listQuery.page = 1
       this.getList()
@@ -349,7 +366,7 @@ export default {
         id: undefined,
         type: 'API',
         title: '',
-        status: 'disabled',
+        status: 'enabled',
         secretKey: '',
         serverAddress: '',
         updatePlanHours: '4',
@@ -387,6 +404,9 @@ export default {
               type: 'success',
               duration: 2000
             })
+          },
+          () => {
+            this.listLoading = false
           })
         }
       })

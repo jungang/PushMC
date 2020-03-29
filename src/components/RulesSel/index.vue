@@ -64,7 +64,7 @@
           >
             <el-option
               label="常量"
-              value="-2"
+              :value="-2"
             />
             <el-option
               v-for="item in options"
@@ -74,7 +74,7 @@
             />
           </el-select>
 
-          <el-input v-model="row.valueColumnPathValue" :disabled="row.valueColumn !== '-2'" placeholder="请输入" style="width:100px" />
+          <el-input v-model="row.valueColumnPathValue" :disabled="row.valueColumn !== -2" placeholder="请输入" style="width:100px" />
 
         </template>
       </el-table-column>
@@ -169,7 +169,7 @@ export default {
           mainColumnPath: '',
           mainColumnPathValue: '',
           mainResourceId: this.mainOptions[0].resourceId,
-          valueColumn: '-2',
+          valueColumn: -2,
           valueColumnPath: '',
           valueColumnPathValue: '',
           valueResourceId: ''

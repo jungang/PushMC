@@ -52,25 +52,10 @@ export const constantRoutes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
-        meta: { title: '首页', icon: 'dashboard', affix: true }
+        meta: { title: '首页', icon: 'dashboard', affix: true, info: '' }
       }
     ]
   },
-  /*  {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: {
-        title: '首页',
-        icon: 'dashboard'
-      }
-    }]
-  },*/
-
   // 404 page must be placed at the end !!!
   { path: '*',
     redirect: 'dashboard',
@@ -85,6 +70,7 @@ export const constantRoutes = [
 export const asyncRoutes = [
 
   {
+    id: 10,
     index: 10,
     path: '/manage',
     component: Layout,
@@ -93,130 +79,114 @@ export const asyncRoutes = [
     meta: {
       title: '推送管理',
       icon: 'example',
-      activeMenu: '/channel-push'
+      activeMenu: '/channel-push',
+      info: ''
 
     },
     children: [
       {
+        id: 11,
         path: 'source',
         name: 'ChannelPush',
         component: () => import('@/views/source/index'),
-        meta: { title: '数据源', icon: 'table' }
+        meta: { title: '数据源', icon: 'table', info: '' }
       },
       {
+        id: 12,
         path: 'category',
         name: 'Category',
         component: () => import('@/views/category/index'),
-        meta: { title: '标签分类', icon: 'table' }
+        meta: { title: '标签分类', icon: 'table', info: '' }
       },
       {
+        id: 13,
         path: 'source/edit',
         name: 'Edit',
         component: () => import('@/views/dataTag/edit'),
-        meta: { title: '标注', icon: 'form' },
+        meta: { title: '标注', icon: 'form', info: '' },
         hidden: true
       },
       {
+        id: 14,
         path: '/business-channel',
         name: 'BusinessChannel',
         component: () => import('@/views/businessChannel/index'),
-        meta: { title: '推送频道', icon: 'form' }
+        meta: { title: '推送频道', icon: 'form', info: 'channel' }
       },
       {
-        path: '/business-channel2',
-        name: 'BusinessChannel2',
-        component: () => import('@/views/businessChannel/index2'),
-        meta: { title: '推送频道!!', icon: 'form' }
-      },
-      {
+        id: 15,
         path: 'push-channel',
         name: 'PushChannel',
         component: () => import('@/views/pushChannel/index'),
-        meta: { title: '推送通道', icon: 'table' }
+        meta: { title: '推送通道', icon: 'table', info: '' }
       },
       {
+        id: 16,
         path: 'push-target',
         name: 'PushTarget',
         component: () => import('@/views/pushTarget/index'),
-        meta: { title: '推送对象', icon: 'form' }
+        meta: { title: '推送对象', icon: 'form', info: 'target' }
       },
       {
+        id: 17,
         path: 'channel-push',
         name: 'ChannelPush',
         component: () => import('@/views/channelPush/index'),
         props: {
           type: 'business'
         },
-        meta: { title: '消息推送', icon: 'table' }
+        meta: { title: '消息推送', icon: 'table', info: 'push_channel' }
       }
-      // {
-      //   path: 'pipe-push',
-      //   name: 'PipePush',
-      //   component: () => import('@/views/channelPush/index'),
-      //   props: {
-      //     type: 'channel'
-      //   },
-      //   meta: { title: '渠道推送', icon: 'table' }
-      // },
-      // {
-      //   path: 'content-push',
-      //   name: 'ContentPush',
-      //   component: () => import('@/views/contentPush/index'),
-      //   props: {
-      //     type: 'content'
-      //   },
-      //   meta: { title: '内容推送', icon: 'tree' }
-      // }
     ]
   },
 
   {
+    id: 20,
     index: 20,
     path: '/content',
     component: Layout,
     redirect: 'noRedirect',
     name: 'MessagePush',
-    meta: { title: '内容管理', icon: 'example' },
+    meta: { title: '内容管理', icon: 'example', info: '' },
     children: [
       {
+        id: 21,
         path: 'push-content',
         name: 'Push content',
         component: () => import('@/views/pushContent/index'),
-        meta: { title: '推送内容', icon: 'form' }
+        meta: { title: '推送内容', icon: 'form', info: '' }
       },
       {
+        id: 22,
         path: 'examine-content',
         name: 'Examine',
         component: () => import('@/views/examine/index'),
-        meta: { title: '内容审批', icon: 'form' }
+        meta: { title: '内容审批', icon: 'form', info: '' }
       }
     ]
   },
   {
+    id: 30,
     index: 20,
     path: '/permission',
     component: Layout,
     redirect: 'noRedirect',
     name: 'MessagePush',
-    meta: { title: '运营监控', icon: 'example' },
+    meta: { title: '运营监控', icon: 'example', info: '' },
     children: [
       {
+        id: 31,
         path: 'user',
         name: 'User',
         component: () => import('@/views/permission/index'),
-        meta: { title: '用户权限', icon: 'table' }
+        meta: { title: '用户权限', icon: 'table', info: '' }
       },
       {
-        path: 'role',
-        name: 'Role',
-        component: () => import('@/views/permission/role'),
-        meta: { title: '用户权限', icon: 'tree' }
-      },
-      {
+        id: 32,
         path: 'statistics',
         name: 'Statistics',
         component: () => import('@/views/statistics/index'),
-        meta: { title: '推送统计', icon: 'form' }
+        meta: { title: '推送统计', icon: 'form', info: '' }
       }
     ]
   }

@@ -5,25 +5,8 @@
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
-      <el-dropdown class="avatar-container" trigger="click">
-        <div class="avatar-wrapper">
-          <!--          <img src="http://pic.90sjimg.com/design/03/29/25/25/5d18cdcacbf42.png" class="user-avatar">-->
-          <el-tag>
-            {{ $store.state.user.name }}
-          </el-tag>
-          <i class="el-icon-caret-bottom" />
-        </div>
-        <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
-            <el-dropdown-item>
-              Home
-            </el-dropdown-item>
-          </router-link>
-          <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">Log Out</span>
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+      <span style="font-size: 12px; margin-right: 20px; color: #5a5e66"> {{ $store.state.user.name }}</span>
+
     </div>
   </div>
 </template>

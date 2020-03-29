@@ -62,29 +62,27 @@ const actions = {
   },
 
   generateAsyncRouter: function({ commit }, arg) {
-    const { roles, roleTypes } = arg
+    const { roleTypes } = arg
     return new Promise(resolve => {
-      let accessedRoutes = []
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
-      } else {
-        roleTypes.forEach(item => {
-          asyncRoutes.forEach(item2 => {
-            if (item.path === item2.path) accessedRoutes.push(item2)
-            if (item2.children.length > 1) {
-              item2.children.forEach(item3 => (item.path === item3.path) || accessedRoutes.push(item2))
-            }
+      const accessedRoutes = asyncRoutes
+
+      accessedRoutes.forEach(topMenu => {
+        const status = roleTypes.find(userPms => userPms.id === topMenu.id)
+        if (!status) {
+          topMenu.children = topMenu.children.filter(subMenu => {
+            return roleTypes.find(userPms => userPms.id === subMenu.id)
           })
-        })
+        }
+      })
+      const _accessedRoutes = accessedRoutes.filter(item => {
+        // console.log(item)
+        // console.log(item.children.length)
+        return item.children.length > 0
+      })
 
-        accessedRoutes = Array.from(new Set(accessedRoutes)) // 去重
-        // accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-
-        accessedRoutes.sort((a, b) => a.index - b.index) // 排序
-      }
-      commit('SET_ROUTES', accessedRoutes)
+      commit('SET_ROUTES', _accessedRoutes)
       // console.log(accessedRoutes)
-      resolve(accessedRoutes)
+      resolve(_accessedRoutes)
     })
   }
 }

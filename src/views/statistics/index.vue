@@ -130,9 +130,16 @@
               查看
             </el-button>-->
 
-            <el-button size="mini" type="text" icon="el-icon-document" @click="handleDownload(row)">
-              导出
-            </el-button>
+            <el-tooltip class="item" effect="dark" content="无可导出数据" placement="top" style="margin-left:0">
+              <el-button v-if="row.readerNum <= 0" size="mini" type="text" icon="el-icon-document" style="color: #cccccc">
+                导出
+              </el-button>
+            </el-tooltip>
+            <el-link v-if="row.readerNum >0" target="_blank" :href="'../dev-api/statistics/export?uuid='+row.uuid" :underline="false" style="margin-left:15px">
+              <el-button size="mini" type="text" icon="el-icon-document">
+                导出
+              </el-button>
+            </el-link>
 
           </template>
         </el-table-column>
@@ -267,7 +274,8 @@ export default {
     },
     handleDownload(row) {
       this.downloadLoading = true
-      ept({ id: row.id }).then(response => {
+      console.log('row:', row)
+      ept({ uuid: row.uuid }).then(response => {
         console.log(response)
         /*      import('@/vendor/Export2Excel').then(excel => {
           const keys = Object.keys(response.data.items[0])
@@ -352,5 +360,8 @@ export default {
   }
   .main-form{
     max-height: 600px;
+  }
+  .el-link{
+    margin-left: 0 !important;
   }
 </style>

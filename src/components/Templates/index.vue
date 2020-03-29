@@ -42,7 +42,9 @@
                 :disabled="tmp.pageIsUrl !== true"
                 placeholder="请输入url"
                 style="width: 300px"
+                @blur="inputUrlBlur"
               />
+              <span v-if="urlError" style="color: red">URL输入错误</span>
             </el-row>
             <el-row>
               <el-radio v-model="tmp.pageIsUrl" :label="false">自定义</el-radio>
@@ -99,13 +101,29 @@
       </el-form-item>
 
     </el-row>
+    <el-dialog
+      :visible.sync="dialogVisible"
+      top="30vh"
+      width="30%"
+      append-to-body
+      :modal="false"
+      :show-close="false"
+      :before-close="handleClose"
+    >
 
+      <el-row>
+
+        <el-button v-for="tag in options" :key="tag.id" size="mini" @click="quillInsertText(tag.pathTitle)">{{ tag.pathTitle }}</el-button>
+
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 
 import Args from '@/components/args'
+import { validURL } from '@/utils/validate'
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线
@@ -140,7 +158,9 @@ export default {
   },
   data() {
     return {
+      urlError: false,
       argVisible: false,
+      dialogVisible: false,
       showAll: false,
       step: 1,
       editorOption: {
@@ -165,6 +185,9 @@ export default {
       })
       console.log(opts)
       return opts
+    },
+    editor() {
+      return this.$refs.myQuillEditor.quill
     }
   },
   watch: {
@@ -182,36 +205,82 @@ export default {
     console.log(this.$store.state.publicData.model.nginxPath)
   },
   methods: {
+    inputUrlBlur() {
+      this.urlError = !validURL(this.tmp.pageUrl)
+      return this.urlError
+    },
+    handleClose() {
+      console.log('handleClose...')
+      this.dialogVisible = false
+    },
     next() {
       this.step = 2
       setTimeout(function() {
         console.log('next...')
         console.log(document.querySelector('.ql-link'))
+        const el = document.querySelector('.ql-link')
+        const text = document.createTextNode('插入字段')
+        el.appendChild(text)
+        el.style.width = '100px'
       }, 0)
     },
     editorAction() {
       console.log('editorAction.')
-      console.log(document.querySelector('.ql-link'))
+      this.dialogVisible = true
     },
 
     toggle() {
       console.log('toggle...')
     },
     async insertText(mark) {
-      mark = '{ ' + mark + ' }'
+      mark = '{{ ' + mark + ' }}'
+      // const myField = document.querySelector('#textarea');
       const myField = this.$refs.editor
-
       if (myField.selectionStart || myField.selectionStart === 0) {
         var startPos = myField.selectionStart
         var endPos = myField.selectionEnd
-        this.tmp.content = myField.value.substring(0, startPos) + mark + myField.value.substring(endPos, myField.value.length)
+        this.tmp.content = myField.value.substring(0, startPos) + mark +
+                myField.value.substring(endPos, myField.value.length)
         await this.$nextTick() // 这句是重点, 圈起来
         myField.focus()
         myField.setSelectionRange(endPos + mark.length, endPos + mark.length)
       } else {
         this.tmp.content += mark
       }
+      /*      const areaField = this.$refs.myQuillEditor
+
+      console.log(document.selection)
+      if (document.selection) {
+        var sel = document.selection.createRange()
+      }
+
+      console.log(areaField)
+      console.log(areaField.selectionStart)
+      if (areaField.selectionStart || areaField.selectionStart === '0') {
+        const startPos = areaField.selectionStart
+        const endPos = areaField.selectionEnd
+        const restoreTop = areaField.scrollTop // 获取滚动条高度
+        //  this.waitingTextArea 是v-model的值
+        // item.text 是 选择的要插入的值
+        this.waitingTextArea = this.waitingTextArea.substring(0, startPos) + 'item.text' + this.waitingTextArea.substring(endPos, this.waitingTextArea.length)
+        console.log(this.waitingTextArea)
+      } else {
+        this.temp.content += mark
+        areaField.focus()
+      }*/
+
+      // const index = this.editor.selection.savedRange.index
+      // console.log('index:', index)
+      // this.editor.insertText(index, ' {' + mark + '} ')
     },
+    async quillInsertText(mark) {
+      console.log(mark)
+      mark = '{{ ' + mark + ' }}'
+      const myField = this.$refs.myQuillEditor.quill.selection
+      const index = myField.savedRange.index
+      this.$refs.myQuillEditor.quill.insertText(index, mark)
+    },
+
     handleSuccess(res, file) {
       this.tmp.cover = res.data
     }

@@ -32,6 +32,22 @@ export function getUserInfo(token) {
     params: { app_token: token }
   })
 }
+
+export function updateFilter(data) {
+  return request({
+    url: '/home/data/filter',
+    method: 'put',
+    data: data
+  })
+}
+export function chartFilter(params) {
+  return request({
+    url: '/home/data/filter',
+    method: 'get',
+    params: { params }
+  })
+}
+
 export function chartData(params) {
   return request({
     url: '/home/data',

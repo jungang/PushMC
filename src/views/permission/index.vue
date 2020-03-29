@@ -4,6 +4,9 @@
       <el-col :span="16" style="line-height: 40px;">
         用户角色列表：
       </el-col>
+      <el-col :span="8" align="right">
+        <el-button type="primary" @click="handleCreate">+添加角色</el-button>
+      </el-col>
     </el-row>
 
     <el-row>
@@ -36,7 +39,7 @@
         <el-table-column label="操作" align="center" width="300" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
             <el-button :disabled="row.status==='pushed'" type="text" size="mini" @click="handleUpdate(row)">
-              分配
+              管理成员
             </el-button>
             <el-button type="text" size="mini" @click="handlePermis(row)">
               编辑权限
@@ -85,6 +88,9 @@
         <el-button v-if="dialogStatus==='update'" :loading="listLoading" type="primary" @click="updateData()">
           完成
         </el-button>
+        <el-button v-if="dialogStatus==='create'" :loading="listLoading" type="primary" @click="createData()">
+          完成
+        </el-button>
       </div>
     </el-dialog>
 
@@ -99,13 +105,13 @@
       <el-form ref="dataForm" :model="permisTemp" label-position="right" label-width="100px" class="main-form">
         <el-checkbox-group v-model="checkedPermissions">
           <el-checkbox
-            v-for="item in permissionsTree.items"
+            v-for="item in permissionsTree"
             :key="item.id"
             :label="item.id"
             border
             :disabled="dialogStatus==='view'"
             class="permission"
-          >{{ item.title }}</el-checkbox>
+          >{{ item.title }}({{ item.type }})</el-checkbox>
         </el-checkbox-group>
 
         <!--        <el-tree
@@ -134,7 +140,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { allPermission, dele, fetchList, updatePermis } from '@/api/permission'
+import { create, allPermission, dele, fetchList, updatePermis } from '@/api/permission'
 import Pagination from '@/components/Pagination'
 import PickPersons from '@/components/pickPersons'
 
@@ -181,7 +187,7 @@ export default {
       textMap: {
         view: '查看',
         update: '编辑',
-        create: '权限管理'
+        create: '新建角色'
       }
     }
   },
@@ -203,7 +209,114 @@ export default {
       this.listLoading = true
       allPermission().then(response => {
         this.permissionsTree = response.data
-        console.log(this.permissionsTree.items)
+        this.permissionsTree = [
+          {
+            'id': 11,
+            'title': '数据源',
+            'type': 'menu'
+          },
+          {
+            'id': 12,
+            'title': '标签分类',
+            'type': 'menu'
+          },
+          {
+            'id': 13,
+            'title': '标注',
+            'type': 'menu'
+          },
+          {
+            'id': 14,
+            'title': '推送频道',
+            'type': 'menu'
+          },
+          {
+            'id': 15,
+            'title': '推送通道',
+            'type': 'menu'
+          },
+          {
+            'id': 16,
+            'title': '推送对象',
+            'type': 'menu'
+          },
+          {
+            'id': 17,
+            'title': '消息推送',
+            'type': 'menu'
+          },
+          {
+            'id': 21,
+            'title': '推送内容',
+            'type': 'menu'
+          },
+          {
+            'id': 22,
+            'title': '内容审批',
+            'type': 'menu'
+          },
+          {
+            'id': 31,
+            'title': '用户权限',
+            'type': 'menu'
+          },
+          {
+            'id': 32,
+            'title': '推送统计',
+            'type': 'menu'
+          },
+          {
+            'id': 101,
+            'title': '新建数据源',
+            'type': 'act'
+          },
+          {
+            'id': 102,
+            'title': 'GoCom组织',
+            'type': 'act'
+          },
+          {
+            'id': 103,
+            'title': '推送审核',
+            'type': 'act'
+          },
+          {
+            'id': 104,
+            'title': '新建业务频道',
+            'type': 'act'
+          },
+          {
+            'id': 105,
+            'title': '消息模版',
+            'type': 'act'
+          },
+          {
+            'id': 106,
+            'title': '创建标签',
+            'type': 'act'
+          },
+          {
+            'id': 107,
+            'title': '创建分类',
+            'type': 'act'
+          },
+          {
+            'id': 108,
+            'title': '渠道推送',
+            'type': 'act'
+          },
+          {
+            'id': 109,
+            'title': '新建推送通道',
+            'type': 'act'
+          },
+          {
+            'id': 110,
+            'title': '推送内容',
+            'type': 'act'
+          }
+        ]
+        console.log(this.permissionsTree)
         this.listLoading = false
       })
     },
@@ -243,6 +356,46 @@ export default {
         persons: []
       }
     },
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          this.temp.author = 'jun'
+          this.temp.persons = this.$refs.pickPersons.dynamicTags
+          this.temp.tunnelId = this.$refs.pickPersons.personsArr.tunnelId
+          this.temp.smPermissions = []
+
+          // todo
+
+          /*       const data = [{
+            roles: [this.temp],
+            userId: -1
+          }]*/
+
+          delete this.temp.smPermissions
+          console.log(this.temp)
+          create(this.temp).then(() => {
+            this.getList()
+            this.dialogFormVisible = false
+            this.$notify({
+              title: '完成',
+              message: '新建',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+
     handlePermis(row) {
       this.permisTemp = Object.assign({}, row) // copy obj
       this.permisFormVisible = true
@@ -253,7 +406,7 @@ export default {
       console.log(this.checkedPermissions)
       this.checkedPermissions.forEach(item => {
         // console.log(item)
-        this.permissionsTree.items.forEach(item2 => {
+        this.permissionsTree.forEach(item2 => {
           if (item2.id === item) {
             this.permisTemp.smPermissions.push(item2)
           }

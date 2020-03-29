@@ -5,13 +5,13 @@
       <el-col :span="20">
         内容列表：
         <el-select
-          v-model="listArr.listQuery.labelId"
+          v-model="listArr.listQuery.tag"
           style="width: 140px"
           class="filter-item"
           @change="handleFilter"
         >
           <el-option label="全部" value="" />
-          <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.id" />
+          <el-option v-for="item in listLabel" :key="item.id" :label="item.title" :value="item.title" />
         </el-select>
 
         <el-input v-model="listArr.listQuery.searchKey" placeholder="输入关键字，例如：涉黄" clearable style="width: 400px" />
@@ -147,6 +147,7 @@ import { mapGetters } from 'vuex'
 import { fetchList, detail, searchList, create, update, dele } from '@/api/pushContent'
 import { fetchCategory, fetchLabel } from '@/api/category'
 import Pagination from '@/components/Pagination'
+import { validURL } from '@/utils/validate'
 // import quillConfig from './quill-config.js'
 
 export default {
@@ -172,6 +173,13 @@ export default {
     }
   },
   data() {
+    const checkUrl = (rule, value, callback) => {
+      if (!validURL(value)) {
+        callback(new Error('请输入URL'))
+      } else {
+        callback()
+      }
+    }
     return {
       visible: false,
       top: 0,
@@ -214,6 +222,10 @@ export default {
         content: ''
       },
       rules: {
+        url: [
+          { required: true, message: '不能为空', trigger: 'blur' },
+          { validator: checkUrl, trigger: 'blur' }
+        ],
         tagId: [
           { required: true, message: '请选择标签', trigger: 'change' }
         ],
@@ -299,6 +311,7 @@ export default {
     getLabel() {
       fetchLabel({ categoryTitle: '内容推送' }).then(response => {
         this.listLabel = response.data.items
+        console.log('getLabel...', this.listLabel)
       })
     },
     getList() {

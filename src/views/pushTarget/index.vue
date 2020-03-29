@@ -26,9 +26,9 @@
             <span>{{ row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="人数" prop="type" align="center" width="50">
+        <el-table-column label="人员" prop="type" show-overflow-tooltip align="center">
           <template slot-scope="{row}">
-            <span>{{ row.amount }}</span>
+            <span>{{ row.roster.join(', ') }}</span>
           </template>
         </el-table-column>
         <!--
@@ -47,9 +47,15 @@
           </template>
         </el-table-column>
 
+        <el-table-column label="异常" align="center">
+          <template slot-scope="{row}">
+            <span>{{ row.errorInfo }}</span>
+          </template>
+        </el-table-column>
+
         <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="text" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" :disabled="row.revamp" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
             <!--            <el-button v-if="row.status!='enabled'" type="success" size="mini" @click="handleModifyStatus(row,'enabled')">
@@ -58,7 +64,7 @@
             <el-button v-if="row.status==='enabled'" size="mini" @click="handleModifyStatus(row,'disabled')">
               停用
             </el-button>-->
-            <el-button v-if="row.status!='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
+            <el-button v-if="row.status!='deleted'" :disabled="row.revamp" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>
@@ -299,6 +305,14 @@ export default {
       fetchList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
+        this.listArr.data.forEach(item => {
+          console.log(item.smGroupItems)
+          item.roster = []
+          item.smGroupItems.forEach(p => {
+            item.roster.push(p.name)
+          })
+          // console.log(item)
+        })
         this.listLoading = false
       })
     },

@@ -1,4 +1,5 @@
 <script>
+
 export default {
   name: 'MenuItem',
   functional: true,
@@ -10,10 +11,14 @@ export default {
     title: {
       type: String,
       default: ''
+    },
+    info: {
+      type: String,
+      default: ''
     }
   },
   render(h, context) {
-    const { icon, title } = context.props
+    const { icon, title, info } = context.props
     const vnodes = []
 
     if (icon) {
@@ -22,6 +27,10 @@ export default {
 
     if (title) {
       vnodes.push(<span slot='title'>{(title)}</span>)
+    }
+
+    if (info) {
+      vnodes.push(<i id={info} ref={info} slot='title' class='el-icon-warning'/>)
     }
     return vnodes
   }
