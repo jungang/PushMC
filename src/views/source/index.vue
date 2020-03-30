@@ -16,10 +16,10 @@
       </el-col>
       <el-col :span="12" align="right">
 
-        <!--        {{ checkPermission(101) }}-->
-        <el-tag v-permission="101">admin</el-tag>
-        <el-tag v-permission="103">editor</el-tag>
-        <el-tag v-permission="104">Both admin or editor can see this</el-tag>
+        <!--                {{ checkPermission(101) }}-->
+        <!--        <el-tag v-permission="101">admin</el-tag>-->
+        <!--        <el-tag v-permission="103">editor</el-tag>-->
+        <!--        <el-tag v-permission="104">Both admin or editor can see this</el-tag>-->
         <el-button type="primary" @click="handleCreate">新建数据源</el-button>
       </el-col>
 

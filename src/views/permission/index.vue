@@ -208,8 +208,8 @@ export default {
     getAllPermissions() {
       this.listLoading = true
       allPermission().then(response => {
-        this.permissionsTree = response.data
-        this.permissionsTree = [
+        this.permissionsTree = response.data.items
+        /*        this.permissionsTree = [
           {
             'id': 11,
             'title': '数据源',
@@ -315,7 +315,7 @@ export default {
             'title': '推送内容',
             'type': 'act'
           }
-        ]
+        ]*/
         console.log(this.permissionsTree)
         this.listLoading = false
       })

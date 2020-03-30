@@ -588,7 +588,7 @@
         <el-button v-if="dialogStatus==='create'" :loading="listLoading" type="primary" @click="createData()">
           保存
         </el-button>
-        <el-button v-if="dialogStatus==='update'" :loading="listLoading" type="primary" @click="updateData()">
+        <el-button v-if="dialogStatus==='update'" :loading="listLoading" type="primary" @click="createData()">
           保存
         </el-button>
         <el-button v-if="dialogStatus==='copy'" :loading="listLoading" type="primary" @click="createData()">
@@ -604,7 +604,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { copyChannel, dele, bookList, createSource, changeStatus, channelList, detail, groups, unPush, updateChannel } from '@/api/channelPush'
+import { copyChannel, dele, bookList, createChannelPush, changeStatus, channelList, detail, groups, unPush, updateChannel } from '@/api/channelPush'
 import { subscribe } from '@/api/businessChannel'
 // import Templates from '@/components/Templates'
 import PickPersons from '@/components/pickPersons'
@@ -1025,14 +1025,17 @@ export default {
     },
     setGroups() {
       // this.$refs.groupsTable2.toggleRowSelection(this.temp.groups)
-      this.$refs.groupsTable2.clearSelection()
-      this.groupsArr.data.forEach((item) => {
-        this.temp.groups.forEach((item2) => {
-          if (item2.id === item.id) {
-            this.$refs.groupsTable2.toggleRowSelection(item)
-          }
+
+      if (this.dialogStatus !== 'view') {
+        this.$refs.groupsTable2.clearSelection()
+        this.groupsArr.data.forEach((item) => {
+          this.temp.groups.forEach((item2) => {
+            if (item2.id === item.id) {
+              this.$refs.groupsTable2.toggleRowSelection(item)
+            }
+          })
         })
-      })
+      }
     },
 
     testGroup() {
@@ -1230,9 +1233,11 @@ export default {
           this.temp.status = (arguments[0] === 'save_push') ? 'enabled' : 'disabled'
 
           this.listLoading = true
-          createSource(this.temp).then(() => {
+
+          createChannelPush(this.temp).then(() => {
             this.listLoading = false
             this.getList()
+            this.$store.dispatch('user/check')
             this.outerVisible = false
             this.$notify({
               title: '完成',
@@ -1240,6 +1245,9 @@ export default {
               type: 'success',
               duration: 2000
             })
+          }).catch(error => {
+            console.log(error)
+            this.listLoading = false
           })
         }
       })
@@ -1293,6 +1301,7 @@ export default {
                 break
               }
             }
+            this.$store.dispatch('user/check')
             this.outerVisible = false
             this.$notify({
               title: '完成',
@@ -1300,6 +1309,9 @@ export default {
               type: 'success',
               duration: 2000
             })
+          }).catch(error => {
+            console.log(error)
+            this.listLoading = false
           })
         }
       })

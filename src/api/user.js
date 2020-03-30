@@ -26,13 +26,13 @@ export function login(data) {
 }
 
 export function getUserInfo(token) {
-/*  return request({
+  return request({
     url: '/user/login',
     method: 'get',
     params: { app_token: token }
-  })*/
+  })
 
-  return new Promise((resolve, reject) => {
+/*  return new Promise((resolve, reject) => {
     const res = {
       'code': 20000,
       'msg': null,
@@ -120,7 +120,7 @@ export function getUserInfo(token) {
               'type': 'act'
             }
           ],
-          /*          'smPermissions': [
+          /!*          'smPermissions': [
             {
               'id': 1,
               'updateTime': null,
@@ -241,14 +241,14 @@ export function getUserInfo(token) {
               'title': '频道推送',
               'path': '/channel-push',
               'describe': '频道推送'
-            }],*/
+            }],*!/
           'persons': null
         }],
         'sessionId': '1'
       }
     }
     resolve(res)
-  })
+  })*/
 }
 export function getPermission(roles) {
 /*
@@ -280,6 +280,14 @@ export function getPermission(roles) {
       }
     }
     resolve(res)
+  })
+}
+
+export function sysCheck(roles) {
+  return request({
+    url: '/business-channel/channel/check',
+    method: 'get',
+    params: { roles }
   })
 }
 

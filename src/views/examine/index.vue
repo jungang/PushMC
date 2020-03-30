@@ -8,7 +8,7 @@
     >
       <el-option label="全部" value="" />
       <el-option label="已审批" value="agree" />
-      <el-option label="待审批" value="disagree" />
+      <el-option label="待审批" value="pro_examine" />
     </el-select>
 
     <el-table
@@ -28,7 +28,7 @@
       </el-table-column>
       <el-table-column label="审批状态" prop="title" align="center" min-width="100">
         <template slot-scope="{row}">
-          <span>{{ row.status | statusFilter }}</span>
+          <span>{{ row.examineStatus | statusFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="分类" prop="channelTag" align="center" min-width="100">

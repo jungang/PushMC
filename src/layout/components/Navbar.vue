@@ -6,7 +6,6 @@
 
     <div class="right-menu">
       <span style="font-size: 12px; margin-right: 20px; color: #5a5e66"> {{ $store.state.user.name }}</span>
-
     </div>
   </div>
 </template>
@@ -34,6 +33,9 @@ export default {
     // console.log(this.$store.state.user.name)
   },
   methods: {
+    test() {
+      this.$store.dispatch('user/check')
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },

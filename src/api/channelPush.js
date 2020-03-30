@@ -102,7 +102,7 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function createChannelPush(data) {
   return request({
     url: '/business-channel/create',
     method: 'post',

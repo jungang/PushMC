@@ -136,7 +136,7 @@ export default {
         listQuery: {
           page: 1,
           limit: 20,
-          categoryTitle: '内容推送',
+          categoryTitle: '',
           importance: undefined,
           title: undefined,
           type: undefined,

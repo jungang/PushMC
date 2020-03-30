@@ -1,4 +1,4 @@
-import { login, logout, getUserInfo, getPermission } from '@/api/user'
+import { login, logout, getUserInfo, getPermission, sysCheck } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -76,9 +76,32 @@ const actions = {
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_SYS', sysError)
+
         resolve(data)
       }).catch(error => {
         console.log(error)
+        reject(error)
+      })
+    })
+  },
+
+  // get check info
+  check({ commit, state }, roles) {
+    return new Promise((resolve, reject) => {
+      sysCheck(roles).then(response => {
+        console.log('check:', response)
+        const sysError = response.data
+        commit('SET_SYS', sysError)
+        const info_channel = document.querySelector('#channel')
+        const info_push_channel = document.querySelector('#push_channel')
+        const info_target = document.querySelector('#target')
+
+        info_channel.style.display = sysError.channel ? 'inline-block' : 'none'
+        info_push_channel.style.display = sysError.push_channel ? 'inline-block' : 'none'
+        info_target.style.display = sysError.target ? 'inline-block' : 'none'
+
+        resolve(response)
+      }).catch(error => {
         reject(error)
       })
     })

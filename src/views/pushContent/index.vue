@@ -37,11 +37,6 @@
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="内容分类" align="center" width="150">
-          <template slot-scope="{row}">
-            <span>{{ row.category }}</span>
-          </template>
-        </el-table-column>
         <el-table-column label="内容标签" align="center" width="150">
           <template slot-scope="{row}">
             <span>{{ row.tag }}</span>
@@ -123,7 +118,7 @@
         </el-form-item>
 
         <el-form-item v-if="dialogStatus!=='create'" label="审批状态">
-          {{ temp.status || '' }} {{ temp.examineTime || '' }}
+          {{ temp.status | statusFilter }} {{ temp.examineTime || '' }}
         </el-form-item>
 
       </el-form>
