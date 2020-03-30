@@ -169,8 +169,8 @@ export default {
   },
   data() {
     const checkUrl = (rule, value, callback) => {
-      if (!validURL(value)) {
-        callback(new Error('请输入URL'))
+      if (value && !validURL(value)) {
+        callback(new Error('请输入正确URL'))
       } else {
         callback()
       }
@@ -218,7 +218,7 @@ export default {
       },
       rules: {
         url: [
-          { required: true, message: '不能为空', trigger: 'blur' },
+          // { required: true, message: '不能为空', trigger: 'blur' },
           { validator: checkUrl, trigger: 'blur' }
         ],
         tagId: [
