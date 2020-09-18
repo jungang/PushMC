@@ -26,7 +26,7 @@ export default {
   name: 'Page404',
   computed: {
     message() {
-      return 'The is webmaster said that you can not enter this page...'
+      return 'The is a webmaster said that you can not enter this page...'
     }
   },
   created() {
