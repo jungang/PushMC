@@ -1,0 +1,94 @@
+{
+  "code": 20000,
+  "msg": "",
+  "data": {
+    "item": {
+      "tag": "tag6",
+      "count": 36,
+      "tables": [
+        {
+          "label": "许无术今新",
+          "id": 26336,
+          "key": "btfblvgxi"
+        },
+        {
+          "label": "切素世太",
+          "id": 47841,
+          "key": "upmmdeuyi"
+        },
+        {
+          "label": "太克及",
+          "id": 21389,
+          "key": "hbm"
+        },
+        {
+          "label": "火先须规",
+          "id": 48042,
+          "key": "zfgyzvekf"
+        }
+      ],
+      "title": "白平于磊",
+      "id": 8122007,
+      "businessSource": 1,
+      "rules": [
+        {
+          "item1": {
+            "value": "jccfhgfho",
+            "tableKey": 5926984,
+            "tableName": "过律身"
+          },
+          "item2": {
+            "value": "xuw",
+            "tableKey": 3591233,
+            "tableName": "海养者"
+          },
+          "item3": {
+            "value": "jrbkgbltg",
+            "tableKey": 6622822,
+            "tableName": "军查小当三走"
+          },
+          "operation1": "==",
+          "operation2": "<"
+        },
+        {
+          "item1": {
+            "value": "xft",
+            "tableKey": 6197457,
+            "tableName": "国才义美合写"
+          },
+          "item2": {
+            "value": "wcpzm",
+            "tableKey": 3153415,
+            "tableName": "装容面"
+          },
+          "item3": {
+            "value": "xyvqf",
+            "tableKey": 6682701,
+            "tableName": "所种"
+          },
+          "operation1": ">",
+          "operation2": "=="
+        },
+        {
+          "item1": {
+            "value": "ruxmmrds",
+            "tableKey": 8064736,
+            "tableName": "每识难"
+          },
+          "item2": {
+            "value": "hmgtpkty",
+            "tableKey": 1049473,
+            "tableName": "铁参儿电"
+          },
+          "item3": {
+            "value": "nnqykqnk",
+            "tableKey": 3928295,
+            "tableName": "数公元"
+          },
+          "operation1": "==",
+          "operation2": "=="
+        }
+      ]
+    }
+  }
+}

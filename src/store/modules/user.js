@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getUserInfo, getPermission, sysCheck } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -26,8 +26,14 @@ const mutations = {
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   },
+  SET_SYS: (state, sysError) => {
+    state.sysError = sysError
+  },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_PERMISSION: (state, permission) => {
+    state.permission = permission
   }
 }
 
@@ -37,11 +43,13 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
+        // console.log(response)
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         resolve()
       }).catch(error => {
+        // console.log(error)
         reject(error)
       })
     })
@@ -50,14 +58,14 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getUserInfo(getToken()).then(response => {
         const { data } = response
 
         if (!data) {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, name, avatar } = data
+        const { roles, name, avatar, sysError } = data
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
@@ -67,6 +75,45 @@ const actions = {
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        commit('SET_SYS', sysError)
+
+        resolve(data)
+      }).catch(error => {
+        console.log(error)
+        reject(error)
+      })
+    })
+  },
+
+  // get check info
+  check({ commit, state }, roles) {
+    return new Promise((resolve, reject) => {
+      sysCheck(roles).then(response => {
+        console.log('check:', response)
+        const sysError = response.data
+        commit('SET_SYS', sysError)
+        const info_channel = document.querySelector('#channel')
+        const info_push_channel = document.querySelector('#push_channel')
+        const info_target = document.querySelector('#target')
+
+        info_channel.style.display = sysError.channel ? 'inline-block' : 'none'
+        info_push_channel.style.display = sysError.push_channel ? 'inline-block' : 'none'
+        info_target.style.display = sysError.target ? 'inline-block' : 'none'
+
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // get permission
+  getPermission({ commit, state }, roles) {
+    return new Promise((resolve, reject) => {
+      getPermission(roles).then(response => {
+        const { data } = response
+
+        commit('SET_PERMISSION', data)
         resolve(data)
       }).catch(error => {
         reject(error)

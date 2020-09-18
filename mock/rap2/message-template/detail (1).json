@@ -1,0 +1,15 @@
+{
+  "code": 20000,
+  "msg": "",
+  "data": {
+    "item": {
+      "id": 6036969,
+      "title": "战有组全明加和农区只",
+      "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+      "status": "disabled ",
+      "type": "template",
+      "origin": "default",
+      "index": 1
+    }
+  }
+}

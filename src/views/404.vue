@@ -28,6 +28,12 @@ export default {
     message() {
       return 'The webmaster said that you can not enter this page...'
     }
+  },
+  created() {
+    window.location.href = '#/'
+  /*  setTimeout(function() {
+      window.location.href = '#/'
+    }, 2000)*/
   }
 }
 </script>

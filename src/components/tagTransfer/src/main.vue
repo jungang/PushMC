@@ -37,7 +37,9 @@
         <i class="el-icon-arrow-right" />
       </el-button>
     </div>
+
     <transfer-panel
+      v-if="type === 'businessChannel'"
       ref="rightPanel"
       :type="type"
       v-bind="$props"
@@ -45,7 +47,23 @@
       :title="titles[1] || t('el.transfer.titles.1')"
       :default-checked="rightDefaultChecked"
       :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
-      :custom-prefix="prefix"
+      :custom-prefix="inputPrefix"
+      class="right-panel"
+      @checked-change="onTargetCheckedChange"
+    >
+      <slot name="right-footer" />
+    </transfer-panel>
+    <transfer-panel
+      v-else
+      ref="rightPanel"
+      :type="type"
+      v-bind="$props"
+      :data="targetData"
+      :title="titles[1] || t('el.transfer.titles.1')"
+      :default-checked="rightDefaultChecked"
+      :placeholder="filterPlaceholder || t('el.transfer.filterPlaceholder')"
+      :is-show-input="true"
+      :custom-prefix="inputPrefix"
       class="right-panel"
       @checked-change="onTargetCheckedChange"
     >
@@ -87,6 +105,12 @@ export default {
 
   props: {
     type: {
+      type: String,
+      default() {
+        return ''
+      }
+    },
+    prefix: {
       type: String,
       default() {
         return ''
@@ -165,7 +189,6 @@ export default {
 
   data() {
     return {
-      prefix: '',
       inputPrefix: '',
       dialogVisible: false,
       leftChecked: [],
@@ -185,7 +208,11 @@ export default {
 
     targetData() {
       if (this.targetOrder === 'original') {
-        return this.data.filter(item => this.value.indexOf(item[this.props.key]) > -1)
+        const res = this.data.filter(item => {
+          // console.log(item)
+          return this.value.indexOf(item[this.props.key]) > -1
+        })
+        return res
       } else {
         return this.value.reduce((arr, cur) => {
           const val = this.dataObj[cur]
@@ -208,11 +235,10 @@ export default {
     }
   },
   created() {
-    console.log(this.type)
+    this.inputPrefix = this.prefix
   },
   methods: {
     handlePrefix() {
-      this.prefix = this.inputPrefix
       this.dialogVisible = false
     },
     getMigratingConfig() {
@@ -248,6 +274,7 @@ export default {
     },
 
     addToRight() {
+      // console.log('addToRight')
       let currentValue = this.value.slice()
       const itemsToBeMoved = []
       const key = this.props.key
@@ -278,8 +305,11 @@ export default {
       return {
         sourceData: this.sourceData,
         targetData: this.targetData,
-        prefix: this.prefix
+        prefix: this.inputPrefix
       }
+    },
+    setQuery() {
+      return { a: 1 }
     }
   }
 }

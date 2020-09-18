@@ -1,6 +1,14 @@
 import request from '@/utils/request'
 
-export function fetchList(query) {
+export function labelFetchList(query) {
+  return request({
+    url: '/label/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function fetchCategory(query) {
   return request({
     url: '/category/list',
     method: 'get',
@@ -8,11 +16,19 @@ export function fetchList(query) {
   })
 }
 
-export function dele(id, status) {
+export function fetchLabel(query) {
   return request({
-    url: '/category/delete',
-    method: 'post',
-    params: { id, status }
+    url: '/label/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function dele(id) {
+  return request({
+    url: '/label/delete',
+    method: 'delete',
+    params: { id }
   })
 }
 
@@ -32,18 +48,25 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function createTag(data) {
+  return request({
+    url: '/label/create',
+    method: 'post',
+    data: data
+  })
+}
+export function saveCategory(data) {
   return request({
     url: '/category/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
-export function updateSource(data) {
+export function updateTag(data) {
   return request({
-    url: '/category/update',
-    method: 'post',
-    data: { data: data }
+    url: '/label/update',
+    method: 'put',
+    data: data
   })
 }

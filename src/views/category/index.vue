@@ -1,7 +1,8 @@
 <template>
   <div class="container">
-    <el-row type="flex" justify="end">
-      <el-button type="primary" @click="handleCreate">添加标签</el-button>
+    <el-row type="flex" justify="end" style="margin-bottom: 10px">
+      <!--      <el-button type="primary" style="margin-right: 10px" @click="handleCreateCategory">添加分类</el-button>-->
+      <el-button type="primary" @click="handleCreateTag">添加标签</el-button>
     </el-row>
     <el-row>
       <el-table
@@ -12,26 +13,25 @@
         fit
         highlight-current-row
         style="width: 100%;"
-        @sort-change="sortChange"
       >
-        <el-table-column label="ID" prop="id" sortable="custom" align="center" :class-name="getSortClass('id')" min-width="50">
+        <el-table-column label="ID" prop="id" align="center" width="50">
           <template slot-scope="{row}">
             <span>{{ row.id }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签名称" prop="type" align="center" min-width="50">
+        <el-table-column label="标签名称" prop="type" align="center">
           <template slot-scope="{row}">
             <span>{{ row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="分类" align="center" min-width="100">
+        <el-table-column label="分类" align="center">
           <template slot-scope="{row}">
             <span>{{ row.category }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="标签来源" align="center" min-width="50">
+        <!--        <el-table-column label="标签来源" align="center" min-width="50">
           <template slot-scope="{row}">
-            <span>{{ row.origin }}</span>
+            <span>{{ row.origin === 'CUSTOM' ? '自定义': '默认' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="标签使用" align="center" min-width="50">
@@ -43,13 +43,13 @@
           <template slot-scope="{row}">
             <span>{{ row.creationTime }}</span>
           </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" min-width="150" class-name="small-padding fixed-width">
+        </el-table-column>-->
+        <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
           <template slot-scope="{row}">
-            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            <el-button type="text" size="mini" @click="handleUpdate(row)">
               编辑
             </el-button>
-            <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+            <el-button v-if="row.status!='deleted'" size="mini" type="text" @click="handleDelete(row,'deleted')">
               删除
             </el-button>
           </template>
@@ -60,6 +60,7 @@
         :total="listArr.total"
         :page.sync="listArr.listQuery.page"
         :limit.sync="listArr.listQuery.limit"
+        hide-on-single-page
         @pagination="getList()"
       />
     </el-row>
@@ -67,13 +68,13 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="700px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" class="main-form">
 
-        <el-form-item v-if="dialogStatus==='create'" label="输入标签名" prop="title">
+        <el-form-item label="输入标签名" prop="title">
           <el-input v-model="temp.title" style="width:400px" />
         </el-form-item>
 
-        <el-form-item label="选择分类" prop="category">
-          <el-select v-model="temp.category" class="filter-item" placeholder="请选择">
-            <el-option v-for="item in MODEL.dataSourceTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+        <el-form-item label="选择分类" prop="categoryId">
+          <el-select v-model="temp.categoryId" class="filter-item" placeholder="请选择">
+            <el-option v-for="item in categoryArr" :key="item.id" :label="item.title" :value="item.id" />
           </el-select>
         </el-form-item>
 
@@ -82,7 +83,23 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <el-button type="primary" :loading="listLoading" @click="dialogStatus==='create'?createData():updateData()">
+          确定
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogCategoryVisible" width="700px">
+      <el-form ref="categoryForm" :rules="rules" :model="temp" label-position="right" label-width="150px" class="main-form">
+        <el-form-item v-if="dialogStatus==='create'" label="输入分类名称" prop="title">
+          <el-input v-model="temp.title" style="width:400px" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogCategoryVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="createCategory()">
           确定
         </el-button>
       </div>
@@ -92,18 +109,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { fetchList, createSource, updateSource, dele } from '@/api/category'
+import { labelFetchList, createTag, saveCategory, fetchCategory, updateTag, dele } from '@/api/category'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-
-const DataSourceModel = {
-  dataSourceTypeOptions: [
-    { key: 'api', display_name: 'API' },
-    { key: 'api2', display_name: 'API_2' },
-    { key: 'api3', display_name: 'API_3' },
-    { key: 'api4', display_name: 'API_4' }
-  ]
-}
 
 export default {
   name: 'ComplexTable',
@@ -121,12 +129,14 @@ export default {
   data() {
     return {
       tableKey: 0,
+      categoryArr: [],
       listArr: {
         data: [],
         total: 0,
         listQuery: {
           page: 1,
           limit: 20,
+          categoryTitle: '',
           importance: undefined,
           title: undefined,
           type: undefined,
@@ -134,21 +144,23 @@ export default {
         }
       },
       listLoading: true,
-      MODEL: DataSourceModel,
       temp: {
-        id: undefined,
-        type: '',
-        describe: '',
+        amount: 0,
+        category: '',
+        id: 0,
+        origin: 'CUSTOM',
+        categoryId: '',
         title: ''
       },
       dialogFormVisible: false,
+      dialogCategoryVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑',
         create: '新建'
       },
       rules: {
-        category: [
+        categoryId: [
           { required: true, message: '请选择分类', trigger: 'change' }
         ],
         title: [
@@ -162,7 +174,10 @@ export default {
     ...mapGetters([
       'name',
       'roles'
-    ])
+    ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    }
   },
   created() {
     this.getList()
@@ -170,10 +185,15 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listArr.listQuery).then(response => {
+      labelFetchList(this.listArr.listQuery).then(response => {
         this.listArr.data = response.data.items
         this.listArr.total = response.data.total
         this.listLoading = false
+      })
+    },
+    getCategory() {
+      fetchCategory().then(response => {
+        this.categoryArr = response.data.items
       })
     },
     handleFilter() {
@@ -181,29 +201,25 @@ export default {
       this.getList()
     },
 
-    sortChange(data) {
-      console.log(data)
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listArr.listQuery.sort = '+id'
-      } else {
-        this.listArr.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        category: 'API',
-        title: '****'
+        amount: 0,
+        category: '',
+        id: 0,
+        origin: 'CUSTOM',
+        categoryId: '',
+        title: ''
       }
     },
-    handleCreate() {
+    handleCreateCategory() {
+      this.temp.title = ''
+      this.dialogStatus = 'create'
+      this.dialogCategoryVisible = true
+    },
+
+    handleCreateTag() {
+      this.getCategory()
+
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -214,14 +230,39 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'jun'
-          createSource(this.temp).then(() => {
+          console.log(this.temp)
+          console.log(this.categoryArr)
+          this.temp.category = this.categoryArr.find(item => {
+            if (item.id === this.temp.categoryId) {
+              return item
+            }
+          }
+          ).title
+
+          this.listLoading = true
+          createTag(this.temp).then(() => {
+            this.listLoading = false
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
               title: '完成',
-              message: '新建数据源',
+              message: '新建',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    createCategory() {
+      this.$refs['categoryForm'].validate((valid) => {
+        if (valid) {
+          saveCategory({ title: this.temp.title }).then(() => {
+            this.getList()
+            this.dialogCategoryVisible = false
+            this.$notify({
+              title: '完成',
+              message: '新建',
               type: 'success',
               duration: 2000
             })
@@ -230,27 +271,31 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.getCategory()
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
+
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateSource(tempData).then(() => {
-            for (const v of this.listArr.data) {
-              if (v.id === this.temp.id) {
-                const index = this.listArr.data.indexOf(v)
-                this.listArr.data.splice(index, 1, this.temp)
-                break
-              }
+
+          tempData.origin = 'CUSTOM'
+          tempData.amount = 0
+          tempData.category = this.listArr.data.find(item => {
+            if (item.id === tempData.categoryId) {
+              return item
             }
+          }
+          ).title
+
+          updateTag(tempData).then(() => {
+            this.getList()
             this.dialogFormVisible = false
             this.$notify({
               title: '完成',

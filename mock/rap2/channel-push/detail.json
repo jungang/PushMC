@@ -1,0 +1,85 @@
+{
+  "code": 20000,
+  "msg": "",
+  "data": {
+    "item": {
+      "pushPlanOption": 3,
+      "pushPlan": "instant",
+      "pushChannels": [
+        {
+          "type": "sms",
+          "id": 1,
+          "label": "短信"
+        },
+        {
+          "type": "goCom",
+          "id": 2,
+          "label": "goCom"
+        },
+        {
+          "type": "business",
+          "id": 3,
+          "label": "business"
+        },
+        {
+          "type": "wx",
+          "id": 4,
+          "label": "微信"
+        },
+        {
+          "type": "openApi",
+          "id": 5,
+          "label": "openApi"
+        }
+      ],
+      "content": "{ 用户姓名 } { 职务 } 您好，{ 业务数据信息 } 如有疑问，请联系 { 发送部门 }",
+      "lastPushTime": "2003-10-15 22:19:26",
+      "templateKey": "tmp3",
+      "title": "始近她重",
+      "status": "pushed",
+      "receipt": "true",
+      "targetType": 1,
+      "rule": "选划长小",
+      "id": 8758355,
+      "tag": [
+        "tag1",
+        "tag2"
+      ],
+      "origin": "田秀兰",
+      "targetes": [
+        {
+          "createDate": "1994-07-22 10:11:25",
+          "amount": 90,
+          "status": "disabled",
+          "title": "至向年"
+        },
+        {
+          "createDate": "2010-02-08 02:52:30",
+          "amount": 44,
+          "status": "enabled",
+          "title": "理器界领道方"
+        }
+      ],
+      "rules": [],
+      "receiptSecond": 121,
+      "additionalOption": [
+        {
+          "priority": 9,
+          "rule": "加大起"
+        },
+        {
+          "priority": 6,
+          "rule": "真委正手安道"
+        },
+        {
+          "priority": 1,
+          "rule": "带红现备着为"
+        },
+        {
+          "priority": 3,
+          "rule": "或适子不"
+        }
+      ]
+    }
+  }
+}

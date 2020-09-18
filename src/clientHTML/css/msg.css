@@ -1,0 +1,33 @@
+body{
+  margin:0;
+  padding:0;
+}
+
+h2{
+  font-size: 1rem;
+}
+
+.btn{
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 200px;
+  height: 30px;
+}
+
+.timer{
+  position: fixed;
+  border: 1px solid #c6c6c6;
+  background: rgba(255, 224, 234, 0.85);
+  bottom: 10px;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 30px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 80px;
+  height: 30px;
+}

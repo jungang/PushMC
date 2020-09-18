@@ -44,175 +44,22 @@ export const constantRoutes = [
   },
 
   {
-    path: '/',
+    path: '',
     component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
-    }]
-  },
-  {
-    path: '/source',
-    component: Layout,
+    redirect: 'dashboard',
     children: [
       {
-        path: '',
-        name: 'Source',
-        component: () => import('@/views/source/index'),
-        meta: { title: '数据源', icon: 'form' }
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: { title: '首页', icon: 'dashboard', affix: true, info: '' }
       }
     ]
   },
-
-  {
-    path: '/data-tag',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'DataTag',
-        component: () => import('@/views/datatag/index'),
-        meta: { title: '数据标注', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/category',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'category',
-        component: () => import('@/views/category/index'),
-        meta: { title: '标签分类', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/business-channel',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'BusinessChannel',
-        component: () => import('@/views/businessChannel/index'),
-        meta: { title: '业务频道', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/push-content',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'Push content',
-        component: () => import('@/views/form/index'),
-        meta: { title: '推送内容', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/push-channel',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'PushChannel',
-        component: () => import('@/views/form/index'),
-        meta: { title: '推送通道', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/push-target',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'PushTarget',
-        component: () => import('@/views/form/index'),
-        meta: { title: '推送对象', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/message-template',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'MessageTemplate',
-        component: () => import('@/views/form/index'),
-        meta: { title: '消息模版', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/message-push',
-    component: Layout,
-    redirect: '/message-push/table',
-    name: 'MessagePush',
-    meta: { title: '消息推送', icon: 'example' },
-    children: [
-      {
-        path: 'channel-push',
-        name: 'ChannelPush',
-        component: () => import('@/views/table/index'),
-        meta: { title: '渠道推送', icon: 'table' }
-      },
-      {
-        path: 'content-push',
-        name: 'ContentPush',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '内容推送', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/permission',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Permission',
-    meta: { title: '用户权限', icon: 'example' },
-    children: [
-      {
-        path: 'user',
-        name: 'User',
-        component: () => import('@/views/table/index'),
-        meta: { title: '用户权限', icon: 'table' }
-      },
-      {
-        path: 'role',
-        name: 'Role',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '用户角色', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: '推送统计', icon: 'form' }
-      }
-    ]
+  // 404 page must be placed at the end !!!
+  { path: '*',
+    redirect: 'dashboard',
+    hidden: true
   }
 ]
 
@@ -221,78 +68,129 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
+
   {
-    path: '/nested',
+    id: 10,
+    index: 10,
+    path: '/manage',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
+    redirect: 'noRedirect',
+    name: 'MessagePush',
     meta: {
-      title: 'Nested',
-      icon: 'nested',
-      roles: ['admin', 'editor']
+      title: '推送管理',
+      icon: 'example',
+      activeMenu: '/channel-push',
+      info: ''
+
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
+        id: 11,
+        path: 'source',
+        name: 'ChannelPush',
+        component: () => import('@/views/source/index'),
+        meta: { title: '数据源', icon: 'table', info: '' }
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
+        id: 12,
+        path: 'category',
+        name: 'Category',
+        component: () => import('@/views/category/index'),
+        meta: { title: '标签分类', icon: 'table', info: '' }
+      },
+      {
+        id: 13,
+        path: 'source/edit',
+        name: 'Edit',
+        component: () => import('@/views/dataTag/edit'),
+        meta: { title: '标注', icon: 'form', info: '' },
+        hidden: true
+      },
+      {
+        id: 14,
+        path: '/business-channel',
+        name: 'BusinessChannel',
+        component: () => import('@/views/businessChannel/index'),
+        meta: { title: '推送频道', icon: 'form', info: 'channel' }
+      },
+      {
+        id: 15,
+        path: 'push-channel',
+        name: 'PushChannel',
+        component: () => import('@/views/pushChannel/index'),
+        meta: { title: '推送通道', icon: 'table', info: '' }
+      },
+      {
+        id: 16,
+        path: 'push-target',
+        name: 'PushTarget',
+        component: () => import('@/views/pushTarget/index'),
+        meta: { title: '推送对象', icon: 'form', info: 'target' }
+      },
+      {
+        id: 17,
+        path: 'channel-push',
+        name: 'ChannelPush',
+        component: () => import('@/views/channelPush/index'),
+        props: {
+          type: 'business'
+        },
+        meta: { title: '消息推送', icon: 'table', info: 'push_channel' }
       }
     ]
   },
 
   {
-    path: 'external-link',
+    id: 20,
+    index: 20,
+    path: '/content',
     component: Layout,
+    redirect: 'noRedirect',
+    name: 'MessagePush',
+    meta: { title: '内容管理', icon: 'example', info: '' },
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        id: 21,
+        path: 'push-content',
+        name: 'Push content',
+        component: () => import('@/views/pushContent/index'),
+        meta: { title: '推送内容', icon: 'form', info: '' }
+      },
+      {
+        id: 22,
+        path: 'examine-content',
+        name: 'Examine',
+        component: () => import('@/views/examine/index'),
+        meta: { title: '内容审批', icon: 'form', info: '' }
       }
     ]
   },
+  {
+    id: 30,
+    index: 20,
+    path: '/permission',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'MessagePush',
+    meta: { title: '运营监控', icon: 'example', info: '' },
+    children: [
+      {
+        id: 31,
+        path: 'user',
+        name: 'User',
+        component: () => import('@/views/permission/index'),
+        meta: { title: '用户权限', icon: 'table', info: '' }
+      },
+      {
+        id: 32,
+        path: 'statistics',
+        name: 'Statistics',
+        component: () => import('@/views/statistics/index'),
+        meta: { title: '推送统计', icon: 'form', info: '' }
+      }
+    ]
+  }
 
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({

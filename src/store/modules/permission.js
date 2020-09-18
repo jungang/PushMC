@@ -56,7 +56,33 @@ const actions = {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
       commit('SET_ROUTES', accessedRoutes)
+      // console.log(accessedRoutes)
       resolve(accessedRoutes)
+    })
+  },
+
+  generateAsyncRouter: function({ commit }, arg) {
+    const { roleTypes } = arg
+    return new Promise(resolve => {
+      const accessedRoutes = asyncRoutes
+
+      accessedRoutes.forEach(topMenu => {
+        const status = roleTypes.find(userPms => userPms.id === topMenu.id)
+        if (!status) {
+          topMenu.children = topMenu.children.filter(subMenu => {
+            return roleTypes.find(userPms => userPms.id === subMenu.id)
+          })
+        }
+      })
+      const _accessedRoutes = accessedRoutes.filter(item => {
+        // console.log(item)
+        // console.log(item.children.length)
+        return item.children.length > 0
+      })
+
+      commit('SET_ROUTES', _accessedRoutes)
+      // console.log(accessedRoutes)
+      resolve(_accessedRoutes)
     })
   }
 }

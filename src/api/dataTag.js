@@ -9,9 +9,12 @@ export function fetchList(query) {
 }
 
 export function saveTag(data) {
+  console.log('saveTag...')
+  console.log(data)
   return request({
-    url: '/data-tag/save-tag',
-    method: 'post',
-    params: { data: data }
+    // url: '/data-tag/save-tag',
+    url: '/resource/update',
+    method: 'put',
+    data: data
   })
 }

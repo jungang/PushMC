@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AutoResponder LastSave="2020-02-17T09:14:51.2271597+08:00" FiddlerVersion="5.0.20194.41348">
+  <State Enabled="true" Fallthrough="true" UseLatency="false">
+    <ResponseRule Match="http://192.168.31.210:8080/dev-api/user/info" Action="C:\Users\songj\WebstormProjects\PushMC\mock\rap2\user\login.json" Latency="26" Enabled="true" />
+    <ResponseRule Match="http://192.168.31.210:8080/dev-api/user/permission" Action="C:\Users\songj\WebstormProjects\PushMC\mock\rap2\user\login.json" Latency="25" Enabled="true" />
+    <ResponseRule Match="http://192.168.31.210:8080/dev-api/common/options" Action="C:\Users\songj\WebstormProjects\PushMC\mock\rap2\user\login.json" Latency="25" Enabled="true" />
+    <ResponseRule Match="METHOD:POST EXACT:http://192.168.31.210:8080/dev-api/user/login" Action="C:\Users\songj\WebstormProjects\PushMC\mock\rap2\user\login.json" Enabled="true" />
+  </State>
+</AutoResponder>

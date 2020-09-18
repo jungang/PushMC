@@ -3,7 +3,8 @@
     <logo v-if="showLogo" :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
-        :default-active="activeMenu"
+        :default-active="'/dashboard'"
+        :default-openeds="['/manage','/content','/permission']"
         :collapse="isCollapse"
         :background-color="variables.menuBg"
         :text-color="variables.menuText"
@@ -31,6 +32,9 @@ export default {
       'permission_routes',
       'sidebar'
     ]),
+    MODEL: function() {
+      return this.$store.state.publicData.model
+    },
     activeMenu() {
       const route = this.$route
       const { meta, path } = route

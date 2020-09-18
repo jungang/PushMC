@@ -1,0 +1,37 @@
+{
+  "data": {
+    "items": [
+      {
+        "type": "sms",
+        "label": "短信",
+        "id": 1
+      },
+      {
+        "type": "goCom",
+        "label": "goCom",
+        "id": 2
+      },
+      {
+        "type": "business",
+        "label": "business",
+        "id": 3
+      },
+      {
+        "type": "wx",
+        "label": "微信",
+        "id": 4
+      },
+      {
+        "type": "openApi",
+        "label": "openApi",
+        "id": 5
+      },
+      {
+        "type": "smartCall",
+        "label": "智能客服",
+        "id": 6
+      }
+    ]
+  },
+  "code": 20000
+}

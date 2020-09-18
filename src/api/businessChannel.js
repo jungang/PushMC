@@ -15,27 +15,34 @@ export function fetchTables(query) {
     params: query
   })
 }
+export function fetchDataItem(query) {
+  return request({
+    url: '/business-channel/data-item',
+    method: 'get',
+    params: { data: JSON.stringify(query) }
+  })
+}
 export function searchList(keyWord) {
   return request({
     url: '/business-channel/list',
     method: 'get',
-    params: { word: keyWord }
+    params: { searchKey: keyWord }
   })
 }
 
-export function dele(id, status) {
+export function dele(data) {
   return request({
     url: '/business-channel/delete',
-    method: 'post',
-    params: { id, status }
+    method: 'delete',
+    params: data
   })
 }
 
-export function fetchSource(id) {
+export function channelDetail(data) {
   return request({
     url: '/business-channel/detail',
     method: 'get',
-    params: { id }
+    params: data
   })
 }
 
@@ -47,18 +54,26 @@ export function fetchPv(pv) {
   })
 }
 
-export function createSource(data) {
+export function createBusinessChannel(data) {
   return request({
-    url: '/business-channel/create',
+    url: '/business-channel/channel/create',
     method: 'post',
-    data: { data: data }
+    data: data
   })
 }
 
-export function updateSource(data) {
+export function update(data) {
   return request({
-    url: '/business-channel/update',
+    url: '/business-channel/channel/update',
     method: 'post',
-    data: { data: data }
+    data: data
+  })
+}
+
+export function subscribe(data) {
+  return request({
+    url: '/business-channel/book',
+    method: 'put',
+    data: data
   })
 }

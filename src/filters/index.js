@@ -1,3 +1,5 @@
+import store from '../store'
+
 // import parseTime, formatTime and set to filter
 export { parseTime, formatTime } from '@/utils'
 
@@ -65,4 +67,40 @@ export function toThousandFilter(num) {
  */
 export function uppercaseFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export function dataSourceTypeOptions(str) {
+  return store.state.publicData.model.dataSourceTypeOptions.find((item) => item.key === str).label
+}
+export function tags(str) {
+  if (store.state.publicData.model.tags.length <= 0) return false
+  return store.state.publicData.model.tags.find((item) => item.key === str).label
+}
+
+export function tagCategory(str) {
+  if (store.state.publicData.model.tagCategory.length <= 0) return false
+  return store.state.publicData.model.tagCategory.find((item) => item.key === str).label
+}
+
+export function contentTag(str) {
+  if (store.state.publicData.model.contentTag.length <= 0) return false
+  return store.state.publicData.model.contentTag.find((item) => item.key === str).label
+}
+export function businessSource(str) {
+  return store.state.publicData.model.businessSource.find((item) => item.key === str).label
+}
+
+export function examineStatus(str) {
+  if (store.state.publicData.model.examineStatus.length <= 0) return false
+  return store.state.publicData.model.examineStatus.find((item) => item.key === str).label
+}
+
+export function channelType(str) {
+  if (store.state.publicData.model.channelType.length <= 0) return false
+  return store.state.publicData.model.channelType.find((item) => item.key === str).label
+}
+
+export function templateOrigin(str) {
+  if (store.state.publicData.model.templateOrigin.length <= 0) return false
+  return store.state.publicData.model.templateOrigin.find((item) => item.key === str).label
 }
